@@ -47,7 +47,21 @@ van een losse Task-vorm).
   fixture-constanten (buffer-inleg, "overig huishouden") als instelbare
   parameters zijn gemodelleerd in plaats van hardgecodeerd.
 
-### Nog open (buiten de 19-schermen scope van dit handoff)
+## Responsive (mobiel)
+
+Breakpoint op **1100px** (zie design-handoff README, "Responsive"): sidebar +
+twee kolommen erboven, single column met een floating bottom-tab-bar
+(`AppMobileTabBar.vue`, 6 tabs — dezelfde als de sidebar's primaire nav)
+eronder. Elk scherm met een twee-koloms CSS-grid heeft een media query die
+'m naar één kolom klapt. Geverifieerd met Playwright op 390×844 (iPhone-
+achtige viewport) over Nu, Potjes, Potje-detail, Nakijken, Te doen, Vooruit
+en Inkomen — geen horizontale overflow, tab bar blijft correct boven de
+content zonder iets te verbergen bij scroll-bottom.
+
+De MT940-import (in de sidebar's secundaire nav, niet in de tab bar) is
+op mobiel bereikbaar via een link onderaan het Nu-scherm.
+
+## Nog open (buiten de 19-schermen scope van dit handoff)
 
 - Automatische maand-rollover (envelope carry-over toepassen bij "nieuwe
   maand") — nu alleen handmatig via het "Meegenomen"-veld op Potje-detail.

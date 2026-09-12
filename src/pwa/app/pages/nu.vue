@@ -136,6 +136,8 @@ const standLabel = computed(() => monthStand.value.stand[0]!.toUpperCase() + mon
           </NuxtLink>
         </template>
       </div>
+
+      <NuxtLink to="/importeren" class="import-link">MT940 importeren ›</NuxtLink>
     </div>
   </div>
 </template>
@@ -145,6 +147,12 @@ const standLabel = computed(() => monthStand.value.stand[0]!.toUpperCase() + mon
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   gap: 24px;
+}
+
+@media (max-width: 1100px) {
+  .nu-screen {
+    grid-template-columns: 1fr;
+  }
 }
 
 .left-column,
@@ -346,5 +354,15 @@ const standLabel = computed(() => monthStand.value.stand[0]!.toUpperCase() + mon
 
 .review-button:hover {
   background: var(--ink-deep);
+}
+
+/* Reaches importeren without the sidebar's secondary nav — needed on mobile,
+   harmless (if slightly redundant) on desktop. */
+.import-link {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-accent);
+  text-decoration: none;
+  padding: 4px;
 }
 </style>

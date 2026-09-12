@@ -246,6 +246,12 @@ async function undoLastBulk() {
   max-width: 960px;
 }
 
+@media (max-width: 1100px) {
+  .nakijken-screen {
+    grid-template-columns: 1fr;
+  }
+}
+
 .left-column,
 .right-column {
   display: flex;

@@ -167,6 +167,12 @@ function toggleCollapsed(group: TaskGroup) {
   max-width: 980px;
 }
 
+@media (max-width: 1100px) {
+  .te-doen-screen {
+    grid-template-columns: 1fr;
+  }
+}
+
 .left-column {
   display: flex;
   flex-direction: column;
