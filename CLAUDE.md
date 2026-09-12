@@ -44,9 +44,11 @@ Zie `docs/architecture/architectuurplaat.html` voor het volledige systeemdiagram
 
 Managed-first documentatiestructuur, zelf hosten is de geavanceerde route (zie `docs/hosting/`):
 1. **STACKIT** — aanbevolen, data uitsluitend in Duitsland/Oostenrijk (EU-soeverein).
-2. **Azure** — Container Apps + Blob Storage.
+2. **Azure** — Container Apps + Blob Storage (voor relay/mcp-server, indien zelf gehost).
 3. **AWS** — App Runner + S3.
 4. **Zelf hosten** — Docker Compose, expliciet gelabeld als "gevorderd".
+
+**Live PWA-deployment:** de PWA zelf (`src/pwa/`) draait als statische SPA op **Azure Static Web Apps**, automatisch gedeployed vanuit `main` via `.github/workflows/azure-static-web-apps-black-rock-05e7e8f03.yml`. Dit is los van de hosting-opties hierboven (die gaan over relay/mcp-server bij zelf hosten) — de PWA heeft immers geen server nodig en kan overal statisch staan.
 
 ## Licentie
 
@@ -90,4 +92,9 @@ src/mcp-server/ .NET 10 MCP server
 
 ### Huidige projectfase
 
-Het project is greenfield: er is nog geen OTAP-scheiding (geen aparte omgevingen/branches per stage). Zolang dat zo is, wordt er direct op `main` gewerkt en gepusht — geen feature branches of PR's nodig. Zodra er een eerste werkende versie staat en/of meerdere mensen meewerken, herzien we dit.
+**Trunk-based development (sinds 2026-09-12).** `main` deployt automatisch naar Azure Static Web Apps (`.github/workflows/azure-static-web-apps-black-rock-05e7e8f03.yml`) — directe pushes op `main` zijn daarom niet meer gepast, dat was alleen zolang er geen echte pipeline aan hing. Nieuwe werkwijze:
+- Elke wijziging via een kortlevende feature branch → PR naar `main`.
+- Claude merget zelf bij twijfel-loze, veilige wijzigingen (bugfixes, kleine features, tests). Bij twijfel — of bij iets risicovols zoals schema-migraties, CI/CD-pipelineconfiguratie of nieuwe dependencies — eerst expliciet aan de gebruiker vragen vóór het mergen.
+- Geen lang-levende branches: snel mergen, klein houden. Dat is het "trunk-based" deel — `main` blijft altijd deploybaar.
+
+(Voorheen, tijdens de allereerste opzet zonder pipeline, werd er nog direct op `main` gepusht — dat gold alleen voor die periode.)
