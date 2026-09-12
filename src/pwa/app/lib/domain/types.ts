@@ -106,6 +106,28 @@ export interface Goal {
   targetDate: Iso8601Date | null
   monthlyDepositCents: number
   pauseWhenIncomeLow: boolean
+  /** Free text, e.g. "Spaarrekening · NL··8842" — where the money physically sits. */
+  accountLabel: string
+  /** Day of the month the automatic transfer happens, e.g. 26. */
+  transferDay: number
+}
+
+/** Singleton settings record (id is always 'buffer') — the emergency buffer, priority 1 in Vooruit. */
+export interface Buffer {
+  id: 'buffer'
+  savedCents: number
+  monthlyContributionCents: number
+}
+
+/**
+ * Singleton settings record (id is always 'investing') — priority 3 in Vooruit.
+ * currentValueCents is informational only: Ruim budgets on deposits, never market value.
+ */
+export interface Investing {
+  id: 'investing'
+  depositsSinceCents: number
+  monthlyDepositCents: number
+  currentValueCents: number
 }
 
 export type TaskGroup = 'overboeken' | 'regelen'

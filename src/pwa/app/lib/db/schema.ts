@@ -1,10 +1,12 @@
 import type { DBSchema } from 'idb'
 import type {
   Account,
+  Buffer,
   FixedCost,
   Goal,
   Household,
   IncomeSource,
+  Investing,
   Label,
   Rule,
   Subscription,
@@ -14,7 +16,7 @@ import type {
 import type { Envelope } from '../domain/types'
 
 export const DB_NAME = 'ruim'
-export const DB_VERSION = 1
+export const DB_VERSION = 2
 
 export interface RuimDB extends DBSchema {
   accounts: {
@@ -68,5 +70,13 @@ export interface RuimDB extends DBSchema {
   household: {
     key: string
     value: Household
+  }
+  buffer: {
+    key: string
+    value: Buffer
+  }
+  investing: {
+    key: string
+    value: Investing
   }
 }

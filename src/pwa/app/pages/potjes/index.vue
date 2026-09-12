@@ -6,6 +6,9 @@ import type { Account, Envelope, RolloverPolicy } from '../../lib/domain/types'
 import { createEnvelope, listEnvelopes, removeEnvelope } from '../../lib/db/envelopes'
 import { getDb } from '../../lib/db/client'
 import { formatEuros } from '../../lib/domain/format'
+import { getBuffer } from '../../lib/db/buffer'
+import { getInvesting } from '../../lib/db/investing'
+import { listGoals } from '../../lib/db/goals'
 
 useScreenHeader().set('Potjes', 'Je maandelijkse envelopes: budget, besteed en wat nog rest.')
 
@@ -13,6 +16,7 @@ const envelopes = ref<Envelope[]>([])
 const accounts = ref<Account[]>([])
 const spentByEnvelope = ref<Record<string, number>>({})
 const showCreateForm = ref(false)
+const netWorthCents = ref(0)
 
 const newName = ref('')
 const newBudget = ref('')
@@ -20,9 +24,19 @@ const newAccountId = ref('')
 const newRollover = ref<RolloverPolicy>('carry-over')
 
 async function load() {
-  const [db, allEnvelopes, allAccounts] = await Promise.all([getDb(), listEnvelopes(), listAccounts()])
+  const [db, allEnvelopes, allAccounts, buffer, investing, goals] = await Promise.all([
+    getDb(),
+    listEnvelopes(),
+    listAccounts(),
+    getBuffer(),
+    getInvesting(),
+    listGoals(),
+  ])
   const transactions = await db.getAll('transactions')
   const month = currentMonthKey()
+
+  netWorthCents.value =
+    buffer.savedCents + investing.currentValueCents + goals.reduce((sum, g) => sum + g.savedCents, 0)
 
   envelopes.value = allEnvelopes
   accounts.value = allAccounts
@@ -109,13 +123,13 @@ async function deleteEnvelope(id: string) {
         </div>
       </NuxtLink>
 
-      <div class="card card--vooruit">
+      <NuxtLink to="/vooruit" class="card card--vooruit">
         <div class="card-title-group">
           <div class="card-name">Vooruit</div>
-          <div class="card-remaining">{{ formatEuros(0) }}</div>
+          <div class="card-remaining">{{ formatEuros(netWorthCents) }}</div>
         </div>
-        <p class="card-note">Buffer, doelen en beleggen volgen in een latere bouwstap.</p>
-      </div>
+        <p class="card-note">Buffer, doelen en beleggen samen.</p>
+      </NuxtLink>
     </div>
 
     <div class="legend-card">
