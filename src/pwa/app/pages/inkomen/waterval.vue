@@ -4,7 +4,9 @@ import { formatEuros } from '../../lib/domain/format'
 import { loadWaterfall } from '../../composables/useWaterfall'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Waterval', 'De volgorde waarin je basisinkomen wordt verdeeld.')
+useScreenHeader().set('Waterval', 'De volgorde waarin je basisinkomen wordt verdeeld.', {
+  back: { to: '/inkomen', label: 'Inkomen' },
+})
 
 const result = ref<WaterfallResult | null>(null)
 

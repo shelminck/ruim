@@ -105,7 +105,7 @@ async function submitCreateGoal() {
     </div>
 
     <div class="priority-item">
-      <div class="priority-number priority-number--accent">2</div>
+      <div class="priority-number">2</div>
       <div class="priority-body">
         <h2 class="priority-title">Doelen</h2>
 
@@ -176,10 +176,6 @@ async function submitCreateGoal() {
   justify-content: center;
 }
 
-.priority-number--accent {
-  background: var(--color-accent);
-}
-
 .priority-body {
   flex: 1;
   display: flex;
@@ -223,12 +219,31 @@ async function submitCreateGoal() {
   margin-top: 6px;
 }
 
+@media (max-width: 1100px) {
+  .inline-form {
+    flex-wrap: wrap;
+  }
+
+  .field {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+
+  .primary-button {
+    flex: none;
+  }
+}
+
 .field {
   display: flex;
   flex-direction: column;
   gap: 4px;
   font-size: 11.5px;
   color: var(--color-neutral-700);
+}
+
+.field .input {
+  width: 100%;
 }
 
 .input {

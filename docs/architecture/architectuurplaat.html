@@ -203,7 +203,7 @@
   <div class="titleblock">
     <div class="eyebrow-row">
       <span>SHEET A1 — SYSTEEMOVERZICHT</span>
-      <span>REV 1.0 — CONCEPT</span>
+      <span>REV 1.2</span>
     </div>
     <h1>Architectuurplaat</h1>
     <p class="subtitle">Huishoudboekje met potjes, automatische categorisatie en optionele gezinssync — lokaal-eerst, met MCP-uitbreiding voor AI-verwerking.</p>
@@ -270,7 +270,7 @@
         <g>
           <rect x="180" y="404" width="220" height="56" fill="rgba(127,224,196,0.08)" stroke="#7FE0C4" stroke-width="1"/>
           <text x="290" y="426" text-anchor="middle" fill="#7FE0C4" class="node-title">.NET 10 sync-relay</text>
-          <text x="290" y="444" text-anchor="middle" fill="#7FE0C4" class="node-sub" opacity="0.8">Cloud of zelf gehost</text>
+          <text x="290" y="444" text-anchor="middle" fill="#7FE0C4" class="node-sub" opacity="0.8">Geschaald (ADR 0004) — cloud of zelf gehost</text>
         </g>
         <g>
           <rect x="440" y="404" width="220" height="56" fill="rgba(127,224,196,0.08)" stroke="#7FE0C4" stroke-width="1"/>
@@ -299,6 +299,7 @@
         <span><span class="swatch" style="background:#F2A386"></span>Externe/opt-in koppeling</span>
       </div>
     </div>
+    <p class="note">De sync-relay is inmiddels geen concept meer maar een werkend scaffold (ASP.NET Core minimal API + SQLite, versioned snapshot-blobs, HKDF-schrijftoken-auth — zie ADR 0004 en `src/relay/`), gemerged op `main`. De MCP-server bestaat nog alleen als plan (README in `src/mcp-server/`, geen implementatie).</p>
   </section>
 
   <section>
@@ -405,9 +406,39 @@
     </ul>
   </section>
 
+  <section>
+    <div class="section-label"><span>10 — SCHERMSTATUS</span><span>PWA · 19 SCHERMEN</span></div>
+    <h2>De totaalplaat: wat staat er al, wat nog niet</h2>
+    <p class="lede">Tegen de design-handoff aangelegd (<code>docs/design/design_handoff_huishoudboekje_ruim/</code>, desktop- én mobiele prototype). Bijgewerkt na de mobiele header/back-link-fix en de 6 desktop-gaten uit REV 1.1 — alle 19 routes zijn op 390×844 met Playwright doorlopen (geen horizontale overflow, terugkoppeling precies op de 13 subschermen die dat horen te hebben).</p>
+    <table class="htable">
+      <tr><th>#</th><th>Scherm</th><th>Desktop</th><th>Mobiel</th><th>Notitie</th></tr>
+      <tr><td>01</td><td>Nu</td><td class="rec">✓</td><td class="rec">✓</td><td>Coach-kaart en meevaller-kaart toegevoegd (desktop én mobiel). Mobiel heeft nu een eigen kop ("Goeiemorgen, Sanne" + avatarpaar) i.p.v. de gedeelde pil-header.</td></tr>
+      <tr><td>02</td><td>Alles</td><td class="rec">✓</td><td class="rec">✓</td><td>Tabblad, geen terug-link nodig.</td></tr>
+      <tr><td>03</td><td>Nakijken</td><td class="rec">✓</td><td class="rec">✓</td><td>Tabblad; actieknoppenrij geverifieerd op 390px, geen overflow.</td></tr>
+      <tr><td>04</td><td>Te doen</td><td class="rec">✓</td><td class="rec">✓</td><td>"Nieuwe maand · lijst terugzetten"-knop toegevoegd (wist alleen dit-maands afgevinkt/verborgen-status, regels blijven staan). Tabblad, geverifieerd op 390px.</td></tr>
+      <tr><td>05</td><td>Potjes (overzicht)</td><td class="rec">✓</td><td class="rec">✓</td><td>Legenda-merkteken 26px → 34px. Tabblad.</td></tr>
+      <tr><td>06</td><td>Potje detail</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Potjes.</td></tr>
+      <tr><td>07</td><td>Vaste lasten</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Nu; groepsregel geverifieerd op 390px.</td></tr>
+      <tr><td>08</td><td>Abonnementen</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Vaste lasten.</td></tr>
+      <tr><td>09</td><td>Labels (overzicht)</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Nu.</td></tr>
+      <tr><td>10</td><td>Label detail</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Labels; vaste 120px-labelkolom geverifieerd, geen overflow op 390px.</td></tr>
+      <tr><td>11</td><td>Scenario "Wegdenken"</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → het specifieke label (dynamisch, niet de generieke "Label"-tekst).</td></tr>
+      <tr><td>12</td><td>MT940 importeren</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Nu.</td></tr>
+      <tr><td>13</td><td>Inkomen</td><td>gedeeltelijk</td><td class="rec">✓</td><td>Terug-link → Nu, geverifieerd. Desktop: 12-maandenstaafdiagram toont bewust alleen de huidige maand echt (datalimiet — nog geen meerdere maanden data — geen bug, blijft buiten scope).</td></tr>
+      <tr><td>14</td><td>Meevaller</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Inkomen.</td></tr>
+      <tr><td>15</td><td>Minder</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Inkomen, geverifieerd op 390px.</td></tr>
+      <tr><td>16</td><td>Waterval</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Inkomen; stap-inspringing geverifieerd, geen overflow op 390px.</td></tr>
+      <tr><td>17</td><td>Vooruit</td><td class="rec">✓</td><td class="rec">✓</td><td>Stap 2 ("Doelen") cirkel accent → navy. Inline formuliertje (buffersaldo/inleg) stapelde niet en overflowde op 390px (483px breed in een 390px-viewport) — nu <code>flex-wrap</code> onder 1100px, geverifieerd gefixt. Tabblad, geen terug-link.</td></tr>
+      <tr><td>18</td><td>Doel detail</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Vooruit, geverifieerd op 390px.</td></tr>
+      <tr><td>19</td><td>Beleggen</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Vooruit, geverifieerd op 390px.</td></tr>
+    </table>
+    <p class="note">Systeembreed: <code>AppHeader.vue</code> heeft nu alle 3 gespecificeerde pillen (maand, "Vandaag € X", nakijken-badge) en toont ze alleen ≥1100px; onder 1100px verschijnt in plaats daarvan op de 13 subschermen een "‹ Vorige"-terugkoppeling, en op Nu een eigen mobiele kop. <code>useScreenHeader().set(title, subtitle, { back, hideOnMobile })</code> is de aansluiting per pagina.</p>
+    <p class="note">Bouwval onderweg gevonden en gefixt: bij twee nieuwe mobile-only <code>display</code>-regels (in <code>AppHeader.vue</code> en <code>nu.vue</code>) stond de onvoorwaardelijke basisregel ná de <code>@media</code>-override in bronvolgorde, waardoor de override bij gelijke specificiteit altijd verloor — de elementen die op mobiel juist moesten verschijnen/verdwijnen deden dat niet. Opgelost door de <code>@media</code>-blokken consequent als laatste in het stylesheet te zetten.</p>
+  </section>
+
   <footer>
     <span>Huishoudboekje — architectuurplaat</span>
-    <span>Sheet A1 · Rev 1.0 · Concept</span>
+    <span>Sheet A1 · Rev 1.2</span>
   </footer>
 
 </div>

@@ -6,7 +6,9 @@ import { createSubscription, listSubscriptions, toggleSubscriptionCancelled } fr
 import { useSidebarValues } from '../composables/useSidebarValues'
 import { useTeDoenCount } from '../composables/useTeDoenCount'
 
-useScreenHeader().set('Abonnementen', 'Actieve en opgezegde abonnementen.')
+useScreenHeader().set('Abonnementen', 'Actieve en opgezegde abonnementen.', {
+  back: { to: '/vaste-lasten', label: 'Vaste lasten' },
+})
 
 const { refresh: refreshSidebarValues } = useSidebarValues()
 const { refresh: refreshTeDoenCount } = useTeDoenCount()

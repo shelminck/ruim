@@ -9,7 +9,9 @@ import { getMonthlyAdjustment, saveMonthlyAdjustment } from '../../lib/db/monthl
 import { getWindfallPolicy, saveWindfallPolicy } from '../../lib/db/windfall-policy'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Meevaller verdelen', 'Verdeel een meevaller over buffer, beleggen en vrij te besteden.')
+useScreenHeader().set('Meevaller verdelen', 'Verdeel een meevaller over buffer, beleggen en vrij te besteden.', {
+  back: { to: '/inkomen', label: 'Inkomen' },
+})
 
 const router = useRouter()
 

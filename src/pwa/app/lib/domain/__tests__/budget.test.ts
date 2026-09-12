@@ -3,6 +3,7 @@ import {
   aggregateProgress,
   effectiveBudgetCents,
   envelopeProgress,
+  spentCentsForDay,
   spentCentsForEnvelope,
   standForRatio,
 } from '../budget'
@@ -39,6 +40,23 @@ describe('spentCentsForEnvelope', () => {
 
   it('returns 0 when nothing matches', () => {
     expect(spentCentsForEnvelope(transactions, 'kleding', '2026-09')).toBe(0)
+  })
+})
+
+describe('spentCentsForDay', () => {
+  const transactions = [
+    { bookedAt: '2026-09-12', amountCents: -2500 },
+    { bookedAt: '2026-09-12', amountCents: -1800 },
+    { bookedAt: '2026-09-11', amountCents: -9999 }, // wrong day
+    { bookedAt: '2026-09-12', amountCents: 5000 }, // income, not spend
+  ]
+
+  it('sums only outgoing transactions booked on the given day', () => {
+    expect(spentCentsForDay(transactions, '2026-09-12')).toBe(4300)
+  })
+
+  it('returns 0 when nothing matches', () => {
+    expect(spentCentsForDay(transactions, '2026-01-01')).toBe(0)
   })
 })
 

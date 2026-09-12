@@ -24,6 +24,16 @@ export function spentCentsForEnvelope(
     .reduce((sum, t) => sum + -t.amountCents, 0)
 }
 
+/** Money spent (positive cents) across all transactions booked on a given day — the header's "Vandaag" pill. */
+export function spentCentsForDay(
+  transactions: Pick<Transaction, 'bookedAt' | 'amountCents'>[],
+  day: string,
+): number {
+  return transactions
+    .filter((t) => t.bookedAt.startsWith(day) && t.amountCents < 0)
+    .reduce((sum, t) => sum + -t.amountCents, 0)
+}
+
 export function effectiveBudgetCents(envelope: Pick<Envelope, 'budgetCents' | 'carriedOverCents'>): number {
   return envelope.budgetCents + envelope.carriedOverCents
 }

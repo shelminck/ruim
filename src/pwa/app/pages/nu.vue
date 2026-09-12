@@ -2,22 +2,43 @@
 import { computed, onMounted, ref } from 'vue'
 import { getDb } from '../lib/db/client'
 import { listEnvelopes } from '../lib/db/envelopes'
-import { aggregateProgress, currentMonthKey, envelopeProgress, spentCentsForEnvelope } from '../lib/domain/budget'
+import { getBuffer, saveBuffer } from '../lib/db/buffer'
+import { listIncomeSources } from '../lib/db/income-sources'
+import { aggregateProgress, currentMonthKey, envelopeProgress, spentCentsForDay, spentCentsForEnvelope } from '../lib/domain/budget'
 import { formatEuros } from '../lib/domain/format'
 import { loadWaterfall } from '../composables/useWaterfall'
+import { useNakijkenCount } from '../composables/useNakijkenCount'
 import type { Envelope, Transaction } from '../lib/domain/types'
 import type { WaterfallResult } from '../lib/domain/waterfall'
 
-useScreenHeader().set('Nu', 'Het overzicht: wat je nog kunt uitgeven, je potjes en wat er nog moet gebeuren.')
+useScreenHeader().set('Nu', 'Het overzicht: wat je nog kunt uitgeven, je potjes en wat er nog moet gebeuren.', {
+  hideOnMobile: true,
+})
+
+const { count: nakijkenCount, refresh: refreshNakijkenCount } = useNakijkenCount()
 
 const waterfall = ref<WaterfallResult | null>(null)
 const envelopes = ref<Envelope[]>([])
 const spentByEnvelope = ref<Record<string, number>>({})
 const labelCount = ref(0)
 const reviewQueue = ref<Transaction[]>([])
+const todayCents = ref(0)
+const meevallerCents = ref(0)
+
+// Session-only nudge: the design's coach card claims a fabricated "3 weeks
+// ahead of pace" streak we have no data to back up (no streak-tracking
+// feature exists). We show the same interaction — move a suggested amount
+// to the buffer, or dismiss — without inventing a precision we don't have.
+const COACH_SUGGESTION_CENTS = 4000
+const coachDismissed = ref(false)
 
 async function load() {
-  const [wf, allEnvelopes, db] = await Promise.all([loadWaterfall(), listEnvelopes(), getDb()])
+  const [wf, allEnvelopes, db, incomeSources] = await Promise.all([
+    loadWaterfall(),
+    listEnvelopes(),
+    getDb(),
+    listIncomeSources(),
+  ])
   const [transactions, labels] = await Promise.all([db.getAll('transactions'), db.getAll('labels')])
   const month = currentMonthKey()
 
@@ -28,9 +49,26 @@ async function load() {
   )
   labelCount.value = labels.length
   reviewQueue.value = transactions.filter((t) => t.envelopeId === null)
+  todayCents.value = spentCentsForDay(transactions, new Date().toISOString().slice(0, 10))
+
+  const binnen = incomeSources.reduce((sum, s) => sum + s.amountCents, 0)
+  const basis = incomeSources.filter((s) => s.countsTowardBase).reduce((sum, s) => sum + s.amountCents, 0)
+  meevallerCents.value = Math.max(0, binnen - basis)
+
+  await refreshNakijkenCount()
 }
 
 onMounted(load)
+
+async function coachDoen() {
+  const buffer = await getBuffer()
+  await saveBuffer({ ...buffer, savedCents: buffer.savedCents + COACH_SUGGESTION_CENTS })
+  coachDismissed.value = true
+}
+
+function coachWeg() {
+  coachDismissed.value = true
+}
 
 const progressList = computed(() =>
   envelopes.value.map((envelope) => ({
@@ -59,11 +97,33 @@ const standExplanation: Record<string, string> = {
 }
 
 const standLabel = computed(() => monthStand.value.stand[0]!.toUpperCase() + monthStand.value.stand.slice(1))
+const showCoach = computed(
+  () => !coachDismissed.value && monthStand.value.stand === 'ruim' && (waterfall.value?.vrij ?? 0) > 0,
+)
+
+const greetingDateLabel = computed(() => {
+  const now = new Date()
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  const daysLeft = lastDay.getDate() - now.getDate() + 1
+  const monthLabel = new Intl.DateTimeFormat('nl-NL', { month: 'long' }).format(now)
+  return `${monthLabel} · nog ${daysLeft} ${daysLeft === 1 ? 'dag' : 'dagen'}`
+})
 </script>
 
 <template>
   <div class="nu-screen">
     <div class="left-column">
+      <div class="mobile-greeting">
+        <div>
+          <div class="greeting-title">Goeiemorgen, Sanne</div>
+          <div class="greeting-sub">{{ greetingDateLabel }}</div>
+        </div>
+        <div class="avatars">
+          <span class="avatar avatar--one" />
+          <span class="avatar avatar--two" />
+        </div>
+      </div>
+
       <div class="hero">
         <div class="hero-top">
           <Merkteken :stand="monthStand.stand" :size="88" surface="bg" hero-ring />
@@ -79,6 +139,30 @@ const standLabel = computed(() => monthStand.value.stand[0]!.toUpperCase() + mon
           <NuxtLink to="/inkomen/waterval" class="ghost-pill">Waar komt dit vandaan ›</NuxtLink>
         </div>
       </div>
+
+      <div v-if="showCoach" class="coach-card">
+        <p class="coach-text">Je zit deze maand ruim onder budget. Zal ik {{ formatEuros(COACH_SUGGESTION_CENTS) }} naar je buffer schuiven?</p>
+        <div class="coach-actions">
+          <button type="button" class="coach-button coach-button--fill" @click="coachDoen">Doen</button>
+          <button type="button" class="coach-button coach-button--outline" @click="coachWeg">Liever niet</button>
+        </div>
+      </div>
+
+      <div class="mobile-pills">
+        <span class="mobile-pill">Vandaag {{ formatEuros(todayCents) }}</span>
+        <NuxtLink v-if="nakijkenCount > 0" to="/nakijken" class="mobile-pill mobile-pill--accent">
+          {{ nakijkenCount }} nakijken
+        </NuxtLink>
+      </div>
+
+      <NuxtLink v-if="meevallerCents > 0" to="/inkomen/meevaller" class="meevaller-card">
+        <span>
+          {{ formatEuros(meevallerCents) }} meevaller
+          <br />
+          <span class="meevaller-sub">boven je basis · nog niet verdeeld</span>
+        </span>
+        <span>›</span>
+      </NuxtLink>
 
       <div class="stat-grid">
         <NuxtLink to="/vaste-lasten" class="stat-card">
@@ -160,6 +244,141 @@ const standLabel = computed(() => monthStand.value.stand[0]!.toUpperCase() + mon
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+/* Mobile-only header replacement: the shared AppHeader hides its title on
+   this screen (hideOnMobile), so nu.vue supplies its own greeting instead
+   — see design handoff README, mobile prototype's "Nu" screen. */
+.mobile-greeting {
+  display: none;
+}
+
+.greeting-title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  color: var(--color-text);
+}
+
+.greeting-sub {
+  font-size: 12.5px;
+  color: var(--color-neutral-700);
+  margin-top: 2px;
+}
+
+.avatars {
+  display: flex;
+  flex: none;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-text);
+}
+
+.avatar--one {
+  background: var(--color-accent-300);
+}
+
+.avatar--two {
+  background: var(--color-neutral-300);
+  margin-left: -9px;
+}
+
+.coach-card {
+  background: var(--soft);
+  border-radius: var(--radius-panel-lg);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.coach-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: var(--ink-deep);
+}
+
+.coach-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.coach-button {
+  flex: 1;
+  border-radius: 999px;
+  padding: 12px;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+}
+
+.coach-button--fill {
+  background: var(--ink);
+  color: #fff;
+}
+
+.coach-button--fill:hover {
+  background: var(--ink-deep);
+}
+
+.coach-button--outline {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+  color: var(--ink-deep);
+}
+
+.mobile-pills {
+  display: none;
+}
+
+.mobile-pill {
+  flex: 1;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-neutral-300);
+  padding: 10px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--color-neutral-800);
+  text-decoration: none;
+}
+
+.mobile-pill--accent {
+  border-color: var(--color-accent);
+  background: var(--color-accent-100);
+  color: var(--color-accent-700);
+}
+
+.mobile-pill--accent:hover {
+  background: var(--color-accent-200);
+}
+
+.meevaller-card {
+  border-radius: var(--radius-row);
+  border: 1.5px solid var(--ink);
+  background: var(--soft);
+  padding: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--ink-deep);
+  font-size: 12.5px;
+}
+
+.meevaller-card:hover {
+  background: var(--soft-pressed);
+}
+
+.meevaller-sub {
+  font-size: 11.5px;
+  color: var(--color-neutral-700);
 }
 
 .hero {
@@ -364,5 +583,21 @@ const standLabel = computed(() => monthStand.value.stand[0]!.toUpperCase() + mon
   color: var(--color-accent);
   text-decoration: none;
   padding: 4px;
+}
+
+/* Placed last so it wins the cascade over the unconditional display:none
+   rules above at equal specificity. */
+@media (max-width: 1100px) {
+  .mobile-greeting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 6px;
+  }
+
+  .mobile-pills {
+    display: flex;
+    gap: 10px;
+  }
 }
 </style>
