@@ -29,8 +29,9 @@ jobs:
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "./src/pwa" # App source code path
-          api_location: ".output/server" # Api source code path - optional
+          api_location: "" # No API — the PWA needs no backend for its core loop (see CLAUDE.md)
           output_location: ".output/public" # Built app content directory - optional
+          app_build_command: "npm run generate" # `nuxt build` (the default) renders index.html at request time via a Node server, which SWA static hosting can't run — `nuxt generate` prerenders real HTML files instead.
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
