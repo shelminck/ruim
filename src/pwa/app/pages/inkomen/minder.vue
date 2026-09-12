@@ -148,6 +148,12 @@ async function deactivate() {
   align-items: start;
 }
 
+@media (max-width: 1100px) {
+  .minder-screen {
+    grid-template-columns: 1fr;
+  }
+}
+
 .left-panel {
   background: var(--soft);
   border-radius: var(--radius-panel-lg);

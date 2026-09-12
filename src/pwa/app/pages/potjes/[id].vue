@@ -145,6 +145,12 @@ async function deleteAndReturn() {
   max-width: 900px;
 }
 
+@media (max-width: 1100px) {
+  .potje-screen {
+    grid-template-columns: 1fr;
+  }
+}
+
 .arithmetic-panel {
   background: var(--soft);
   border-radius: var(--radius-panel-lg);

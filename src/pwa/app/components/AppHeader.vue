@@ -29,7 +29,8 @@ const monthLabel = new Intl.DateTimeFormat('nl-NL', { month: 'long', year: 'nume
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 12px 24px;
   margin-bottom: 26px;
 }
 
@@ -37,6 +38,16 @@ const monthLabel = new Intl.DateTimeFormat('nl-NL', { month: 'long', year: 'nume
   font-size: 32px;
   line-height: 1.1;
   color: var(--color-text);
+}
+
+@media (max-width: 1100px) {
+  .title {
+    font-size: 24px;
+  }
+
+  .pills {
+    flex-wrap: wrap;
+  }
 }
 
 .subtitle {

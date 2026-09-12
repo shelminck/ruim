@@ -128,6 +128,12 @@ async function deleteCost(id: string) {
   align-items: start;
 }
 
+@media (max-width: 1100px) {
+  .vaste-lasten-screen {
+    grid-template-columns: 1fr;
+  }
+}
+
 .summary-panel {
   background: var(--soft);
   border-radius: var(--radius-panel-lg);

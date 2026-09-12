@@ -133,6 +133,12 @@ async function submitCreate() {
   max-width: 960px;
 }
 
+@media (max-width: 1100px) {
+  .inkomen-screen {
+    grid-template-columns: 1fr;
+  }
+}
+
 .left-column {
   display: flex;
   flex-direction: column;
