@@ -54,7 +54,7 @@ Managed-first documentatiestructuur, zelf hosten is de geavanceerde route (zie `
 
 ## Open backlog
 
-- [ ] Aansprakelijkheidsdisclaimer ("gebruik op eigen risico") — README + eerste-gebruik-scherm in de app.
+- [ ] Aansprakelijkheidsdisclaimer ("gebruik op eigen risico") — README + eerste-gebruik-scherm in de app. Moet ook expliciet benoemen dat AI (Claude, via de MCP-server) als assistent kan optreden bij categorisatie/budgetsuggesties — de gebruiker moet zich daarvan bewust zijn, niet aannemen dat elke suggestie puur regelgebaseerd/deterministisch is.
 - [ ] Matching-logica bonnetje ↔ bestaande transactie bij afwijkend bedrag (fooien, afronding, deelbetalingen).
 - [ ] Lokale migratiestrategie voor het datamodel (versienummer + migratiescripts bij nieuwe PWA-versie).
 - [ ] CRDT-conflictresolutie voor gelijktijdige offline wijzigingen op meerdere apparaten.
@@ -86,6 +86,7 @@ src/mcp-server/ .NET 10 MCP server
 - Destructieve DB-acties (schema-migraties, resets van lokale SQLite/IndexedDB) nooit automatisch uitvoeren, ook niet lokaal — altijd expliciete bevestiging.
 - Nieuwe dependencies afstemmen met de gebruiker, vooral bij telemetrie, een afwijkende licentie, of iets dat de "dun & blind" relay-filosofie doorbreekt.
 - Geen secrets/sleutels in logs of repo: het sync-wachtwoord en afgeleide sleutels nooit persisteren buiten de daarvoor bedoelde versleutelde opslag.
+- AI-transparantie: overal waar een suggestie/actie van de AI-assistent (via MCP) een resultaat beïnvloedt — categorisatie, budgetadvies, bonnetje-koppeling — moet voor de gebruiker duidelijk zijn dat dit van AI komt, niet van de deterministische regel-engine. Nooit AI-suggesties tonen alsof het een gewone regel-match is.
 
 ### Huidige projectfase
 
