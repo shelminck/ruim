@@ -2,13 +2,15 @@
 
 Werkdocument voor Claude Code bij het bouwen van **ruim** — een lokaal-eerst huishoudboekje met potjes, automatische categorisatie en optionele versleutelde gezinssync.
 
+**Hoofddoel:** ruim is geen boekhoudprogramma maar een **budgetcoach**. Het doel is niet "alles netjes registreren", maar structureel ruimte vrijmaken om vermogen op te bouwen (buffer, doelen, beleggen — zie Planning/Vooruit). Elke feature wordt hieraan getoetst: helpt dit de gebruiker actief richting meer financiële ruimte, of is het alleen administratie? Een AI-assistent die potjes categoriseert, indeelt en budgetsuggesties doet is expliciet **binnen scope** van dit hoofddoel — zie de MCP-server hieronder.
+
 Dit bestand is de bron van waarheid over *waarom* dingen zo zijn opgezet. Houd het bij zodra een architectuurkeuze verandert — niet alleen code hoeft te kloppen, dit document ook.
 
 ## Kernprincipe
 
 Alles draait primair lokaal, op het apparaat. Er is geen server nodig om de app te gebruiken. Twee losse, optionele uitbreidingen komen daar bovenop:
 1. Versleutelde sync tussen apparaten binnen een gezin (end-to-end encrypted, relay ziet nooit leesbare data).
-2. Een lokale MCP-server waarmee een AI-client (Claude) met de eigen data kan werken, incl. bonnetjes-foto's verwerken.
+2. Een lokale MCP-server waarmee een AI-client (Claude) met de eigen data kan werken: bonnetjes-foto's verwerken, én — conform het hoofddoel — desgevraagd de nakijken-wachtrij categoriseren, potjes/labels indelen en budgetsuggesties doen. Dit blijft een expliciete, door de gebruiker gestarte stap (geen achtergrond-call vanuit de kernflow), zodat de PWA zelf zonder server en zonder netwerkafhankelijkheid blijft werken.
 
 Zie `docs/architecture/architectuurplaat.html` voor het volledige systeemdiagram.
 
@@ -26,10 +28,10 @@ Zie `docs/architecture/architectuurplaat.html` voor het volledige systeemdiagram
 ## Domeinmodules
 
 - **Accounts** — rekeningen, MT940-bestanden handmatig importeren en parsen.
-- **Categorization** — regelgebaseerde matching (tegenrekening, omschrijving, bedrag) met confidence score, zichtbaar als percentage in de uitvallijst. Twee niveaus: Potje + optioneel fijnmaziger Label. Herkent terugkerende transacties en stelt een blijvende regel voor; retroactieve toepassing op oude transacties vereist altijd eerst een preview en expliciete bevestiging (nooit automatisch). Wordt verrijkt door bonnetje-regelitems via MCP.
+- **Categorization** — regelgebaseerde matching (tegenrekening, omschrijving, bedrag) met confidence score, zichtbaar als percentage in de uitvallijst. Twee niveaus: Potje + optioneel fijnmaziger Label. Herkent terugkerende transacties en stelt een blijvende regel voor; retroactieve toepassing op oude transacties vereist altijd eerst een preview en expliciete bevestiging (nooit automatisch). Wordt verrijkt door bonnetje-regelitems via MCP. De regel-engine blijft de bron van waarheid in de PWA zelf (werkt altijd, ook offline); een AI-assistent via MCP is een optionele versneller bovenop dezelfde data, geen vervanging.
 - **Budgeting** — potjes per rekening voor de korte termijn (maandelijkse uitgaven), budgetten per periode, berekend (niet opgeslagen) restbudget.
 - **Review** — uitvallijst voor transacties onder de confidence-drempel, één-klik toewijzing.
-- **Planning (Vooruit)** — middellange termijn: buffer, spaarpotten, beleggen, plus inkomensoverzicht. Losstaand van de korte-termijn potjes in Budgeting. Toegevoegd na v1-ontwerpreview, zie ADR 0003.
+- **Planning (Vooruit)** — middellange termijn: buffer, spaarpotten, beleggen, plus inkomensoverzicht. Losstaand van de korte-termijn potjes in Budgeting. Dit is waar het hoofddoel (vermogen opbouwen) concreet wordt. Toegevoegd na v1-ontwerpreview, zie ADR 0003.
 
 ## Sync & privacy
 
@@ -57,6 +59,7 @@ Managed-first documentatiestructuur, zelf hosten is de geavanceerde route (zie `
 - [ ] Lokale migratiestrategie voor het datamodel (versienummer + migratiescripts bij nieuwe PWA-versie).
 - [ ] CRDT-conflictresolutie voor gelijktijdige offline wijzigingen op meerdere apparaten.
 - [ ] Gezinslid-toewijzing op transacties (zoals in v1-ontwerp): puur informatief, of ook gevolgen voor rechten (wie mag bewerken)? Nog niet bepaald — zie ADR 0003.
+- [ ] MCP-tool(s) voor AI-ondersteunde categorisatie/budgetsuggesties: de nakijken-wachtrij (of onduidelijke potjes-indeling) voorleggen aan Claude en voorgestelde regels/budgetten laten terugschrijven — met dezelfde preview-en-bevestig-eis als retroactieve regels (nooit stilzwijgend toepassen).
 
 ## Mapstructuur
 
