@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="_ds/organic-e892d3d2-3fd5-4ecd-b3f3-b049ff903a9b/styles.css"><script src="_ds/organic-e892d3d2-3fd5-4ecd-b3f3-b049ff903a9b/_ds_bundle.js"></script><style>:root{--ink:#2c3a54;--ink-deep:#1c2536;--soft:#dde2ec;--card:#fffdf9}body{margin:0;background:var(--color-bg)}a{color:var(--ink)}a:hover{color:var(--ink-deep)}*{box-sizing:border-box}::-webkit-scrollbar{width:0}</style></helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:18px;padding:26px 16px 40px;font-family:var(--font-body)">
+  <div style="display:flex;flex-direction:column;gap:4px;text-align:center;max-width:420px">
+    <div style="font-family:var(--font-heading);font-size:22px;color:var(--color-text)">Ruim · prototype</div>
+    <div style="font-size:13px;color:var(--color-neutral-700)">Tik rond: tabbalk onderin, potjes, nakijken, labels en vaste lasten werken echt.</div>
+  </div>
+
+  <div style="width:390px;height:812px;border-radius:44px;background:var(--color-bg);box-shadow:var(--shadow-lg);overflow:hidden;display:flex;flex-direction:column;position:relative">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 24px 4px;font-size:12px;color:var(--color-neutral-700);flex:none"><span>9:41</span><span style="letter-spacing:2px">▮▮▮</span></div>
+
+    <div style="flex:1;overflow:auto;padding:4px 22px 100px;display:flex;flex-direction:column;gap:16px">
+
+      <sc-if value="{{ isNu }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px">
+          <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Goeiemorgen, Sanne</div><div style="font-size:12.5px;color:var(--color-neutral-700)">september · nog 11 dagen</div></div>
+          <div style="display:flex"><span style="width:30px;height:30px;border-radius:999px;background:var(--color-accent-200);border:1.5px solid var(--color-text);display:flex;align-items:center;justify-content:center;font-size:12px">S</span><span style="width:30px;height:30px;border-radius:999px;background:#c9d2e2;border:1.5px solid var(--color-text);display:flex;align-items:center;justify-content:center;font-size:12px;margin-left:-9px">M</span></div>
+        </div>
+        <div style="border-radius:32px;background:var(--ink);padding:26px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:13.5px;color:rgba(255,255,255,.82)">je kunt nog uitgeven</div>
+          <div style="font-family:var(--font-heading);font-size:60px;line-height:.95;color:#fff">{{ vrijLabel }}</div>
+          <div style="font-size:13.5px;color:rgba(255,255,255,.82)">{{ perDagLabel }}</div>
+        </div>
+        <sc-if value="{{ coachOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="border-radius:28px;background:var(--soft);padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:14.5px;line-height:1.45;color:var(--ink-deep)">{{ coachTekst }}</div>
+            <div style="display:flex;gap:10px">
+              <div onClick="{{ coachDoen }}" style="flex:1;border-radius:999px;background:var(--ink);color:#fff;padding:12px;text-align:center;font-family:var(--font-heading);font-size:14px;cursor:pointer" style-hover="background:var(--ink-deep)">Doen</div>
+              <div onClick="{{ coachWeg }}" style="flex:1;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--ink);color:var(--ink-deep);padding:12px;text-align:center;font-family:var(--font-heading);font-size:14px;cursor:pointer">Liever niet</div>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;border-radius:999px;border:1.5px solid var(--color-neutral-300);padding:10px;text-align:center;font-size:12.5px;color:var(--color-neutral-800)">Vandaag € 50,75</div>
+          <div onClick="{{ goReview }}" style="flex:1;border-radius:999px;border:1.5px solid var(--color-accent);background:var(--color-accent-100);padding:10px;text-align:center;font-size:12.5px;color:var(--color-accent-700);cursor:pointer" style-hover="background:var(--color-accent-200)">{{ reviewChip }}</div>
+        </div>
+        <sc-if value="{{ meevallerOpen }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ goMeevaller }}" style="border-radius:var(--radius-md);border:1.5px solid var(--ink);background:var(--soft);padding:13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" style-hover="background:#c9d2e2">
+            <span style="font-size:12.5px;color:var(--ink-deep)">{{ meevallerTitel }}<br><span style="font-size:11.5px;color:var(--color-neutral-700)">boven je basis · nog niet verdeeld</span></span>
+            <span style="font-size:17px;color:var(--ink-deep)">›</span>
+          </div>
+        </sc-if>
+        <div style="height:1px;background:var(--color-neutral-200)"></div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ potjes }}" as="p" hint-placeholder-count="4">
+            <div onClick="{{ p.open }}" style="display:flex;justify-content:space-between;align-items:center;padding:13px 4px;border-bottom:1px solid var(--color-neutral-200);cursor:pointer" style-hover="background:var(--color-neutral-100)">
+              <span style="font-size:15px;color:var(--color-text)">{{ p.naam }}</span>
+              <span style="font-size:13px;color:{{ p.kleur }}">{{ p.rest }}</span>
+            </div>
+          </sc-for>
+          <div onClick="{{ goPotjes }}" style="display:flex;justify-content:space-between;align-items:center;padding:13px 4px;color:var(--color-neutral-700);cursor:pointer"><span style="font-size:15px">Alle potjes en sparen</span><span style="font-size:17px">›</span></div>
+          <div onClick="{{ goVast }}" style="display:flex;justify-content:space-between;align-items:center;padding:13px 4px;color:var(--color-neutral-700);cursor:pointer;border-top:1px solid var(--color-neutral-200)"><span style="font-size:15px">Vaste lasten · {{ vasteLastenLabel }} p/m</span><span style="font-size:17px">›</span></div>
+          <div onClick="{{ goLabels }}" style="display:flex;justify-content:space-between;align-items:center;padding:13px 4px;color:var(--color-neutral-700);cursor:pointer;border-top:1px solid var(--color-neutral-200)"><span style="font-size:15px">Labels · wat kost het ons?</span><span style="font-size:17px">›</span></div>
+          <div onClick="{{ goInkomen }}" style="display:flex;justify-content:space-between;align-items:center;padding:13px 4px;color:var(--color-neutral-700);cursor:pointer;border-top:1px solid var(--color-neutral-200)"><span style="font-size:15px">Inkomen · basis {{ basisLabel }}</span><span style="font-size:17px">›</span></div>
+          <div onClick="{{ goVooruit }}" style="display:flex;justify-content:space-between;align-items:center;padding:13px 4px;color:var(--color-neutral-700);cursor:pointer;border-top:1px solid var(--color-neutral-200)"><span style="font-size:15px">Vooruit · sparen &amp; beleggen</span><span style="font-size:17px">›</span></div>
+          <div onClick="{{ goImport }}" style="display:flex;justify-content:space-between;align-items:center;padding:13px 4px;color:var(--color-neutral-700);cursor:pointer;border-top:1px solid var(--color-neutral-200)"><span style="font-size:15px">MT940 importeren</span><span style="font-size:17px">›</span></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPotjes }}" hint-placeholder-val="{{ false }}">
+        <div style="padding-top:6px"><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Potjes</div><div style="font-size:12.5px;color:var(--color-neutral-700)">september · nog 11 dagen</div></div>
+        <div style="border-radius:28px;background:var(--ink);padding:22px;display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:12.5px;color:rgba(255,255,255,.8)">samen nog in je potjes</div>
+          <div style="font-family:var(--font-heading);font-size:40px;line-height:1;color:#fff">{{ potjesRestLabel }}</div>
+          <div style="font-size:12.5px;color:rgba(255,255,255,.8)">{{ potjesKoersSub }}</div>
+        </div>
+        <div style="font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--color-neutral-600)">Betaalpotjes</div>
+        <sc-for list="{{ potjes }}" as="p" hint-placeholder-count="4">
+          <div onClick="{{ p.open }}" style="border-radius:26px;background:var(--card);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:10px;cursor:pointer" style-hover="box-shadow:var(--shadow-md)">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span style="font-size:15px;color:var(--color-text)">{{ p.naam }}</span><span style="font-family:var(--font-heading);font-size:17px;color:{{ p.kleur }}">{{ p.restBedrag }}</span></div>
+            <div style="height:9px;border-radius:999px;background:var(--color-neutral-200);overflow:hidden"><div style="height:100%;border-radius:999px;width:{{ p.pct }};background:{{ p.balk }}"></div></div>
+            <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px;color:var(--color-neutral-700)"><span>{{ p.sub }}</span><span style="color:{{ p.kleur }};flex:none">{{ p.restWoord }}</span></div>
+          </div>
+        </sc-for>
+        <div style="font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--color-neutral-600);margin-top:6px">Sparen &amp; beleggen</div>
+        <div onClick="{{ goVooruit }}" style="border-radius:26px;background:var(--soft);padding:17px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer" style-hover="background:#c9d2e2">
+          <span style="font-size:14.5px;color:var(--ink-deep)">Vooruit<br><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ vooruitSub }}</span></span>
+          <span style="font-family:var(--font-heading);font-size:17px;color:var(--ink-deep);flex:none">{{ vermogenLabel }}</span>
+        </div>
+        <div style="font-size:12px;color:var(--color-neutral-700);border-left:2px solid var(--color-accent);padding-left:11px">Een potje is geen rekening — het is een afspraak met jezelf over deze maand.</div>
+      </sc-if>
+
+      <sc-if value="{{ isPotje }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ back }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ terug</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">{{ potje.naam }}</div><div style="font-size:12px;color:var(--color-neutral-700)">betaalpotje · gedeeld met Mark</div></div>
+        <div style="border-radius:28px;background:var(--soft);padding:18px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--color-neutral-800)"><span>Budget per maand</span><span>{{ potje.budget }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--color-neutral-800)"><span>Meegenomen uit augustus</span><span>{{ potje.mee }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--color-neutral-800)"><span>Besteed</span><span>{{ potje.besteed }}</span></div>
+          <div style="height:1px;background:var(--color-accent-300)"></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;color:var(--color-neutral-800)">Nog te besteden</span><span style="font-family:var(--font-heading);font-size:22px;color:var(--color-accent-700)">{{ potje.rest }}</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--color-neutral-700)">Restbudget aan het eind van de maand</div>
+        <div style="border-radius:28px;background:var(--card);box-shadow:var(--shadow-sm);overflow:hidden">
+          <sc-for list="{{ rolloverOpties }}" as="o" hint-placeholder-count="3">
+            <div onClick="{{ o.pick }}" style="display:flex;gap:11px;padding:14px;align-items:flex-start;cursor:pointer;background:{{ o.bg }};border-top:1px solid var(--color-neutral-200)">
+              <span style="width:16px;height:16px;border-radius:999px;flex:none;margin-top:2px;border:{{ o.ring }}"></span>
+              <span style="font-size:13px;color:var(--color-text)">{{ o.titel }}<br><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ o.sub }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:var(--color-neutral-700);border-left:2px solid var(--color-accent);padding-left:11px">Een tekort schuift altijd door — anders verdampt overbesteding stilletjes.</div>
+      </sc-if>
+
+      <sc-if value="{{ isTx }}" hint-placeholder-val="{{ false }}">
+        <div style="font-family:var(--font-heading);font-size:19px;padding-top:6px;color:var(--color-text)">Transacties</div>
+        <div style="display:flex;gap:7px">
+          <sc-for list="{{ txFilters }}" as="f" hint-placeholder-count="3">
+            <span onClick="{{ f.pick }}" style="border-radius:999px;padding:6px 13px;font-size:12px;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ f.rand }};background:{{ f.bg }};color:{{ f.fg }}">{{ f.naam }}</span>
+          </sc-for>
+        </div>
+        <sc-for list="{{ txLijst }}" as="t" hint-placeholder-count="6">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 2px;border-bottom:1px solid var(--color-neutral-200)">
+            <span style="font-size:14px;color:var(--color-text)">{{ t.naam }}<br><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ t.meta }}</span></span>
+            <span style="font-size:14px;color:{{ t.kleur }}">{{ t.bedrag }}</span>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:6px;gap:10px"><span style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Nakijken</span><span style="font-size:12.5px;color:var(--color-neutral-700)">{{ reviewOver }}</span></div>
+        <div style="display:flex;gap:5px">
+          <sc-for list="{{ reviewStappen }}" as="r" hint-placeholder-count="4">
+            <div style="flex:1;height:5px;border-radius:999px;background:{{ r.kleur }}"></div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ reviewLeeg }}" hint-placeholder-val="{{ false }}">
+          <div style="border-radius:28px;background:var(--soft);padding:28px;text-align:center;display:flex;flex-direction:column;gap:8px">
+            <div style="font-family:var(--font-heading);font-size:20px;color:var(--ink-deep)">Klaar ✓</div>
+            <div style="font-size:13px;color:var(--color-neutral-800)">Alles heeft een potje. Niets meer te doen.</div>
+            <div onClick="{{ resetReview }}" style="align-self:center;margin-top:6px;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--ink);padding:9px 18px;font-size:12.5px;cursor:pointer">Opnieuw met 4</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ reviewActief }}" hint-placeholder-val="{{ true }}">
+          <div style="border-radius:26px;background:var(--card);box-shadow:var(--shadow-sm);padding:18px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span style="font-size:15px;color:var(--color-text)">{{ huidige.naam }}</span><span style="font-family:var(--font-heading);font-size:26px;line-height:1;color:var(--color-text);flex:none">{{ huidige.bedrag }}</span></div>
+            <div style="font-size:12px;color:var(--color-neutral-700)">{{ huidige.meta }}</div>
+            <div style="display:flex;align-items:center;gap:7px;margin-top:2px">
+              <span style="width:7px;height:7px;border-radius:999px;background:var(--color-accent)"></span>
+              <span style="font-size:11.5px;color:var(--color-neutral-700)">Ruim gokt op {{ gokPotje }} · {{ gokZeker }} zeker</span>
+            </div>
+          </div>
+          <div style="font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--color-neutral-600)">Potje</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ potjeKeuzes }}" as="k" hint-placeholder-count="4">
+              <span onClick="{{ k.pick }}" style="border-radius:999px;padding:9px 14px;font-size:13px;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ k.rand }};background:{{ k.bg }};color:{{ k.fg }}">{{ k.label }}</span>
+            </sc-for>
+          </div>
+          <div style="font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--color-neutral-600)">Label <span style="text-transform:none;letter-spacing:0;color:var(--color-neutral-500)">optioneel</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ labelKeuzes }}" as="k" hint-placeholder-count="3">
+              <span onClick="{{ k.pick }}" style="border-radius:999px;padding:9px 14px;font-size:13px;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ k.rand }};background:{{ k.bg }};color:{{ k.fg }}">{{ k.label }}</span>
+            </sc-for>
+          </div>
+          <div onClick="{{ toggleRegel }}" style="border-radius:var(--radius-md);padding:12px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ regelRand }};background:{{ regelBg }}">
+            <span style="width:17px;height:17px;border-radius:5px;flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;border:1.5px solid var(--color-neutral-500);background:{{ regelVink }}">{{ regelTeken }}</span>
+            <span style="font-size:12.5px;color:var(--color-neutral-800)">Voortaan zo, ook terugwerkend<br><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ regelUitleg }}</span></span>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:4px">
+            <div onClick="{{ skip }}" style="flex:1;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--ink);padding:13px;text-align:center;font-size:13px;cursor:pointer" style-hover="background:var(--color-neutral-100)">Overslaan</div>
+            <div onClick="{{ bevestig }}" style="flex:1.7;border-radius:999px;background:var(--ink);color:#fff;padding:13px;text-align:center;font-size:13px;cursor:pointer" style-hover="background:var(--ink-deep)">{{ bevestigLabel }}</div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ isVast }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goNu }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Nu</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Vaste lasten</div><div style="font-size:12px;color:var(--color-neutral-700)">24 terugkerende betalingen · herkend</div></div>
+        <div style="border-radius:28px;background:var(--soft);padding:18px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12.5px;color:var(--color-neutral-700)">gaat er elke maand vanaf</div>
+          <div style="font-family:var(--font-heading);font-size:34px;line-height:1;color:var(--color-accent-700)">{{ vasteLastenLabel }}</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">{{ vasteLastenSub }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ vasteGroepen }}" as="g" hint-placeholder-count="5">
+            <div onClick="{{ g.open }}" style="display:flex;justify-content:space-between;align-items:center;padding:13px 2px;border-bottom:1px solid var(--color-neutral-200);cursor:pointer" style-hover="background:var(--color-neutral-100)">
+              <span style="font-size:14.5px;color:var(--color-text)">{{ g.naam }}<br><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ g.sub }}</span></span>
+              <span style="font-size:14.5px;color:var(--color-text)">{{ g.bedrag }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="border-radius:22px;box-shadow:inset 0 0 0 1.5px var(--color-accent);background:var(--color-accent-100);padding:13px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12.5px;color:var(--color-accent-800)">3 wijzigingen deze maand<br><span style="font-size:11.5px;color:var(--color-neutral-700)">energie +€ 18, Netflix +€ 2, sportschool gestopt</span></span>
+          <span style="font-size:17px;color:var(--color-accent-700)">›</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isAbos }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goVast }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Vaste lasten</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Abonnementen</div><div style="font-size:12px;color:var(--color-neutral-700)">{{ abosSub }}</div></div>
+        <sc-for list="{{ abos }}" as="a" hint-placeholder-count="6">
+          <div onClick="{{ a.toggle }}" style="border-radius:var(--radius-md);padding:13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ a.rand }};background:{{ a.bg }};opacity:{{ a.opacity }}">
+            <span style="font-size:13.5px;color:var(--color-text)">{{ a.naam }}<br><span style="font-size:11px;color:var(--color-neutral-700)">{{ a.meta }}</span></span>
+            <span style="font-size:13.5px;text-align:right;color:var(--color-text)">{{ a.bedrag }}<br><span style="font-size:11px;color:var(--color-accent-700)">{{ a.delta }}</span></span>
+          </div>
+        </sc-for>
+        <div style="font-size:12px;color:var(--color-neutral-700);border-left:2px solid var(--color-accent);padding-left:11px">Tik een abonnement aan om het als opgezegd te markeren — de maandlast rekent direct mee.</div>
+      </sc-if>
+
+      <sc-if value="{{ isLabels }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goNu }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Nu</div>
+        <div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Labels</div>
+        <div style="font-size:12px;color:var(--color-neutral-700)">Een label loopt dwars door potjes heen — zo zie je wat iets écht kost.</div>
+        <sc-for list="{{ labels }}" as="l" hint-placeholder-count="5">
+          <div onClick="{{ l.open }}" style="border-radius:22px;background:var(--card);box-shadow:var(--shadow-sm);padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" style-hover="border-color:var(--color-accent)">
+            <span style="font-size:14px;color:var(--color-text)">◈ {{ l.naam }}<br><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ l.sub }}</span></span>
+            <span style="font-size:14px;color:var(--color-text)">{{ l.bedrag }}</span>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{ isLabel }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goLabels }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Labels</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">◈ Auto 2 · Berlingo</div><div style="font-size:12px;color:var(--color-neutral-700)">68 transacties · loopt door 4 potjes</div></div>
+        <div style="border-radius:28px;background:var(--soft);padding:18px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12.5px;color:var(--color-neutral-700)">kost je gemiddeld</div>
+          <div style="font-family:var(--font-heading);font-size:34px;line-height:1;color:var(--color-accent-700)">€ 274</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">€ 3.288 per jaar · gemeten over 12 maanden</div>
+        </div>
+        <div style="font-size:12px;color:var(--color-neutral-700)">Waar dat vandaan komt</div>
+        <sc-for list="{{ labelBron }}" as="b" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:98px;font-size:13px;color:var(--color-text)">{{ b.naam }}</span>
+            <span style="flex:1;height:9px;border-radius:999px;background:var(--color-neutral-200);overflow:hidden"><span style="display:block;height:100%;border-radius:999px;width:{{ b.pct }};background:var(--color-accent)"></span></span>
+            <span style="width:46px;text-align:right;font-size:12px;color:var(--color-neutral-700)">{{ b.bedrag }}</span>
+          </div>
+        </sc-for>
+        <div onClick="{{ goScenario }}" style="border-radius:22px;box-shadow:inset 0 0 0 1.5px var(--color-accent);background:var(--color-accent-100);padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" style-hover="background:var(--color-accent-200)">
+          <span style="font-size:13px;color:var(--color-accent-800)">Wegdenken: wat blijft er over?<br><span style="font-size:11.5px;color:var(--color-neutral-700)">bereken de besparing</span></span>
+          <span style="font-size:17px;color:var(--color-accent-700)">›</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isScenario }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goLabel }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Auto 2</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Zonder auto 2</div><div style="font-size:12px;color:var(--color-neutral-700)">schatting op basis van 12 maanden</div></div>
+        <div style="border-radius:28px;background:var(--card);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--color-neutral-800)"><span>Valt weg</span><span style="color:var(--ink)">− € 236/mnd</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--color-neutral-800)"><span>Extra op auto 1</span><span>+ {{ extraPolo }}/mnd</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--color-neutral-800)"><span>OV &amp; deelauto</span><span>+ {{ extraOv }}/mnd</span></div>
+        </div>
+        <div style="border-radius:28px;background:var(--soft);padding:18px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12.5px;color:var(--color-neutral-700)">netto besparing</div>
+          <div style="font-family:var(--font-heading);font-size:34px;line-height:1;color:var(--color-accent-700)">{{ nettoLabel }}</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">{{ nettoJaar }} per jaar · verkoopopbrengst niet meegerekend</div>
+        </div>
+        <div style="font-size:12px;color:var(--color-neutral-700)">Aannames — schuif om te spelen</div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--color-neutral-800)"><span>ritten naar de Polo</span><span>{{ ritPct }}</span></div>
+            {{ ritSlider }}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--color-neutral-800)"><span>OV &amp; deelauto per maand</span><span>{{ extraOv }}</span></div>
+            {{ ovSlider }}
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isImport }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goNu }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Nu</div>
+        <div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">MT940 importeren</div>
+        <div onClick="{{ leesBestand }}" style="border-radius:var(--radius-lg);border:1.5px dashed var(--color-accent);padding:30px 16px;text-align:center;cursor:pointer;display:flex;flex-direction:column;gap:6px" style-hover="background:var(--color-accent-100)">
+          <div style="font-size:26px;color:var(--color-accent-700)">↧</div>
+          <div style="font-size:13.5px;color:var(--color-text)">{{ importTitel }}</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">{{ importSub }}</div>
+        </div>
+        <sc-if value="{{ importGelezen }}" hint-placeholder-val="{{ false }}">
+          <div style="border-radius:28px;background:var(--card);box-shadow:var(--shadow-sm);overflow:hidden">
+            <sc-for list="{{ importRegels }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;padding:12px 14px;font-size:13px;border-top:1px solid var(--color-neutral-200);color:var(--color-neutral-800)"><span>{{ r.naam }}</span><span style="color:{{ r.kleur }}">{{ r.waarde }}</span></div>
+            </sc-for>
+          </div>
+          <div onClick="{{ goReview }}" style="border-radius:999px;background:var(--ink);color:#fff;padding:13px;text-align:center;font-size:13px;cursor:pointer" style-hover="background:var(--ink-deep)">44 toevoegen · 12 nakijken</div>
+        </sc-if>
+        <div style="font-size:12px;color:var(--color-neutral-700);border-left:2px solid var(--color-accent);padding-left:11px">Bestand blijft op je apparaat. Dubbelen worden herkend op volgnummer.</div>
+      </sc-if>
+
+      <sc-if value="{{ isInkomen }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goNu }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Nu</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Inkomen</div><div style="font-size:12px;color:var(--color-neutral-700)">{{ inkomenSub }}</div></div>
+        <div style="border-radius:28px;background:var(--soft);padding:18px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12.5px;color:var(--color-neutral-700)">je plan draait op</div>
+          <div style="font-family:var(--font-heading);font-size:38px;line-height:1;color:var(--ink-deep)">{{ basisLabel }}</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">per maand · alles daarboven is meevaller</div>
+        </div>
+        <div style="border-radius:26px;background:var(--card);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--color-neutral-600)">Wat er binnenkwam · 12 maanden</div>
+          <div style="display:flex;align-items:flex-end;gap:5px;height:86px;position:relative">
+            <div style="position:absolute;left:0;right:0;bottom:{{ basisLijn }};border-top:1.5px dashed var(--ink)"></div>
+            <sc-for list="{{ inkomenBalken }}" as="b" hint-placeholder-count="12">
+              <div style="flex:1;border-radius:999px 999px 4px 4px;height:{{ b.h }};background:{{ b.kleur }}"></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--color-neutral-600)"><span>okt '25</span><span style="display:flex;align-items:center;gap:5px;color:var(--ink-deep)"><span style="width:14px;border-top:1.5px dashed var(--ink)"></span>basis</span><span>sep '26</span></div>
+        </div>
+        <div style="font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--color-neutral-600)">Bronnen</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin-top:-8px">Tik een bron aan om hem wel of niet in je basis te laten meetellen.</div>
+        <sc-for list="{{ bronnen }}" as="b" hint-placeholder-count="5">
+          <div onClick="{{ b.toggle }}" style="border-radius:var(--radius-md);padding:13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ b.rand }};background:{{ b.bg }}">
+            <span style="font-size:13.5px;color:var(--color-text)">{{ b.naam }}<br><span style="font-size:11px;color:var(--color-neutral-700)">{{ b.meta }}</span></span>
+            <span style="font-size:13.5px;text-align:right;color:var(--color-text)">{{ b.bedrag }}<br><span style="font-size:11px;color:{{ b.basisKleur }}">{{ b.basisTekst }}</span></span>
+          </div>
+        </sc-for>
+        <div onClick="{{ goWaterval }}" style="border-radius:22px;background:var(--card);box-shadow:var(--shadow-sm);padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" style-hover="border-color:var(--color-accent)">
+          <span style="font-size:13px;color:var(--color-text)">Waar gaat je basis heen?<br><span style="font-size:11.5px;color:var(--color-neutral-700)">vaste lasten · sparen · potjes · vrij</span></span>
+          <span style="font-size:17px;color:var(--color-neutral-700)">›</span>
+        </div>
+        <div onClick="{{ goMinder }}" style="border-radius:22px;box-shadow:inset 0 0 0 1.5px var(--color-accent);background:var(--color-accent-100);padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" style-hover="background:var(--color-accent-200)">
+          <span style="font-size:13px;color:var(--color-accent-800)">{{ minderTitel }}<br><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ minderSub }}</span></span>
+          <span style="font-size:17px;color:var(--color-accent-700)">›</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isMeevaller }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goInkomen }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Inkomen</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Er kwam meer binnen</div><div style="font-size:12px;color:var(--color-neutral-700)">{{ meevallerSub }}</div></div>
+        <div style="border-radius:28px;background:var(--soft);padding:18px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:var(--font-heading);font-size:34px;line-height:1;color:var(--ink-deep)">{{ meevallerLabel }}</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">staat nog nergens op. Waar zet je het neer?</div>
+        </div>
+        <div style="border-radius:28px;background:var(--card);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--color-neutral-800)"><span>Buffer aanvullen</span><span>{{ deelBufferLabel }}</span></div>
+            {{ bufferSlider }}
+            <div style="font-size:11.5px;color:var(--color-neutral-700)">{{ bufferGevolg }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--color-neutral-800)"><span>Extra beleggen</span><span>{{ deelBelegLabel }}</span></div>
+            {{ belegSlider }}
+            <div style="font-size:11.5px;color:var(--color-neutral-700)">bovenop je vaste inleg van € 300</div>
+          </div>
+          <div style="height:1px;background:var(--color-neutral-200)"></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;color:var(--color-neutral-800)">Erbij op je vrij te besteden<br><span style="font-size:11.5px;color:var(--color-neutral-700)">eenmalig, alleen deze maand</span></span><span style="font-family:var(--font-heading);font-size:22px;color:var(--color-accent-700)">{{ deelVrijLabel }}</span></div>
+        </div>
+        <div onClick="{{ toggleVaste }}" style="border-radius:var(--radius-md);padding:13px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ vasteRand }};background:{{ vasteBg }}">
+          <span style="width:17px;height:17px;border-radius:5px;flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;border:1.5px solid var(--color-neutral-500);background:{{ vasteVink }}">{{ vasteTeken }}</span>
+          <span style="font-size:12.5px;color:var(--color-neutral-800)">Elke meevaller zo verdelen<br><span style="font-size:11.5px;color:var(--color-neutral-700)">dan hoef je dit nooit meer te beslissen</span></span>
+        </div>
+        <div onClick="{{ pasMeevallerToe }}" style="border-radius:999px;background:var(--ink);color:#fff;padding:13px;text-align:center;font-size:13px;cursor:pointer" style-hover="background:var(--ink-deep)">{{ meevallerKnop }}</div>
+      </sc-if>
+
+      <sc-if value="{{ isMinder }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goInkomen }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Inkomen</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Je basis daalt</div><div style="font-size:12px;color:var(--color-neutral-700)">Sam gaat 4 dagen werken · vanaf oktober</div></div>
+        <div style="border-radius:28px;background:var(--soft);padding:18px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12.5px;color:var(--color-neutral-700)">je plan is te duur geworden met</div>
+          <div style="font-family:var(--font-heading);font-size:34px;line-height:1;color:var(--color-accent-700)">− € 340</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">basis € 4.100 → € 3.760 per maand</div>
+        </div>
+        <div style="font-size:12px;color:var(--color-neutral-700)">Kies hoe je het opvangt — je ziet direct wat het kost.</div>
+        <sc-for list="{{ dekkingOpties }}" as="d" hint-placeholder-count="3">
+          <div onClick="{{ d.toggle }}" style="border-radius:var(--radius-md);padding:14px;display:flex;flex-direction:column;gap:6px;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ d.rand }};background:{{ d.bg }}">
+            <div style="display:flex;justify-content:space-between;font-size:13.5px;color:var(--color-text)"><span>{{ d.naam }}</span><span>{{ d.bedrag }}</span></div>
+            <div style="font-size:11.5px;color:var(--color-neutral-700)">{{ d.gevolg }}</div>
+          </div>
+        </sc-for>
+        <div style="border-radius:var(--radius-md);padding:14px;display:flex;justify-content:space-between;align-items:center;box-shadow:inset 0 0 0 1.5px {{ tekortRand }};background:{{ tekortBg }}">
+          <span style="font-size:12.5px;color:var(--color-neutral-800)">{{ tekortTekst }}</span>
+          <span style="font-family:var(--font-heading);font-size:20px;color:{{ tekortKleur }}">{{ tekortLabel }}</span>
+        </div>
+        <div onClick="{{ pasMinderToe }}" style="border-radius:999px;padding:13px;text-align:center;font-size:13px;cursor:pointer;background:{{ minderKnopBg }};color:{{ minderKnopFg }}">{{ minderKnop }}</div>
+      </sc-if>
+
+      <sc-if value="{{ isWaterval }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goInkomen }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Inkomen</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Waar gaat je basis heen</div><div style="font-size:12px;color:var(--color-neutral-700)">de volgorde van je maand</div></div>
+        <div style="border-radius:var(--radius-md);border:1.5px solid var(--color-text);background:var(--soft);padding:13px;display:flex;justify-content:space-between;font-size:14px;color:var(--color-text)"><span>Basisinkomen</span><span>{{ basisLabel }}</span></div>
+        <sc-for list="{{ watervalStappen }}" as="w" hint-placeholder-count="3">
+          <div onClick="{{ w.open }}" style="margin-left:16px;border-radius:var(--radius-md);padding:13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ w.rand }};background:{{ w.bg }}">
+            <span style="font-size:13.5px;color:var(--color-text)">{{ w.naam }}<br><span style="font-size:11px;color:var(--color-neutral-700)">{{ w.sub }}</span></span>
+            <span style="font-size:13.5px;color:var(--color-text)">{{ w.bedrag }}</span>
+          </div>
+        </sc-for>
+        <div style="border-radius:28px;background:var(--soft);padding:18px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px;color:var(--color-accent-800)">Vrij te besteden</span>
+          <span style="font-family:var(--font-heading);font-size:30px;color:var(--color-accent-700)">{{ vrijLabel }}</span>
+        </div>
+        <div style="font-size:12px;color:var(--color-neutral-700);border-left:2px solid var(--color-accent);padding-left:11px">Dit is het getal op je startscherm. Zeg een abonnement op of verhoog je inleg en het schuift meteen mee.</div>
+      </sc-if>
+
+      <sc-if value="{{ isVooruit }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goNu }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Nu</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Vooruit</div><div style="font-size:12px;color:var(--color-neutral-700)">{{ vooruitSub }}</div></div>
+        <div style="border-radius:28px;background:var(--soft);padding:18px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12.5px;color:var(--color-neutral-700)">samen opgebouwd</div>
+          <div style="font-family:var(--font-heading);font-size:34px;line-height:1;color:var(--ink-deep)">{{ vermogenLabel }}</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">{{ vermogenSub }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:4px"><span style="width:23px;height:23px;border-radius:999px;background:var(--ink);color:#fff;font-size:11.5px;display:flex;align-items:center;justify-content:center;flex:none">1</span><span style="font-size:13px;color:var(--color-neutral-800)">Eerst: zekerheid</span></div>
+        <div style="border-radius:26px;background:var(--card);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14.5px;color:var(--color-text)">Buffer</span><span style="font-size:13px;color:var(--color-neutral-800)">{{ bufferLabel }}</span></div>
+          <div style="height:10px;border-radius:999px;background:var(--color-neutral-200);overflow:hidden"><div style="height:100%;border-radius:999px;background:var(--ink);width:{{ bufferPct }}"></div></div>
+          <div style="font-size:11.5px;color:var(--color-neutral-700)">{{ bufferSub }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:4px"><span style="width:23px;height:23px;border-radius:999px;background:var(--ink);color:#fff;font-size:11.5px;display:flex;align-items:center;justify-content:center;flex:none">2</span><span style="font-size:13px;color:var(--color-neutral-800)">Dan: doelen met een datum</span></div>
+        <sc-for list="{{ doelen }}" as="d" hint-placeholder-count="2">
+          <div onClick="{{ d.open }}" style="border-radius:26px;background:var(--card);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:9px;cursor:pointer" style-hover="box-shadow:var(--shadow-md)">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14.5px;color:var(--color-text)">{{ d.naam }}</span><span style="font-size:13px;color:var(--color-neutral-800)">{{ d.saldo }}</span></div>
+            <div style="height:9px;border-radius:999px;background:var(--color-neutral-200);overflow:hidden"><div style="height:100%;border-radius:999px;background:var(--color-accent);width:{{ d.pct }}"></div></div>
+            <div style="font-size:11.5px;color:{{ d.kleur }}">{{ d.sub }}</div>
+          </div>
+        </sc-for>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:4px"><span style="width:23px;height:23px;border-radius:999px;background:var(--ink);color:#fff;font-size:11.5px;display:flex;align-items:center;justify-content:center;flex:none">3</span><span style="font-size:13px;color:var(--color-neutral-800)">Daarna: richting zonder einddatum</span></div>
+        <div onClick="{{ goBeleggen }}" style="border-radius:26px;background:var(--card);box-shadow:var(--shadow-sm);padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer" style-hover="box-shadow:var(--shadow-md)">
+          <span style="font-size:14.5px;color:var(--color-text)">Beleggen<br><span style="font-size:11.5px;color:var(--color-neutral-700)">{{ belegSub }}</span></span>
+          <span style="font-family:var(--font-heading);font-size:17px;color:var(--color-text);flex:none">{{ belegSaldoLabel }}</span>
+        </div>
+        <div style="font-size:12px;color:var(--color-neutral-700);border-left:2px solid var(--color-accent);padding-left:11px">{{ vooruitVoet }}</div>
+      </sc-if>
+
+      <sc-if value="{{ isDoel }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goVooruit }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Vooruit</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Vakantie Italië</div><div style="font-size:12px;color:var(--color-neutral-700)">doel · € 2.400</div></div>
+        <div style="border-radius:28px;background:var(--card);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:var(--font-heading);font-size:30px;line-height:1;color:var(--color-text)">{{ doelSaldo }}</div>
+          <div style="height:12px;border-radius:999px;background:var(--color-neutral-200);overflow:hidden"><div style="height:100%;border-radius:999px;background:var(--color-accent);width:{{ doelPct }}"></div></div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">{{ doelRest }}</div>
+        </div>
+        <div style="border-radius:28px;background:var(--soft);padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;color:var(--color-neutral-800)">Inleg per maand</span><span style="font-family:var(--font-heading);font-size:22px;color:var(--color-accent-700)">{{ inlegLabel }}</span></div>
+          {{ inlegSlider }}
+          <div style="font-size:12px;color:var(--color-neutral-800)">{{ doelKlaar }}</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">en je vrij te besteden wordt {{ vrijLabel }} per maand</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="display:flex;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--color-neutral-200);font-size:13.5px;color:var(--color-text)"><span>Staat op</span><span style="color:var(--color-neutral-700)">Spaarrekening · NL··8842</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--color-neutral-200);font-size:13.5px;color:var(--color-text)"><span>Overboeking</span><span style="color:var(--color-neutral-700)">automatisch · 26e</span></div>
+          <div onClick="{{ togglePauze }}" style="display:flex;justify-content:space-between;padding:12px 2px;font-size:13.5px;color:var(--color-text);cursor:pointer"><span>Pauzeren bij te weinig inkomen</span><span style="color:{{ pauzeKleur }}">{{ pauzeTekst }}</span></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isBeleggen }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goVooruit }}" style="font-size:13px;color:var(--color-neutral-700);cursor:pointer;padding-top:6px">‹ Vooruit</div>
+        <div><div style="font-family:var(--font-heading);font-size:20px;color:var(--color-text)">Beleggen</div><div style="font-size:12px;color:var(--color-neutral-700)">richting, geen potje dat leegraakt</div></div>
+        <div style="border-radius:28px;background:var(--card);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12.5px;color:var(--color-neutral-700)">ingelegd sinds 2022</div>
+          <div style="font-family:var(--font-heading);font-size:30px;line-height:1;color:var(--color-text)">{{ belegSaldoLabel }}</div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">waarde vandaag {{ belegWaarde }} · <span style="color:var(--ink)">{{ belegWinst }}</span> · bijgewerkt 1 sep</div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:4px;height:64px">
+          <sc-for list="{{ belegBalken }}" as="b" hint-placeholder-count="12">
+            <div style="flex:1;border-radius:3px 3px 0 0;height:{{ b.h }};background:{{ b.kleur }}"></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-700)"><span>inleg per maand</span><span>april overgeslagen</span></div>
+        <div style="border-radius:var(--radius-md);border:1.5px dashed var(--color-accent);background:var(--color-accent-100);padding:13px;font-size:12.5px;color:var(--color-accent-800)">We volgen je inleg, niet de koers. Koerswinst is geen geld om mee te budgetteren — en telt niet mee in je buffer.</div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="display:flex;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--color-neutral-200);font-size:13.5px;color:var(--color-text)"><span>Vaste inleg<br><span style="font-size:11px;color:var(--color-neutral-700)">27e · naar beleggingsrekening</span></span><span>€ 300</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px 2px;font-size:13.5px;color:var(--color-text)"><span>Uit meevallers<br><span style="font-size:11px;color:var(--color-neutral-700)">{{ belegRegelSub }}</span></span><span>{{ belegUitMeevaller }}</span></div>
+        </div>
+      </sc-if>
+
+    </div>
+
+    <div style="position:absolute;left:18px;right:18px;bottom:18px;height:66px;border-radius:999px;background:var(--card);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:space-between;padding:0 24px">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+        <div onClick="{{ t.go }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ t.kleur }};position:relative">
+          <span style="display:flex;align-items:center;justify-content:center;height:22px">{{ t.icon }}</span>
+          <span style="font-size:10.5px">{{ t.naam }}</span>
+          <span style="position:absolute;top:-4px;right:-12px;border-radius:999px;background:var(--color-accent);color:#fff;font-size:9.5px;padding:1px 5px;display:{{ t.badgeShow }}">{{ t.badge }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="font-size:12px;color:var(--color-neutral-700);max-width:420px;text-align:center">Werkt: nakijken met potje + label, potje-detail, abonnementen opzeggen, het wegdenk-scenario, import — en nieuw: inkomen (bronnen in of uit je basis), meevaller verdelen, een inkomensdaling opvangen, de waterval naar vrij-te-besteden, en doelen met beleggen. Alles rekent door naar het bedrag op je startscherm.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:1000}}">
+const EUR = n => '€ ' + n.toLocaleString('nl-NL', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+
+const POTJES = [
+  {id:'bood', naam:'Boodschappen', budget:300, mee:42, besteed:216},
+  {id:'verv', naam:'Vervoer', budget:150, mee:0, besteed:53},
+  {id:'uit', naam:'Uit eten', budget:120, mee:0, besteed:132},
+  {id:'abo', naam:'Abonnementen', budget:78, mee:0, besteed:69},
+  {id:'kled', naam:'Kleding', budget:100, mee:15, besteed:20}
+];
+
+const QUEUE = [
+  {id:1, naam:'UNIVE SCHADEVERZ.', bedrag:'€ 45,00', meta:'15 sep · Mark · maandelijks terugkerend', potje:'Vaste lasten', zeker:'81%', label:'Auto 2 · Berlingo', regel:'"UNIVE" € 45,00 → Vaste lasten + Auto 2 · raakt 11 oude transacties'},
+  {id:2, naam:'SHELL 4412', bedrag:'€ 24,00', meta:'16 sep · Mark · pinbetaling', potje:'Vervoer', zeker:'78%', label:'Auto 2 · Berlingo', regel:'"SHELL" → Vervoer + Auto 2 · raakt 26 oude transacties'},
+  {id:3, naam:'CCV*BISTRO ZUID', bedrag:'€ 63,00', meta:'17 sep · Sanne · pinbetaling', potje:'Uit eten', zeker:'64%', label:null, regel:'"BISTRO" → Uit eten · raakt 4 oude transacties'},
+  {id:4, naam:'GARAGE VAN DIJK', bedrag:'€ 218,40', meta:'14 sep · Mark · welke auto?', potje:'Onderhoud', zeker:'58%', label:null, regel:'"GARAGE VAN DIJK" → Onderhoud · raakt 3 oude transacties'}
+];
+
+const ABOS = [
+  {id:'nf', naam:'Netflix', meta:'maandelijks · 4e · sinds 2021', bedrag:15.99, delta:'+€ 2,00'},
+  {id:'sp', naam:'Spotify Family', meta:'maandelijks · 12e', bedrag:19.99, delta:''},
+  {id:'zs', naam:'Ziggo Sport', meta:'maandelijks · 1e', bedrag:14.95, delta:''},
+  {id:'dp', naam:'Disney+', meta:'12 mnd betaald · geen gebruik gezien', bedrag:11.99, delta:'', let:true},
+  {id:'st', naam:'Strava', meta:'jaarlijks · mrt · € 59,99', bedrag:5.00, delta:''},
+  {id:'kr', naam:'Krant digitaal', meta:'kwartaal · okt', bedrag:8.33, delta:''},
+  {id:'gy', naam:'Sportschool', meta:'gestopt na aug', bedrag:32.00, delta:'', op:true}
+];
+
+class Component extends DCLogic {
+  state = {
+    bronnen: {jesse: true, sam: true, kb: true, toeslag: true, fl: false},
+    inkomenLaag: false, deelBuffer: 50, deelBeleg: 30, vasteVerdeling: true,
+    meevallerVerwerkt: false, extraBuffer: 0, extraBeleg: 0, extraVrij: 0,
+    dekking: {potjes: false, pauze: false, buffer: false}, spaarPauze: false,
+    inleg: 150, pauzeBijKrap: true, coachGedaan: false,
+    screen: 'nu', vorige: 'nu', potjeId: 'bood',
+    rollover: {bood:0, verv:0, uit:0, abo:1, kled:2},
+    queue: QUEUE, qi: 0, gekozenPotje: null, gekozenLabel: null, regelAan: true,
+    txFilter: 'Alles', opgezegd: {gy:true}, rit: 60, ov: 45, importGelezen: false
+  };
+
+  set = (k, v) => this.setState({[k]: v});
+  nav = s => this.setState(st => ({screen: s, vorige: st.screen}));
+
+  huidigItem() { const q = this.state.queue; return q.length ? q[Math.min(this.state.qi, q.length - 1)] : null; }
+
+  chip(actief, kleurBasis) {
+    return actief
+      ? {rand: 'var(--color-accent)', bg: 'var(--color-accent-100)', fg: 'var(--color-accent-800)'}
+      : {rand: kleurBasis || 'var(--color-neutral-400)', bg: '#fff', fg: 'var(--color-text)'};
+  }
+
+  slider(key, min, max, step) {
+    const val = this.state[key];
+    return React.createElement('input', {
+      type: 'range', min, max, step: step || 1, value: val,
+      onChange: e => this.setState({[key]: Number(e.target.value)}),
+      style: {width: '100%', accentColor: 'var(--color-accent)', height: '20px'}
+    });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const s = st.screen;
+    const potjes = POTJES.map(p => {
+      const rest = p.budget + p.mee - p.besteed;
+      const pct = Math.min(100, Math.round(p.besteed / (p.budget + p.mee) * 100));
+      return {
+        naam: p.naam,
+        rest: rest < 0 ? EUR(-rest) + ' te veel' : EUR(rest) + ' over',
+        restBedrag: rest < 0 ? '− ' + EUR(-rest) : EUR(rest),
+        restWoord: rest < 0 ? 'te veel besteed' : 'nog te besteden',
+        kleur: rest < 0 ? 'var(--color-accent-700)' : 'var(--ink-deep)',
+        balk: rest < 0 ? 'var(--color-text)' : (pct > 65 ? 'var(--color-accent)' : 'var(--ink)'),
+        pct: pct + '%',
+        sub: p.mee ? 'incl. ' + EUR(p.mee) + ' meegenomen uit augustus' : EUR(p.besteed) + ' van ' + EUR(p.budget),
+        open: () => this.setState({screen: 'potje', vorige: s, potjeId: p.id})
+      };
+    });
+
+    const pd = POTJES.find(p => p.id === st.potjeId);
+    const rolloverKeuze = st.rollover[st.potjeId] || 0;
+    const rolloverOpties = [
+      {titel: 'Schuift door naar volgende maand', sub: 'max. 1 maand meenemen'},
+      {titel: 'Valt weg, elke maand schoon', sub: 'strakker, maar straft een zuinige maand af'},
+      {titel: 'Rest gaat naar spaarpotje Vakantie', sub: 'geld verdwijnt niet, maar is niet meer vrij'}
+    ].map((o, i) => ({
+      titel: o.titel, sub: o.sub,
+      bg: i === rolloverKeuze ? 'var(--color-accent-100)' : '#fff',
+      ring: i === rolloverKeuze ? '5px solid var(--color-accent)' : '1.5px solid var(--color-neutral-500)',
+      pick: () => this.setState(x => ({rollover: {...x.rollover, [x.potjeId]: i}}))
+    }));
+
+    const item = this.huidigItem();
+    const potjeKeuzes = item ? [item.potje, 'Boodschappen', 'Vervoer', 'Onvoorzien']
+      .filter((v, i, a) => a.indexOf(v) === i).slice(0, 4)
+      .map((naam, i) => {
+        const actief = st.gekozenPotje ? st.gekozenPotje === naam : i === 0;
+        return {label: naam, ...this.chip(actief), pick: () => this.set('gekozenPotje', naam)};
+      }) : [];
+    const labelOpties = ['Auto 2 · Berlingo', 'Auto 1 · Polo', 'Huisdieren', 'geen label'];
+    const labelKeuzes = item ? labelOpties.map(naam => {
+      const gekozen = st.gekozenLabel !== null ? st.gekozenLabel : (item.label || 'geen label');
+      const actief = gekozen === naam;
+      const c = actief
+        ? {rand: 'var(--ink)', bg: 'var(--soft)', fg: 'var(--ink-deep)'}
+        : {rand: 'var(--color-neutral-400)', bg: '#fff', fg: 'var(--color-text)'};
+      return {label: naam === 'geen label' ? naam : '◈ ' + naam, ...c, pick: () => this.set('gekozenLabel', naam)};
+    }) : [];
+
+    const verwerk = () => this.setState(x => {
+      const q = x.queue.filter((_, i) => i !== Math.min(x.qi, x.queue.length - 1));
+      return {queue: q, qi: 0, gekozenPotje: null, gekozenLabel: null, regelAan: true};
+    });
+
+    const abos = ABOS.map(a => {
+      const op = !!st.opgezegd[a.id];
+      return {
+        naam: a.naam,
+        meta: op ? 'opgezegd · bespaart ' + a.bedrag.toFixed(2).replace('.', ',') : a.meta,
+        bedrag: '€ ' + a.bedrag.toFixed(2).replace('.', ','),
+        delta: a.delta,
+        rand: op ? 'var(--color-neutral-300)' : (a.let ? 'var(--color-accent)' : 'var(--color-neutral-300)'),
+        bg: op ? 'var(--color-neutral-100)' : (a.let ? 'var(--color-accent-100)' : '#fff'),
+        opacity: op ? '0.55' : '1',
+        toggle: () => this.setState(x => ({opgezegd: {...x.opgezegd, [a.id]: !x.opgezegd[a.id]}}))
+      };
+    });
+    const aboTotaal = ABOS.filter(a => !st.opgezegd[a.id]).reduce((t, a) => t + a.bedrag, 0);
+    const aboActief = ABOS.filter(a => !st.opgezegd[a.id]).length;
+
+    const extraPolo = Math.round(st.rit * 0.63);
+    const netto = 236 - extraPolo - st.ov;
+
+    const vasteGroepen = [
+      {naam: 'Wonen', sub: 'hypotheek, VvE, opstal', bedrag: '€ 980'},
+      {naam: 'Energie & water', sub: 'gas, licht, water, internet', bedrag: '€ 242'},
+      {naam: 'Verzekeringen', sub: "zorg, auto's, aansprakelijk", bedrag: '€ 196'},
+      {naam: 'Abonnementen', sub: aboActief + ' diensten · tik om te openen', bedrag: '€ ' + aboTotaal.toFixed(0)},
+      {naam: 'Bankkosten', sub: '2 rekeningen', bedrag: '€ 16'}
+    ].map(g => ({...g, open: () => this.nav(g.naam === 'Abonnementen' ? 'abos' : 'vast')}));
+
+    const txAlles = [
+      {naam: 'Albert Heijn', meta: '18 sep · Boodschappen · Sanne', bedrag: '€ 42,15', potje: true},
+      {naam: 'NS Groep', meta: '18 sep · Vervoer · Mark', bedrag: '€ 8,60', potje: true},
+      {naam: 'Salaris werkgever', meta: '17 sep · Inkomen', bedrag: '+ € 2.140', kleur: 'var(--ink)', potje: true},
+      {naam: 'CCV*BISTRO ZUID', meta: '17 sep · geen potje · Sanne', bedrag: '€ 63,00', potje: false},
+      {naam: 'SHELL 4412', meta: '16 sep · geen potje · Mark', bedrag: '€ 24,00', potje: false},
+      {naam: 'Vattenfall', meta: '12 sep · Vaste lasten', bedrag: '€ 198,00', potje: true}
+    ];
+    const txLijst = txAlles
+      .filter(t => st.txFilter === 'Alles' || (st.txFilter === 'Geen potje' ? !t.potje : parseFloat(t.bedrag.replace(/[^0-9,]/g, '').replace(',', '.')) > 50))
+      .map(t => ({...t, kleur: t.kleur || 'var(--color-text)'}));
+
+    const MAAND = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+    const BRONNEN = [
+      {id:'jesse', naam:'Salaris Jesse', meta:'maandelijks · 25e', bedrag:2650},
+      {id:'sam', naam:'Salaris Sam', meta:'maandelijks · laatste werkdag', bedrag:1180},
+      {id:'kb', naam:'Kinderbijslag', meta:'per kwartaal · omgerekend', bedrag:89},
+      {id:'toeslag', naam:'Toeslagen', meta:'maandelijks · 20e', bedrag:181},
+      {id:'fl', naam:'Freelance Sam', meta:'wisselend · € 0–890', bedrag:620}
+    ].map(b => ({...b, bedrag: b.id === 'sam' && st.inkomenLaag ? 840 : b.bedrag}));
+
+    const basis = BRONNEN.filter(b => st.bronnen[b.id]).reduce((t, b) => t + b.bedrag, 0);
+    const binnen = BRONNEN.reduce((t, b) => t + b.bedrag, 0);
+    const meevallerBedrag = Math.max(0, binnen - basis);
+    const bronnen = BRONNEN.map(b => {
+      const aan = !!st.bronnen[b.id];
+      return {
+        naam: b.naam, meta: b.meta, bedrag: EUR(b.bedrag),
+        basisTekst: aan ? 'telt mee in basis' : 'niet in basis',
+        basisKleur: aan ? 'var(--ink)' : 'var(--color-accent-700)',
+        bg: aan ? '#fff' : 'var(--color-accent-100)',
+        rand: aan ? 'var(--color-neutral-300)' : 'var(--color-accent)',
+        toggle: () => this.setState(x => ({bronnen: {...x.bronnen, [b.id]: !x.bronnen[b.id]}}))
+      };
+    });
+
+    const vasteLasten = 1434 + aboTotaal;
+    const potjesVol = POTJES.reduce((t, p) => t + p.budget, 0);
+    const OVERIG = 728;
+
+    let gat = st.inkomenLaag ? 340 : 0;
+    const potjesKrimp = st.inkomenLaag && st.dekking.potjes ? Math.min(200, gat) : 0; gat -= potjesKrimp;
+    const pauzeBedrag = st.inkomenLaag && st.dekking.pauze ? Math.min(300, gat) : 0; gat -= pauzeBedrag;
+    const bufferOpname = st.inkomenLaag && st.dekking.buffer ? Math.min(340, gat) : 0; gat -= bufferOpname;
+
+    const belegInleg = 300 - pauzeBedrag;
+    const sparen = 250 + st.inleg + belegInleg;
+    const potjesBudget = potjesVol - potjesKrimp;
+    const vrij = Math.round(basis - vasteLasten - sparen - potjesBudget - OVERIG + bufferOpname + st.extraVrij);
+    const lastenMnd = vasteLasten + potjesBudget;
+    const nl1 = n => n.toFixed(1).replace('.', ',');
+
+    const INK = [4180, 4090, 4380, 4130, 4090, 4450, 4210, 4100, 4310, 4520, 4110, binnen];
+    const balkH = v => Math.max(6, Math.round((v - 3500) / 1200 * 78));
+    const inkomenBalken = INK.map((v, i) => ({
+      h: Math.round(balkH(v) * 86 / 78) + 'px',
+      kleur: i === 11 ? 'var(--color-accent)' : 'var(--color-neutral-300)'
+    }));
+
+    const deelBeleg = Math.min(st.deelBeleg, 100 - st.deelBuffer);
+    const dBuffer = Math.round(meevallerBedrag * st.deelBuffer / 100);
+    const dBeleg = Math.round(meevallerBedrag * deelBeleg / 100);
+    const dVrij = meevallerBedrag - dBuffer - dBeleg;
+
+    const bufferSaldo = 7400 + st.extraBuffer;
+    const bufferDoel = Math.round(6 * lastenMnd);
+    const belegd = 9300 + st.extraBeleg;
+
+    const doelSaldoN = 1180, doelTotaal = 2400;
+    const teGaan = doelTotaal - doelSaldoN;
+    const maandenTeGaan = Math.ceil(teGaan / st.inleg);
+    const klaarIdx = 9 + maandenTeGaan;
+    const klaarTekst = 'klaar in ' + MAAND[klaarIdx % 12] + ' ' + (2026 + Math.floor(klaarIdx / 12)) + ' · nog ' + maandenTeGaan + ' inlegmaanden';
+
+    const DEK = [
+      {id:'potjes', naam:'Potjes krimpen', bedrag:200, gevolg:'boodschappen −80 · uitjes −80 · kleding −40'},
+      {id:'pauze', naam:'Beleggen pauzeren', bedrag:300, gevolg:'buffer en vakantiedoel lopen door, beleggen staat stil'},
+      {id:'buffer', naam:'Uit de buffer', bedrag:340, gevolg:'buffer houdt dit ' + Math.floor(bufferSaldo / 340) + ' maanden vol'}
+    ];
+    const gedekt = DEK.filter(d => st.dekking[d.id]).reduce((t, d) => t + d.bedrag, 0);
+    const tekortRest = Math.max(0, 340 - gedekt);
+    const dekkingOpties = DEK.map(d => ({
+      naam: d.naam, bedrag: '€ ' + d.bedrag, gevolg: d.gevolg,
+      rand: st.dekking[d.id] ? 'var(--color-accent)' : 'var(--color-neutral-300)',
+      bg: st.dekking[d.id] ? 'var(--color-accent-100)' : '#fff',
+      toggle: () => this.setState(x => ({dekking: {...x.dekking, [d.id]: !x.dekking[d.id]}}))
+    }));
+
+    const BLG = [220, 250, 250, 300, 300, 300, 0, 300, 300, 300, 300, belegInleg + dBeleg];
+    const belegBalken = BLG.map((v, i) => ({
+      h: Math.round(v / 600 * 64) + 'px',
+      kleur: i === 11 ? 'var(--color-accent)' : '#5f7196'
+    }));
+
+    const watervalStappen = [
+      {naam: 'Vaste lasten', sub: '24 terugkerende betalingen', bedrag: '− ' + EUR(vasteLasten), open: () => this.nav('vast'), rand: 'var(--color-neutral-300)', bg: '#fff'},
+      {naam: 'Sparen & beleggen', sub: pauzeBedrag ? 'beleggen gepauzeerd · ' + EUR(pauzeBedrag) + ' minder' : 'vóór de rest opzij', bedrag: '− ' + EUR(sparen), open: () => this.nav('vooruit'), rand: 'var(--ink)', bg: 'var(--soft)'},
+      {naam: 'Potjes', sub: potjesKrimp ? 'gekrompen met ' + EUR(potjesKrimp) : 'boodschappen, vervoer, uit eten …', bedrag: '− ' + EUR(potjesBudget), open: () => this.nav('potjes'), rand: 'var(--color-neutral-300)', bg: '#fff'},
+      {naam: 'Overig huishouden', sub: 'losse uitgaven zonder potje', bedrag: '− ' + EUR(OVERIG), open: () => this.nav('tx'), rand: 'var(--color-neutral-300)', bg: '#fff'}
+    ];
+    if (bufferOpname) watervalStappen.push({naam: 'Uit de buffer', sub: 'maandelijkse opname zolang het inkomen laag is', bedrag: '+ ' + EUR(bufferOpname), open: () => this.nav('vooruit'), rand: 'var(--ink)', bg: 'var(--soft)'});
+
+    const ic = (...ds) => React.createElement('svg', {
+      width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor',
+      strokeWidth: 2.75, strokeLinecap: 'round', strokeLinejoin: 'round'
+    }, ds.map((d, i) => React.createElement('path', {key: i, d})));
+    const tabs = [
+      {naam: 'Nu', icon: ic('M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8', 'M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'), s: 'nu'},
+      {naam: 'Alles', icon: ic('M3 6h.01', 'M3 12h.01', 'M3 18h.01', 'M8 6h13', 'M8 12h13', 'M8 18h13'), s: 'tx'},
+      {naam: 'Nakijken', icon: ic('M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z', 'm9 12 2 2 4-4'), s: 'review', badge: st.queue.length},
+      {naam: 'Potjes', icon: ic('M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1', 'M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4'), s: 'potjes'},
+      {naam: 'Vooruit', icon: ic('M16 7h6v6', 'm22 7-8.5 8.5-5-5L2 17'), s: 'vooruit'}
+    ].map(t => ({
+      naam: t.naam, icon: t.icon,
+      kleur: s === t.s ? 'var(--ink)' : 'var(--color-neutral-600)',
+      badge: t.badge || '', badgeShow: t.badge ? 'block' : 'none',
+      go: () => this.nav(t.s)
+    }));
+
+    return {
+      isNu: s === 'nu', isTx: s === 'tx', isReview: s === 'review', isPotjes: s === 'potjes',
+      isPotje: s === 'potje', isVast: s === 'vast', isAbos: s === 'abos', isLabels: s === 'labels',
+      isLabel: s === 'label', isScenario: s === 'scenario', isImport: s === 'import',
+
+      isInkomen: s === 'inkomen', isMeevaller: s === 'meevaller', isMinder: s === 'minder',
+      isWaterval: s === 'waterval', isVooruit: s === 'vooruit', isDoel: s === 'doel', isBeleggen: s === 'beleggen',
+
+      coachOpen: !st.coachGedaan,
+      coachTekst: 'Je houdt dit ritme al drie weken vol en ligt € 40 voor. Zal ik dat naar je buffer schuiven?',
+      coachDoen: () => this.setState(x => ({extraBuffer: x.extraBuffer + 40, coachGedaan: true})),
+      coachWeg: () => this.set('coachGedaan', true),
+      basisLabel: EUR(basis), vasteLastenLabel: EUR(vasteLasten),
+      vasteLastenSub: EUR(vasteLasten * 12) + ' per jaar · ' + Math.round(vasteLasten / basis * 100) + '% van je basisinkomen',
+      inkomenSub: '5 bronnen · deze maand ' + EUR(binnen) + ' binnen',
+      bronnen, inkomenBalken,
+      basisLijn: Math.round((basis - 3500) / 1200 * 86) + 'px',
+      basisLijnLabel: (Math.round((basis - 3500) / 1200 * 86) + 3) + 'px',
+      potjesRestLabel: EUR(POTJES.reduce((t, p) => t + Math.max(0, p.budget + p.mee - p.besteed), 0)),
+      potjesKoersSub: POTJES.filter(p => p.budget + p.mee - p.besteed < 0).length + ' van de ' + POTJES.length + ' potjes staat in het rood',
+      reviewStappen: [0, 1, 2, 3].map(i => ({
+        kleur: i < (4 - st.queue.length) ? 'var(--ink)' : 'var(--color-neutral-300)'
+      })),
+      gokPotje: item ? item.potje : '',
+      gokZeker: item ? item.zeker : '',
+      vooruitVoet: 'De buffer gaat voor. Doelen schuiven op in een krappe maand; beleggen blijft staan.',
+      meevallerOpen: meevallerBedrag > 0 && !st.meevallerVerwerkt,
+      meevallerTitel: EUR(meevallerBedrag) + ' meevaller',
+      meevallerLabel: EUR(meevallerBedrag),
+      meevallerSub: EUR(meevallerBedrag) + ' boven je basis · freelance Sam',
+      deelBufferLabel: EUR(dBuffer) + ' · ' + st.deelBuffer + '%',
+      deelBelegLabel: EUR(dBeleg) + ' · ' + deelBeleg + '%',
+      deelVrijLabel: EUR(dVrij),
+      bufferGevolg: 'buffer ' + nl1(bufferSaldo / lastenMnd) + ' → ' + nl1((bufferSaldo + dBuffer) / lastenMnd) + ' maanden lasten',
+      bufferSlider: this.slider('deelBuffer', 0, 100, 5),
+      belegSlider: this.slider('deelBeleg', 0, 100, 5),
+      vasteRand: st.vasteVerdeling ? 'var(--color-accent)' : 'var(--color-neutral-300)',
+      vasteBg: st.vasteVerdeling ? 'var(--color-accent-100)' : '#fff',
+      vasteVink: st.vasteVerdeling ? 'var(--color-accent-700)' : '#fff',
+      vasteTeken: st.vasteVerdeling ? '✓' : '',
+      toggleVaste: () => this.set('vasteVerdeling', !st.vasteVerdeling),
+      meevallerKnop: st.vasteVerdeling ? 'Zo doen · en voortaan automatisch' : 'Zo doen',
+      pasMeevallerToe: () => this.setState(x => ({
+        extraBuffer: x.extraBuffer + dBuffer, extraBeleg: x.extraBeleg + dBeleg, extraVrij: x.extraVrij + dVrij,
+        meevallerVerwerkt: true, screen: 'vooruit', vorige: 'inkomen'
+      })),
+
+      minderTitel: st.inkomenLaag ? 'Basis is bijgesteld naar ' + EUR(basis) : 'Wat als je inkomen daalt?',
+      minderSub: st.inkomenLaag ? 'tik om je dekking aan te passen' : 'Sam 4 dagen werken · − € 340 per maand',
+      dekkingOpties,
+      tekortTekst: tekortRest ? 'Nog te dekken' : 'Helemaal gedekt',
+      tekortLabel: tekortRest ? '€ ' + tekortRest : '€ 0',
+      tekortKleur: tekortRest ? 'var(--color-accent-700)' : 'var(--ink-deep)',
+      tekortRand: tekortRest ? 'var(--color-accent)' : 'var(--ink)',
+      tekortBg: tekortRest ? 'var(--color-accent-100)' : 'var(--soft)',
+      minderKnop: tekortRest ? 'Kies eerst hoe je € ' + tekortRest + ' dekt' : 'Plan bijstellen vanaf oktober',
+      minderKnopBg: tekortRest ? 'var(--color-neutral-200)' : 'var(--color-text)',
+      minderKnopFg: tekortRest ? 'var(--color-neutral-700)' : '#fff',
+      pasMinderToe: () => { if (!tekortRest) this.setState({inkomenLaag: true, screen: 'waterval', vorige: 'minder'}); },
+
+      watervalStappen,
+
+      vooruitSub: pauzeBedrag ? EUR(sparen) + ' per maand · beleggen deels gepauzeerd' : EUR(sparen) + ' per maand opzij',
+      vermogenLabel: EUR(bufferSaldo + doelSaldoN + 2900 + belegd),
+      vermogenSub: 'buffer, doelen en beleggingen samen',
+      bufferLabel: EUR(bufferSaldo) + ' / ' + EUR(bufferDoel),
+      bufferPct: Math.min(100, Math.round(bufferSaldo / bufferDoel * 100)) + '%',
+      bufferSub: nl1(bufferSaldo / lastenMnd) + ' van de 6 maanden lasten · € 250 per maand' + (bufferOpname ? ' · − ' + EUR(bufferOpname) + ' opname' : ''),
+      doelen: [
+        {naam: 'Vakantie Italië', saldo: EUR(doelSaldoN) + ' / ' + EUR(doelTotaal), pct: Math.round(doelSaldoN / doelTotaal * 100) + '%',
+         sub: EUR(st.inleg) + ' per maand · ' + klaarTekst.replace('klaar in ', 'klaar '),
+         kleur: 'var(--color-neutral-700)', open: () => this.nav('doel')},
+        {naam: 'Keuken', saldo: '€ 2.900 / € 9.000', pct: '32%', sub: '3 maanden geen inleg · doel schuift op',
+         kleur: 'var(--color-accent-700)', open: () => this.nav('doel')}
+      ],
+      belegSub: pauzeBedrag ? EUR(belegInleg) + ' per maand · deels gepauzeerd' : '€ 300 per maand · geen einddatum',
+      belegSaldoLabel: EUR(belegd),
+
+      doelSaldo: EUR(doelSaldoN) + ' van ' + EUR(doelTotaal),
+      doelPct: Math.round(doelSaldoN / doelTotaal * 100) + '%',
+      doelRest: EUR(teGaan) + ' te gaan',
+      inlegLabel: EUR(st.inleg),
+      inlegSlider: this.slider('inleg', 50, 300, 10),
+      doelKlaar: klaarTekst,
+      togglePauze: () => this.set('pauzeBijKrap', !st.pauzeBijKrap),
+      pauzeTekst: st.pauzeBijKrap ? 'aan ✓' : 'uit',
+      pauzeKleur: st.pauzeBijKrap ? 'var(--ink)' : 'var(--color-neutral-700)',
+
+      belegBalken,
+      belegWaarde: EUR(Math.round(belegd * 1.092)),
+      belegWinst: '+ ' + EUR(Math.round(belegd * 0.092)),
+      belegUitMeevaller: EUR(1240 + st.extraBeleg),
+      belegRegelSub: st.deelBeleg + '%-regel · dit jaar bij elkaar',
+
+      goInkomen: () => this.nav('inkomen'), goMeevaller: () => this.nav('meevaller'),
+      goMinder: () => this.nav('minder'), goWaterval: () => this.nav('waterval'),
+      goVooruit: () => this.nav('vooruit'), goBeleggen: () => this.nav('beleggen'),
+
+      vrijLabel: EUR(vrij), perDagLabel: EUR(Math.round(vrij / 11)) + ' per dag tot 30 september',
+      reviewChip: st.queue.length ? st.queue.length + ' na te kijken' : 'niets na te kijken',
+      potjes, tabs, txLijst,
+      txFilters: ['Alles', 'Geen potje', 'Groot'].map(f => ({
+        naam: f, ...this.chip(st.txFilter === f), pick: () => this.set('txFilter', f)
+      })),
+
+      potje: {
+        naam: pd.naam, budget: EUR(pd.budget), mee: pd.mee ? '+ ' + EUR(pd.mee) : '—',
+        besteed: '− ' + EUR(pd.besteed), rest: EUR(pd.budget + pd.mee - pd.besteed)
+      },
+      rolloverOpties,
+
+      reviewOver: st.queue.length + ' over',
+      reviewLeeg: st.queue.length === 0,
+      reviewActief: st.queue.length > 0,
+      huidige: item || {naam: '', bedrag: '', meta: ''},
+      potjeKeuzes, labelKeuzes,
+      regelAan: st.regelAan,
+      regelRand: st.regelAan ? 'var(--color-accent)' : 'var(--color-neutral-300)',
+      regelBg: st.regelAan ? 'var(--color-accent-100)' : '#fff',
+      regelVink: st.regelAan ? 'var(--color-accent-700)' : '#fff',
+      regelTeken: st.regelAan ? '✓' : '',
+      regelUitleg: item ? item.regel : '',
+      bevestigLabel: item ? 'Bevestigen · volgende' : 'Klaar',
+      toggleRegel: () => this.set('regelAan', !st.regelAan),
+      bevestig: verwerk, skip: verwerk,
+      resetReview: () => this.setState({queue: QUEUE, qi: 0}),
+
+      vasteGroepen, abos,
+      abosSub: aboActief + ' diensten · € ' + aboTotaal.toFixed(2).replace('.', ',') + ' per maand',
+
+      labels: [
+        {naam: 'Auto 2 · Berlingo', sub: '68 transacties · 4 potjes', bedrag: '€ 274'},
+        {naam: 'Auto 1 · Polo', sub: '74 transacties · 3 potjes', bedrag: '€ 252'},
+        {naam: 'Huisdieren', sub: '41 transacties', bedrag: '€ 71'},
+        {naam: 'Kinderen · school', sub: '33 transacties', bedrag: '€ 97'},
+        {naam: "Vakantie Frankrijk '26", sub: 'eenmalig · € 1.940 totaal', bedrag: '—'}
+      ].map((l, i) => ({...l, open: () => this.nav(i === 0 ? 'label' : 'labels')})),
+      labelBron: [
+        {naam: 'Vaste lasten', pct: '44%', bedrag: '€ 121'},
+        {naam: 'Vervoer', pct: '34%', bedrag: '€ 94'},
+        {naam: 'Onderhoud', pct: '16%', bedrag: '€ 44'},
+        {naam: 'Onvoorzien', pct: '6%', bedrag: '€ 15'}
+      ],
+
+      ritPct: st.rit + '% van de ritten',
+      extraPolo: EUR(extraPolo), extraOv: EUR(st.ov),
+      nettoLabel: EUR(netto) + ' p/m',
+      nettoJaar: EUR(netto * 12),
+      ritSlider: this.slider('rit', 0, 100),
+      ovSlider: this.slider('ov', 0, 120),
+
+      importGelezen: st.importGelezen,
+      importTitel: st.importGelezen ? 'ING_20260918.sta gelezen ✓' : 'Kies je .sta-bestand',
+      importSub: st.importGelezen ? '62 regels · 01–18 sep · NL21 INGB ···45 67' : 'of sleep het hierheen',
+      leesBestand: () => this.set('importGelezen', true),
+      importRegels: [
+        {naam: 'Regels gevonden', waarde: '62', kleur: 'var(--color-text)'},
+        {naam: 'Al bekend (dubbel)', waarde: '18', kleur: 'var(--color-neutral-700)'},
+        {naam: 'Automatisch in een potje', waarde: '32', kleur: 'var(--ink)'},
+        {naam: 'Naar nakijken', waarde: '12', kleur: 'var(--color-accent-700)'}
+      ],
+
+      goNu: () => this.nav('nu'), goPotjes: () => this.nav('potjes'), goReview: () => this.nav('review'),
+      goVast: () => this.nav('vast'), goLabels: () => this.nav('labels'), goLabel: () => this.nav('label'),
+      goScenario: () => this.nav('scenario'), goImport: () => this.nav('import'),
+      back: () => this.nav(st.vorige || 'nu')
+    };
+  }
+}
+</script>
+</body>
+</html>

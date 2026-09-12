@@ -72,3 +72,18 @@ src/mcp-server/ .NET 10 MCP server
 - Domeinlogica: TypeScript, in `src/pwa/`. Geen dubbele implementatie in .NET.
 - Belangrijke architectuurkeuzes: vastleggen als ADR in `docs/architecture/decisions/`, niet alleen hier samenvatten.
 - Geen telemetrie/analytics standaard aan.
+
+## Werkafspraken met Claude Code
+
+- Compact het contextvenster zodra eerdere conversatie-historie niet meer nodig is om verder te bouwen — bijv. na het afronden van een feature of module, voordat aan de volgende wordt begonnen. Dit bestand, ADR's en de code zelf zijn de bron van waarheid, niet de gespreksgeschiedenis.
+- Taalconventie: documentatie en ADR's in het Nederlands, code/identifiers/commit messages in het Engels.
+- Crypto nooit zelf bouwen: voor de e2e-sync altijd een gevetterde library (libsodium-achtig), geen eigen encryptie-primitieven. Bij twijfel over het crypto-ontwerp eerst afstemmen vóór implementatie — de impact van een fout hier is groot.
+- ADR vóór implementatie, niet erna: bij keuzes die het datamodel, syncprotocol, security-grens of licentie raken, eerst een ADR-voorstel maken en pas daarna coderen.
+- Testbaarheid van geldlogica: categorisatie- en budgetberekeningen (potjes, confidence scores) krijgen unit tests voordat een module als "klaar" geldt.
+- Destructieve DB-acties (schema-migraties, resets van lokale SQLite/IndexedDB) nooit automatisch uitvoeren, ook niet lokaal — altijd expliciete bevestiging.
+- Nieuwe dependencies afstemmen met de gebruiker, vooral bij telemetrie, een afwijkende licentie, of iets dat de "dun & blind" relay-filosofie doorbreekt.
+- Geen secrets/sleutels in logs of repo: het sync-wachtwoord en afgeleide sleutels nooit persisteren buiten de daarvoor bedoelde versleutelde opslag.
+
+### Huidige projectfase
+
+Het project is greenfield: er is nog geen OTAP-scheiding (geen aparte omgevingen/branches per stage). Zolang dat zo is, wordt er direct op `main` gewerkt en gepusht — geen feature branches of PR's nodig. Zodra er een eerste werkende versie staat en/of meerdere mensen meewerken, herzien we dit.

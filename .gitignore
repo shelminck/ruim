@@ -1,0 +1,26 @@
+# Node / npm
+node_modules/
+npm-debug.log*
+
+# Nuxt
+.nuxt/
+.output/
+dist/
+
+# Build artifacts
+*.tsbuildinfo
+
+# .NET
+bin/
+obj/
+
+# Editor / OS
+.vs/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
