@@ -13,6 +13,8 @@ dist/
 # .NET
 bin/
 obj/
+*.db
+*.db-journal
 
 # Editor / OS
 .vs/
