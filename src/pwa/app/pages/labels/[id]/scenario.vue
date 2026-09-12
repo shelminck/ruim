@@ -7,8 +7,11 @@ import { getDb } from '../../../lib/db/client'
 import type { Label } from '../../../lib/domain/types'
 
 const route = useRoute()
+const screenHeader = useScreenHeader()
 
-useScreenHeader().set('Scenario', 'Wat blijft er over als je dit wegdenkt?')
+screenHeader.set('Scenario', 'Wat blijft er over als je dit wegdenkt?', {
+  back: { to: `/labels/${route.params.id}`, label: 'Label' },
+})
 
 const label = ref<Label | null>(null)
 const stats = ref<LabelStats | null>(null)
@@ -22,6 +25,9 @@ onMounted(async () => {
   }
   label.value = found
   stats.value = computeLabelStats(id, await db.getAll('transactions'))
+  screenHeader.set('Scenario', 'Wat blijft er over als je dit wegdenkt?', {
+    back: { to: `/labels/${id}`, label: found.name },
+  })
 })
 </script>
 

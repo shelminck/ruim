@@ -9,7 +9,9 @@ import type { Envelope, Label } from '../../../lib/domain/types'
 
 const route = useRoute()
 
-useScreenHeader().set('Label', 'Gemiddelde per maand en de kosten per potje.')
+useScreenHeader().set('Label', 'Gemiddelde per maand en de kosten per potje.', {
+  back: { to: '/labels', label: 'Labels' },
+})
 
 const label = ref<Label | null>(null)
 const stats = ref<LabelStats | null>(null)

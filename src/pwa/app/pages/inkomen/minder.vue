@@ -8,7 +8,9 @@ import { getMonthlyAdjustment, saveMonthlyAdjustment } from '../../lib/db/monthl
 import { useSidebarValues } from '../../composables/useSidebarValues'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Minder inkomen', 'Dek een inkomensdaling met potjes, pauzeren of de buffer.')
+useScreenHeader().set('Minder inkomen', 'Dek een inkomensdaling met potjes, pauzeren of de buffer.', {
+  back: { to: '/inkomen', label: 'Inkomen' },
+})
 
 const router = useRouter()
 const { refresh: refreshSidebarValues } = useSidebarValues()

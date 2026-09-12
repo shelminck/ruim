@@ -8,7 +8,9 @@ import type { Goal } from '../../../lib/domain/types'
 const route = useRoute()
 const router = useRouter()
 
-useScreenHeader().set('Doel', 'Voortgang en instellingen voor dit doel.')
+useScreenHeader().set('Doel', 'Voortgang en instellingen voor dit doel.', {
+  back: { to: '/vooruit', label: 'Vooruit' },
+})
 
 const goal = ref<Goal | null>(null)
 const accountLabelInput = ref('')

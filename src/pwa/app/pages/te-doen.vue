@@ -9,7 +9,7 @@ import { listGoals } from '../lib/db/goals'
 import { listSubscriptions } from '../lib/db/subscriptions'
 import { getMonthlyAdjustment } from '../lib/db/monthly-adjustments'
 import { getDb } from '../lib/db/client'
-import { listTaskStatesForMonth, saveTaskState } from '../lib/db/task-state'
+import { clearTaskStatesForMonth, listTaskStatesForMonth, saveTaskState } from '../lib/db/task-state'
 import { useTeDoenCount } from '../composables/useTeDoenCount'
 import type { TaskGroup, TaskState } from '../lib/domain/types'
 
@@ -87,6 +87,12 @@ async function dismiss(task: DerivedTask) {
 function toggleCollapsed(group: TaskGroup) {
   collapsed.value = { ...collapsed.value, [group]: !collapsed.value[group] }
 }
+
+async function resetMonth() {
+  await clearTaskStatesForMonth(month)
+  states.value = {}
+  await refreshTeDoenCount()
+}
 </script>
 
 <template>
@@ -151,6 +157,8 @@ function toggleCollapsed(group: TaskGroup) {
         Zet de vaste overboekingen één keer als periodieke opdracht in je bank. Dan blijven hier alleen de eenmalige
         dingen staan.
       </div>
+
+      <button type="button" class="reset-button" @click="resetMonth">Nieuwe maand · lijst terugzetten</button>
 
       <p class="disclaimer">
         Afvinken verandert je saldo niet — Ruim gelooft je pas als de transactie in je import staat.
@@ -351,6 +359,22 @@ function toggleCollapsed(group: TaskGroup) {
   border-radius: var(--radius-callout);
   padding: 16px;
   font-size: 13px;
+}
+
+.reset-button {
+  border: none;
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+  background: transparent;
+  color: var(--ink-deep);
+  border-radius: 999px;
+  padding: 13px;
+  font-family: var(--font-heading);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.reset-button:hover {
+  background: var(--color-neutral-100);
 }
 
 .disclaimer {

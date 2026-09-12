@@ -20,8 +20,17 @@ const STAND_STYLE: Record<Stand, { disc: string; innerPct: number; insetPct: num
   op: { disc: 'var(--color-accent-900)', innerPct: 18, insetPct: 20 },
 }
 
+// On the hero panel (navy background) the "ruim" disc is also navy, so only
+// the white ring reads — see design handoff README, merkteken "known open
+// item". Swap to a cream disc with a navy cutout there instead.
+const heroRuimOverride = computed(() => props.heroRing && props.stand === 'ruim')
+
 const style = computed(() => STAND_STYLE[props.stand])
-const cutoutColor = computed(() => (props.surface === 'card' ? 'var(--card)' : 'var(--color-bg)'))
+const discColor = computed(() => (heroRuimOverride.value ? 'var(--color-bg)' : style.value.disc))
+const cutoutColor = computed(() => {
+  if (heroRuimOverride.value) return 'var(--ink)'
+  return props.surface === 'card' ? 'var(--card)' : 'var(--color-bg)'
+})
 </script>
 
 <template>
@@ -30,7 +39,7 @@ const cutoutColor = computed(() => (props.surface === 'card' ? 'var(--card)' : '
     :style="{
       width: `${size}px`,
       height: `${size}px`,
-      background: style.disc,
+      background: discColor,
       boxShadow: heroRing ? '0 0 0 1.5px rgba(255,255,255,.45)' : undefined,
     }"
   >

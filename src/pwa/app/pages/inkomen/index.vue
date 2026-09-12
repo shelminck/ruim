@@ -5,7 +5,9 @@ import type { IncomeSource } from '../../lib/domain/types'
 import { createIncomeSource, listIncomeSources, updateIncomeSource } from '../../lib/db/income-sources'
 import { useSidebarValues } from '../../composables/useSidebarValues'
 
-useScreenHeader().set('Inkomen', 'Waar je plan op draait, en wat erboven komt.')
+useScreenHeader().set('Inkomen', 'Waar je plan op draait, en wat erboven komt.', {
+  back: { to: '/nu', label: 'Nu' },
+})
 
 const { refresh: refreshSidebarValues } = useSidebarValues()
 

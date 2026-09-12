@@ -14,7 +14,9 @@ const spentCents = ref(0)
 const budgetInput = ref('')
 const carriedOverInput = ref('')
 
-useScreenHeader().set('Potje', 'Budget, meegenomen rest en de doorschuif-regel voor dit potje.')
+useScreenHeader().set('Potje', 'Budget, meegenomen rest en de doorschuif-regel voor dit potje.', {
+  back: { to: '/potjes', label: 'Potjes' },
+})
 
 async function load() {
   const id = String(route.params.id)

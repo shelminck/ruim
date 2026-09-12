@@ -134,7 +134,7 @@ async function deleteEnvelope(id: string) {
 
     <div class="legend-card">
       <div v-for="item in legend" :key="item.stand" class="legend-row" :class="{ 'legend-row--dim': item.stand !== monthStand.stand }">
-        <Merkteken :stand="item.stand" :size="26" />
+        <Merkteken :stand="item.stand" :size="34" />
         <span>{{ item.label }}</span>
       </div>
     </div>

@@ -203,7 +203,7 @@
   <div class="titleblock">
     <div class="eyebrow-row">
       <span>SHEET A1 — SYSTEEMOVERZICHT</span>
-      <span>REV 1.1</span>
+      <span>REV 1.2</span>
     </div>
     <h1>Architectuurplaat</h1>
     <p class="subtitle">Huishoudboekje met potjes, automatische categorisatie en optionele gezinssync — lokaal-eerst, met MCP-uitbreiding voor AI-verwerking.</p>
@@ -409,35 +409,36 @@
   <section>
     <div class="section-label"><span>10 — SCHERMSTATUS</span><span>PWA · 19 SCHERMEN</span></div>
     <h2>De totaalplaat: wat staat er al, wat nog niet</h2>
-    <p class="lede">Tegen de design-handoff aangelegd (<code>docs/design/design_handoff_huishoudboekje_ruim/</code>, desktop- én mobiele prototype). "Gedeeltelijk" = het scherm bestaat en werkt, maar mist een specifiek gespecificeerd onderdeel. "Nog te verifiëren" = nooit op telefoonbreedte (390px) getest sinds de eerste responsive-pas; mogelijk een krappe rij, nog niet bevestigd.</p>
+    <p class="lede">Tegen de design-handoff aangelegd (<code>docs/design/design_handoff_huishoudboekje_ruim/</code>, desktop- én mobiele prototype). Bijgewerkt na de mobiele header/back-link-fix en de 6 desktop-gaten uit REV 1.1 — alle 19 routes zijn op 390×844 met Playwright doorlopen (geen horizontale overflow, terugkoppeling precies op de 13 subschermen die dat horen te hebben).</p>
     <table class="htable">
       <tr><th>#</th><th>Scherm</th><th>Desktop</th><th>Mobiel</th><th>Notitie</th></tr>
-      <tr><td>01</td><td>Nu</td><td>gedeeltelijk</td><td>ontbreekt</td><td>Coach-kaart en meevaller-kaart missen op desktop; mobiel heeft geen eigen kop (geen "Goeiemorgen"-groet/avatarpaar) en toont de gedeelde pil-header i.p.v. niets.</td></tr>
-      <tr><td>02</td><td>Alles</td><td class="rec">✓</td><td>gedeeltelijk</td><td>Alleen het header-formaat wijkt af op mobiel (geen "‹ terug"-conventie van toepassing, is tabblad).</td></tr>
-      <tr><td>03</td><td>Nakijken</td><td class="rec">✓</td><td>nog te verifiëren</td><td>Actieknoppenrij (Overslaan/Bevestigen) nooit op 390px bekeken.</td></tr>
-      <tr><td>04</td><td>Te doen</td><td>gedeeltelijk</td><td>nog te verifiëren</td><td>"Nieuwe maand · lijst terugzetten"-knop + reset-logica ontbreekt; taakregel-packing op telefoonbreedte onbevestigd.</td></tr>
-      <tr><td>05</td><td>Potjes (overzicht)</td><td>gedeeltelijk</td><td>gedeeltelijk</td><td>Legenda-merkteken 26px i.p.v. 34px; mobiel mist header-formaat.</td></tr>
-      <tr><td>06</td><td>Potje detail</td><td class="rec">✓</td><td>gedeeltelijk</td><td>Header-formaat + terug-link ontbreekt op mobiel.</td></tr>
-      <tr><td>07</td><td>Vaste lasten</td><td class="rec">✓</td><td>nog te verifiëren</td><td>Groepsregel (naam + bedrag + "Verwijderen") mogelijk krap op 390px.</td></tr>
-      <tr><td>08</td><td>Abonnementen</td><td class="rec">✓</td><td>gedeeltelijk</td><td>Grid klapt al vanzelf naar 1 kolom; alleen header-formaat wijkt af.</td></tr>
-      <tr><td>09</td><td>Labels (overzicht)</td><td class="rec">✓</td><td>gedeeltelijk</td><td>Header-formaat.</td></tr>
-      <tr><td>10</td><td>Label detail</td><td class="rec">✓</td><td>nog te verifiëren</td><td>Vaste 120px-labelkolom in de staafjes-rij mogelijk te breed op 390px.</td></tr>
-      <tr><td>11</td><td>Scenario "Wegdenken"</td><td class="rec">✓</td><td>gedeeltelijk</td><td>Al single-column; alleen header-formaat.</td></tr>
-      <tr><td>12</td><td>MT940 importeren</td><td class="rec">✓</td><td>gedeeltelijk</td><td>Header-formaat.</td></tr>
-      <tr><td>13</td><td>Inkomen</td><td>gedeeltelijk</td><td>nog te verifiëren</td><td>12-maandenstaafdiagram toont alleen de huidige maand echt (datalimiet, geen bug); staafjes-packing op 390px onbevestigd.</td></tr>
-      <tr><td>14</td><td>Meevaller</td><td class="rec">✓</td><td>gedeeltelijk</td><td>Sliders staan al gestapeld; alleen header-formaat.</td></tr>
-      <tr><td>15</td><td>Minder</td><td class="rec">✓</td><td>nog te verifiëren</td><td>Dekkingsrij + invoerveld mogelijk krap op 390px.</td></tr>
-      <tr><td>16</td><td>Waterval</td><td class="rec">✓</td><td>nog te verifiëren</td><td>De 40px-inspringing per stap laat weinig breedte over op 390px.</td></tr>
-      <tr><td>17</td><td>Vooruit</td><td>gedeeltelijk</td><td>nog te verifiëren</td><td>Stap 2 ("Doelen") heeft een accent- i.p.v. navy cirkel; inline formuliertje mogelijk krap op 390px.</td></tr>
-      <tr><td>18</td><td>Doel detail</td><td class="rec">✓</td><td>nog te verifiëren</td><td>Instellingenlijst met inline invoervelden onbevestigd op 390px.</td></tr>
-      <tr><td>19</td><td>Beleggen</td><td class="rec">✓</td><td>nog te verifiëren</td><td>Twee grote cijferblokken naast elkaar mogelijk krap op 390px.</td></tr>
+      <tr><td>01</td><td>Nu</td><td class="rec">✓</td><td class="rec">✓</td><td>Coach-kaart en meevaller-kaart toegevoegd (desktop én mobiel). Mobiel heeft nu een eigen kop ("Goeiemorgen, Sanne" + avatarpaar) i.p.v. de gedeelde pil-header.</td></tr>
+      <tr><td>02</td><td>Alles</td><td class="rec">✓</td><td class="rec">✓</td><td>Tabblad, geen terug-link nodig.</td></tr>
+      <tr><td>03</td><td>Nakijken</td><td class="rec">✓</td><td class="rec">✓</td><td>Tabblad; actieknoppenrij geverifieerd op 390px, geen overflow.</td></tr>
+      <tr><td>04</td><td>Te doen</td><td class="rec">✓</td><td class="rec">✓</td><td>"Nieuwe maand · lijst terugzetten"-knop toegevoegd (wist alleen dit-maands afgevinkt/verborgen-status, regels blijven staan). Tabblad, geverifieerd op 390px.</td></tr>
+      <tr><td>05</td><td>Potjes (overzicht)</td><td class="rec">✓</td><td class="rec">✓</td><td>Legenda-merkteken 26px → 34px. Tabblad.</td></tr>
+      <tr><td>06</td><td>Potje detail</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Potjes.</td></tr>
+      <tr><td>07</td><td>Vaste lasten</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Nu; groepsregel geverifieerd op 390px.</td></tr>
+      <tr><td>08</td><td>Abonnementen</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Vaste lasten.</td></tr>
+      <tr><td>09</td><td>Labels (overzicht)</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Nu.</td></tr>
+      <tr><td>10</td><td>Label detail</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Labels; vaste 120px-labelkolom geverifieerd, geen overflow op 390px.</td></tr>
+      <tr><td>11</td><td>Scenario "Wegdenken"</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → het specifieke label (dynamisch, niet de generieke "Label"-tekst).</td></tr>
+      <tr><td>12</td><td>MT940 importeren</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Nu.</td></tr>
+      <tr><td>13</td><td>Inkomen</td><td>gedeeltelijk</td><td class="rec">✓</td><td>Terug-link → Nu, geverifieerd. Desktop: 12-maandenstaafdiagram toont bewust alleen de huidige maand echt (datalimiet — nog geen meerdere maanden data — geen bug, blijft buiten scope).</td></tr>
+      <tr><td>14</td><td>Meevaller</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Inkomen.</td></tr>
+      <tr><td>15</td><td>Minder</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Inkomen, geverifieerd op 390px.</td></tr>
+      <tr><td>16</td><td>Waterval</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Inkomen; stap-inspringing geverifieerd, geen overflow op 390px.</td></tr>
+      <tr><td>17</td><td>Vooruit</td><td class="rec">✓</td><td class="rec">✓</td><td>Stap 2 ("Doelen") cirkel accent → navy. Inline formuliertje (buffersaldo/inleg) stapelde niet en overflowde op 390px (483px breed in een 390px-viewport) — nu <code>flex-wrap</code> onder 1100px, geverifieerd gefixt. Tabblad, geen terug-link.</td></tr>
+      <tr><td>18</td><td>Doel detail</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Vooruit, geverifieerd op 390px.</td></tr>
+      <tr><td>19</td><td>Beleggen</td><td class="rec">✓</td><td class="rec">✓</td><td>Terug-link → Vooruit, geverifieerd op 390px.</td></tr>
     </table>
-    <p class="note">Systeembreed (alle schermen): <code>AppHeader.vue</code> mist de derde gespecificeerde pil ("Vandaag € 50,75") naast maand en nakijken-badge. Op mobiel heeft <em>geen enkel</em> scherm de "‹ Vorige"-terugkoppeling uit het mobiele prototype — dat is de systemische header-fix, niet een los per-scherm gat.</p>
+    <p class="note">Systeembreed: <code>AppHeader.vue</code> heeft nu alle 3 gespecificeerde pillen (maand, "Vandaag € X", nakijken-badge) en toont ze alleen ≥1100px; onder 1100px verschijnt in plaats daarvan op de 13 subschermen een "‹ Vorige"-terugkoppeling, en op Nu een eigen mobiele kop. <code>useScreenHeader().set(title, subtitle, { back, hideOnMobile })</code> is de aansluiting per pagina.</p>
+    <p class="note">Bouwval onderweg gevonden en gefixt: bij twee nieuwe mobile-only <code>display</code>-regels (in <code>AppHeader.vue</code> en <code>nu.vue</code>) stond de onvoorwaardelijke basisregel ná de <code>@media</code>-override in bronvolgorde, waardoor de override bij gelijke specificiteit altijd verloor — de elementen die op mobiel juist moesten verschijnen/verdwijnen deden dat niet. Opgelost door de <code>@media</code>-blokken consequent als laatste in het stylesheet te zetten.</p>
   </section>
 
   <footer>
     <span>Huishoudboekje — architectuurplaat</span>
-    <span>Sheet A1 · Rev 1.1</span>
+    <span>Sheet A1 · Rev 1.2</span>
   </footer>
 
 </div>
