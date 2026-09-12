@@ -19,7 +19,7 @@ Response-header `X-Sync-Version` geeft bij elke respons de (nieuwe) versie terug
 
 ## Opslag
 
-SQLite (`Microsoft.Data.Sqlite`), één tabel `sync_blobs`. Pad instelbaar via configuratie-sleutel `Relay:DbPath` (env var: `Relay__DbPath`), standaard `sync.db` naast de executable.
+SQLite (`Microsoft.Data.Sqlite` + Dapper), één tabel `sync_blobs`. Pad instelbaar via configuratie-sleutel `Relay:DbPath` (env var: `Relay__DbPath`), standaard `sync.db` naast de executable.
 
 ## Draaien
 

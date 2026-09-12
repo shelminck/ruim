@@ -1,3 +1,4 @@
+using Dapper;
 using Microsoft.Data.Sqlite;
 using System.Security.Cryptography;
 
@@ -37,8 +38,7 @@ public sealed class SyncBlobStore
         _connectionString = $"Data Source={dbPath}";
 
         using var connection = OpenConnection();
-        using var command = connection.CreateCommand();
-        command.CommandText = """
+        connection.Execute("""
             CREATE TABLE IF NOT EXISTS sync_blobs (
                 sync_id TEXT NOT NULL,
                 partition_key TEXT NOT NULL,
@@ -48,8 +48,7 @@ public sealed class SyncBlobStore
                 updated_at TEXT NOT NULL,
                 PRIMARY KEY (sync_id, partition_key)
             );
-            """;
-        command.ExecuteNonQuery();
+            """);
     }
 
     public SyncWriteResult Write(string syncId, string partitionKey, long expectedVersion, byte[] tokenHash, byte[] blob)
@@ -57,73 +56,54 @@ public sealed class SyncBlobStore
         using var connection = OpenConnection();
         using var transaction = connection.BeginTransaction();
 
-        using var select = connection.CreateCommand();
-        select.Transaction = transaction;
-        select.CommandText = "SELECT version, token_hash FROM sync_blobs WHERE sync_id = $syncId AND partition_key = $partitionKey";
-        select.Parameters.AddWithValue("$syncId", syncId);
-        select.Parameters.AddWithValue("$partitionKey", partitionKey);
-
-        long? storedVersion = null;
-        byte[]? storedTokenHash = null;
-        using (var reader = select.ExecuteReader())
-        {
-            if (reader.Read())
-            {
-                storedVersion = reader.GetInt64(0);
-                storedTokenHash = (byte[])reader["token_hash"];
-            }
-        }
+        var existing = connection.QueryFirstOrDefault<StoredRow>(
+            """
+            SELECT version AS Version, token_hash AS TokenHash
+            FROM sync_blobs WHERE sync_id = @syncId AND partition_key = @partitionKey
+            """,
+            new { syncId, partitionKey },
+            transaction);
 
         var now = DateTimeOffset.UtcNow.ToString("O");
 
-        if (storedVersion is null)
+        if (existing is null)
         {
             if (expectedVersion != 0)
             {
                 return new SyncWriteResult(SyncWriteOutcome.VersionConflict, 0);
             }
 
-            using var insert = connection.CreateCommand();
-            insert.Transaction = transaction;
-            insert.CommandText = """
+            connection.Execute(
+                """
                 INSERT INTO sync_blobs (sync_id, partition_key, version, token_hash, blob, updated_at)
-                VALUES ($syncId, $partitionKey, 1, $tokenHash, $blob, $updatedAt)
-                """;
-            insert.Parameters.AddWithValue("$syncId", syncId);
-            insert.Parameters.AddWithValue("$partitionKey", partitionKey);
-            insert.Parameters.AddWithValue("$tokenHash", tokenHash);
-            insert.Parameters.AddWithValue("$blob", blob);
-            insert.Parameters.AddWithValue("$updatedAt", now);
-            insert.ExecuteNonQuery();
+                VALUES (@syncId, @partitionKey, 1, @tokenHash, @blob, @now)
+                """,
+                new { syncId, partitionKey, tokenHash, blob, now },
+                transaction);
 
             transaction.Commit();
             return new SyncWriteResult(SyncWriteOutcome.Created, 1);
         }
 
-        if (!CryptographicOperations.FixedTimeEquals(storedTokenHash!, tokenHash))
+        if (!CryptographicOperations.FixedTimeEquals(existing.TokenHash, tokenHash))
         {
-            return new SyncWriteResult(SyncWriteOutcome.Unauthorized, storedVersion.Value);
+            return new SyncWriteResult(SyncWriteOutcome.Unauthorized, existing.Version);
         }
 
-        if (storedVersion.Value != expectedVersion)
+        if (existing.Version != expectedVersion)
         {
-            return new SyncWriteResult(SyncWriteOutcome.VersionConflict, storedVersion.Value);
+            return new SyncWriteResult(SyncWriteOutcome.VersionConflict, existing.Version);
         }
 
-        var newVersion = storedVersion.Value + 1;
+        var newVersion = existing.Version + 1;
 
-        using var update = connection.CreateCommand();
-        update.Transaction = transaction;
-        update.CommandText = """
-            UPDATE sync_blobs SET version = $version, blob = $blob, updated_at = $updatedAt
-            WHERE sync_id = $syncId AND partition_key = $partitionKey
-            """;
-        update.Parameters.AddWithValue("$version", newVersion);
-        update.Parameters.AddWithValue("$blob", blob);
-        update.Parameters.AddWithValue("$updatedAt", now);
-        update.Parameters.AddWithValue("$syncId", syncId);
-        update.Parameters.AddWithValue("$partitionKey", partitionKey);
-        update.ExecuteNonQuery();
+        connection.Execute(
+            """
+            UPDATE sync_blobs SET version = @newVersion, blob = @blob, updated_at = @now
+            WHERE sync_id = @syncId AND partition_key = @partitionKey
+            """,
+            new { newVersion, blob, now, syncId, partitionKey },
+            transaction);
 
         transaction.Commit();
         return new SyncWriteResult(SyncWriteOutcome.Updated, newVersion);
@@ -132,27 +112,25 @@ public sealed class SyncBlobStore
     public SyncReadResult Read(string syncId, string partitionKey, byte[] tokenHash)
     {
         using var connection = OpenConnection();
-        using var command = connection.CreateCommand();
-        command.CommandText = "SELECT version, token_hash, blob FROM sync_blobs WHERE sync_id = $syncId AND partition_key = $partitionKey";
-        command.Parameters.AddWithValue("$syncId", syncId);
-        command.Parameters.AddWithValue("$partitionKey", partitionKey);
 
-        using var reader = command.ExecuteReader();
-        if (!reader.Read())
+        var existing = connection.QueryFirstOrDefault<StoredBlobRow>(
+            """
+            SELECT version AS Version, token_hash AS TokenHash, blob AS Blob
+            FROM sync_blobs WHERE sync_id = @syncId AND partition_key = @partitionKey
+            """,
+            new { syncId, partitionKey });
+
+        if (existing is null)
         {
             return new SyncReadResult(SyncReadOutcome.NotFound, 0, null);
         }
 
-        var version = reader.GetInt64(0);
-        var storedTokenHash = (byte[])reader["token_hash"];
-
-        if (!CryptographicOperations.FixedTimeEquals(storedTokenHash, tokenHash))
+        if (!CryptographicOperations.FixedTimeEquals(existing.TokenHash, tokenHash))
         {
-            return new SyncReadResult(SyncReadOutcome.Unauthorized, version, null);
+            return new SyncReadResult(SyncReadOutcome.Unauthorized, existing.Version, null);
         }
 
-        var blob = (byte[])reader["blob"];
-        return new SyncReadResult(SyncReadOutcome.Found, version, blob);
+        return new SyncReadResult(SyncReadOutcome.Found, existing.Version, existing.Blob);
     }
 
     private SqliteConnection OpenConnection()
@@ -161,4 +139,8 @@ public sealed class SyncBlobStore
         connection.Open();
         return connection;
     }
+
+    private sealed record StoredRow(long Version, byte[] TokenHash);
+
+    private sealed record StoredBlobRow(long Version, byte[] TokenHash, byte[] Blob);
 }
