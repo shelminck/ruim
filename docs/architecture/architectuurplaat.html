@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architectuurplaat — Huishoudboekje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-bg: #0F2035;
+    --ink-bg-2: #152A45;
+    --ink-bg-3: #1B3450;
+    --line: #557A98;
+    --line-soft: rgba(85,122,152,0.35);
+    --paper: #EAF2FA;
+    --text-muted: #9FB7CE;
+    --amber: #E8A33D;
+    --purple: #C3B4F5;
+    --teal: #7FE0C4;
+    --coral: #F2A386;
+    --blue: #6FB3FF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--ink-bg);
+    color: var(--paper);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height:1.65;
+  }
+  .sheet{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 28px 80px;
+  }
+  .titleblock{
+    border: 1px solid var(--line);
+    padding: 28px 30px;
+    position: relative;
+    margin-bottom: 40px;
+  }
+  .titleblock::before{
+    content:"";
+    position:absolute; top:8px; left:8px; right:8px; bottom:8px;
+    border: 1px solid var(--line-soft);
+    pointer-events:none;
+  }
+  .eyebrow-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; color: var(--text-muted);
+    letter-spacing:0.02em;
+    margin-bottom:18px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size: 40px;
+    line-height:1.15;
+    margin:0 0 10px;
+    color: var(--paper);
+  }
+  .subtitle{
+    font-size:16px;
+    color: var(--text-muted);
+    max-width: 46ch;
+    margin:0;
+  }
+  section{
+    margin: 56px 0;
+  }
+  .section-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color: var(--line);
+    border-bottom: 1px solid var(--line-soft);
+    padding-bottom:8px;
+    margin-bottom:20px;
+    display:flex;
+    justify-content:space-between;
+  }
+  h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:26px;
+    margin: 0 0 14px;
+    color: var(--paper);
+  }
+  p{ color: var(--paper); max-width: 66ch; }
+  p.lede{ color: var(--text-muted); font-size:17px; }
+  .panel{
+    border:1px solid var(--line-soft);
+    background: var(--ink-bg-2);
+    padding: 26px 28px;
+  }
+
+  /* Diagram */
+  .diagram-wrap{ background: var(--ink-bg-2); border:1px solid var(--line-soft); padding: 20px; }
+  svg text{ font-family:'IBM Plex Sans', sans-serif; }
+  .node-title{ font-size:14px; font-weight:500; }
+  .node-sub{ font-size:11.5px; }
+  .legend{
+    display:flex; flex-wrap:wrap; gap: 18px 26px;
+    margin-top:18px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color: var(--text-muted);
+  }
+  .legend span{ display:inline-flex; align-items:center; gap:8px; }
+  .swatch{ width:11px; height:11px; display:inline-block; border-radius:2px; }
+
+  /* Module rows */
+  .module-row{
+    display:grid;
+    grid-template-columns: 90px 160px 1fr;
+    gap: 18px;
+    padding: 16px 0;
+    border-top:1px solid var(--line-soft);
+    align-items:baseline;
+  }
+  .module-row:last-child{ border-bottom:1px solid var(--line-soft); }
+  .module-id{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--line); }
+  .module-name{ font-weight:500; color: var(--paper); }
+  .module-desc{ color: var(--text-muted); font-size:15px; }
+
+  /* Hosting table */
+  .htable{ width:100%; border-collapse:collapse; font-size:14.5px; }
+  .htable th, .htable td{
+    text-align:left; padding:11px 14px;
+    border-bottom:1px solid var(--line-soft);
+    vertical-align:top;
+  }
+  .htable th{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:400; font-size:12px;
+    color: var(--line);
+    text-transform: none;
+  }
+  .htable td.rec{ color: var(--teal); }
+  .quickstart-list{ margin: 18px 0 0; padding:0; list-style:none; }
+  .quickstart-list li{
+    display:flex; align-items:center; gap:12px;
+    padding: 10px 0; border-top:1px solid var(--line-soft);
+  }
+  .quickstart-list li:last-child{ border-bottom:1px solid var(--line-soft); }
+  .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding: 3px 8px;
+    border:1px solid var(--line);
+    color: var(--line);
+    white-space:nowrap;
+  }
+  .tag.tag-rec{ border-color: var(--teal); color: var(--teal); }
+  .tag.tag-advanced{ border-color: var(--amber); color: var(--amber); }
+
+  /* Open items */
+  .openlist{ list-style:none; margin:0; padding:0; }
+  .openlist li{
+    display:flex; gap:14px; align-items:flex-start;
+    padding: 14px 0; border-top:1px solid var(--line-soft);
+  }
+  .openlist li:last-child{ border-bottom:1px solid var(--line-soft); }
+  .openlist .box{
+    width:14px; height:14px; border:1px solid var(--amber);
+    margin-top:4px; flex-shrink:0;
+  }
+  .openlist .status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; color: var(--amber);
+    display:block; margin-bottom:2px;
+  }
+
+  .note{
+    font-size:13.5px; color: var(--text-muted);
+    border-left: 2px solid var(--amber);
+    padding: 4px 0 4px 14px;
+    margin-top:18px;
+  }
+
+  footer{
+    margin-top: 70px;
+    border-top:1px solid var(--line-soft);
+    padding-top:18px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color: var(--text-muted);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+
+  @media (max-width: 600px){
+    h1{ font-size:30px; }
+    .module-row{ grid-template-columns: 1fr; gap:4px; }
+    .eyebrow-row{ flex-direction:column; gap:4px; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="titleblock">
+    <div class="eyebrow-row">
+      <span>SHEET A1 — SYSTEEMOVERZICHT</span>
+      <span>REV 1.0 — CONCEPT</span>
+    </div>
+    <h1>Architectuurplaat</h1>
+    <p class="subtitle">Huishoudboekje met potjes, automatische categorisatie en optionele gezinssync — lokaal-eerst, met MCP-uitbreiding voor AI-verwerking.</p>
+  </div>
+
+  <section>
+    <div class="section-label"><span>01 — UITGANGSPUNT</span><span>PRINCIPE</span></div>
+    <h2>Lokaal-eerst, geen server nodig om te beginnen</h2>
+    <p class="lede">De volledige app — rekeningen, potjes, MT940-import, categorisatie en de uitvallijst — draait op het apparaat zelf. Er is geen backend nodig om de app te gebruiken. Twee losse, optionele uitbreidingen komen daar bovenop: versleutelde synchronisatie tussen apparaten binnen een gezin, en een lokale MCP-server waarmee een AI-client zoals Claude met de eigen data kan werken.</p>
+  </section>
+
+  <section>
+    <div class="section-label"><span>02 — SYSTEEMDIAGRAM</span><span>SCHAAL n.v.t.</span></div>
+    <div class="diagram-wrap">
+      <svg width="100%" viewBox="0 0 760 640" role="img">
+        <title>Architectuurdiagram</title>
+        <desc>PWA per apparaat met vier domeinmodules en lokale opslag, met optionele versleutelde sync naar een relay en blob-opslag, en een lokale MCP server die met een AI-client bonnetjes verwerkt.</desc>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#557A98" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <rect x="60" y="30" width="640" height="330" rx="2" fill="none" stroke="#557A98" stroke-width="1"/>
+        <text x="380" y="58" text-anchor="middle" fill="#EAF2FA" class="node-title">PWA — per apparaat</text>
+        <text x="380" y="76" text-anchor="middle" fill="#9FB7CE" class="node-sub">Lokaal-eerst, werkt volledig offline</text>
+
+        <g>
+          <rect x="90" y="96" width="182" height="56" fill="rgba(195,180,245,0.08)" stroke="#C3B4F5" stroke-width="1"/>
+          <text x="181" y="118" text-anchor="middle" fill="#C3B4F5" class="node-title">Accounts</text>
+          <text x="181" y="136" text-anchor="middle" fill="#C3B4F5" class="node-sub" opacity="0.8">Rekeningen, MT940</text>
+        </g>
+        <g>
+          <rect x="288" y="96" width="182" height="56" fill="rgba(195,180,245,0.08)" stroke="#C3B4F5" stroke-width="1"/>
+          <text x="379" y="118" text-anchor="middle" fill="#C3B4F5" class="node-title">Categorization</text>
+          <text x="379" y="136" text-anchor="middle" fill="#C3B4F5" class="node-sub" opacity="0.8">Regels + labels</text>
+        </g>
+        <g>
+          <rect x="486" y="96" width="182" height="56" fill="rgba(195,180,245,0.08)" stroke="#C3B4F5" stroke-width="1"/>
+          <text x="577" y="118" text-anchor="middle" fill="#C3B4F5" class="node-title">Budgeting</text>
+          <text x="577" y="136" text-anchor="middle" fill="#C3B4F5" class="node-sub" opacity="0.8">Potjes, korte termijn</text>
+        </g>
+        <g>
+          <rect x="90" y="170" width="282" height="56" fill="rgba(195,180,245,0.08)" stroke="#C3B4F5" stroke-width="1"/>
+          <text x="231" y="192" text-anchor="middle" fill="#C3B4F5" class="node-title">Review</text>
+          <text x="231" y="210" text-anchor="middle" fill="#C3B4F5" class="node-sub" opacity="0.8">Uitvallijst, toewijzing</text>
+        </g>
+        <g>
+          <rect x="388" y="170" width="282" height="56" fill="rgba(195,180,245,0.08)" stroke="#C3B4F5" stroke-width="1"/>
+          <text x="529" y="192" text-anchor="middle" fill="#C3B4F5" class="node-title">Planning (Vooruit)</text>
+          <text x="529" y="210" text-anchor="middle" fill="#C3B4F5" class="node-sub" opacity="0.8">Buffer, sparen, beleggen, inkomen</text>
+        </g>
+
+        <g>
+          <rect x="90" y="250" width="580" height="52" fill="rgba(111,179,255,0.08)" stroke="#6FB3FF" stroke-width="1"/>
+          <text x="380" y="270" text-anchor="middle" fill="#6FB3FF" class="node-title">Lokale opslag</text>
+          <text x="380" y="288" text-anchor="middle" fill="#6FB3FF" class="node-sub" opacity="0.8">SQLite / IndexedDB</text>
+        </g>
+
+        <line x1="290" y1="360" x2="290" y2="404" stroke="#557A98" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+        <text x="290" y="386" text-anchor="middle" fill="#9FB7CE" font-family="IBM Plex Mono, monospace" font-size="10.5">optioneel</text>
+        <line x1="530" y1="360" x2="530" y2="404" stroke="#557A98" stroke-width="1" marker-end="url(#arrow)"/>
+
+        <g>
+          <rect x="180" y="404" width="220" height="56" fill="rgba(127,224,196,0.08)" stroke="#7FE0C4" stroke-width="1"/>
+          <text x="290" y="426" text-anchor="middle" fill="#7FE0C4" class="node-title">.NET 10 sync-relay</text>
+          <text x="290" y="444" text-anchor="middle" fill="#7FE0C4" class="node-sub" opacity="0.8">Cloud of zelf gehost</text>
+        </g>
+        <g>
+          <rect x="440" y="404" width="220" height="56" fill="rgba(127,224,196,0.08)" stroke="#7FE0C4" stroke-width="1"/>
+          <text x="550" y="426" text-anchor="middle" fill="#7FE0C4" class="node-title">MCP server (lokaal)</text>
+          <text x="550" y="444" text-anchor="middle" fill="#7FE0C4" class="node-sub" opacity="0.8">Werkt op lokale data</text>
+        </g>
+
+        <line x1="290" y1="460" x2="290" y2="500" stroke="#557A98" stroke-width="1" marker-end="url(#arrow)"/>
+        <line x1="550" y1="500" x2="550" y2="460" stroke="#557A98" stroke-width="1" marker-end="url(#arrow)"/>
+
+        <g>
+          <rect x="180" y="500" width="220" height="56" fill="rgba(242,163,134,0.08)" stroke="#F2A386" stroke-width="1"/>
+          <text x="290" y="522" text-anchor="middle" fill="#F2A386" class="node-title">Blob-opslag</text>
+          <text x="290" y="540" text-anchor="middle" fill="#F2A386" class="node-sub" opacity="0.8">Enkel versleutelde data</text>
+        </g>
+        <g>
+          <rect x="440" y="500" width="220" height="56" fill="rgba(242,163,134,0.08)" stroke="#F2A386" stroke-width="1"/>
+          <text x="550" y="522" text-anchor="middle" fill="#F2A386" class="node-title">AI-client (Claude)</text>
+          <text x="550" y="540" text-anchor="middle" fill="#F2A386" class="node-sub" opacity="0.8">Bonnetje-foto's, chat</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span><span class="swatch" style="background:#C3B4F5"></span>Domeinmodules (client-side, TypeScript)</span>
+        <span><span class="swatch" style="background:#6FB3FF"></span>Lokale opslag per apparaat</span>
+        <span><span class="swatch" style="background:#7FE0C4"></span>Infrastructuur (.NET 10)</span>
+        <span><span class="swatch" style="background:#F2A386"></span>Externe/opt-in koppeling</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span>03 — DOMEINMODULES</span><span>CLIENT-SIDE</span></div>
+    <h2>Vijf modules, één taal</h2>
+    <p>De domeinlogica draait client-side in TypeScript, zodat de app ook zonder verbinding volledig werkt. DDD blijft het denkmodel; het is geen taalkeuze. Bijgewerkt na de v1-ontwerpreview (zie ADR 0003).</p>
+    <div class="panel">
+      <div class="module-row">
+        <span class="module-id">MOD.01</span>
+        <span class="module-name">Accounts</span>
+        <span class="module-desc">Rekeningen beheren en MT940-bestanden handmatig importeren en parsen.</span>
+      </div>
+      <div class="module-row">
+        <span class="module-id">MOD.02</span>
+        <span class="module-name">Categorization</span>
+        <span class="module-desc">Regelgebaseerde matching op tegenrekening, omschrijving en bedrag, met confidence score (zichtbaar als percentage in de uitvallijst). Twee niveaus: een Potje en een optioneel, fijnmaziger Label eronder. Herkent terugkerende transacties en stelt een blijvende regel voor; een nieuwe regel toont altijd eerst een preview van getroffen oude transacties en vereist expliciete bevestiging voordat hij retroactief wordt toegepast. Wordt verrijkt door bonnetje-regelitems via MCP.</span>
+      </div>
+      <div class="module-row">
+        <span class="module-id">MOD.03</span>
+        <span class="module-name">Budgeting</span>
+        <span class="module-desc">Potjes per rekening voor de korte termijn (maandelijkse uitgaven), budgetten per periode, berekend (niet opgeslagen) overzicht van resterend budget.</span>
+      </div>
+      <div class="module-row">
+        <span class="module-id">MOD.04</span>
+        <span class="module-name">Review</span>
+        <span class="module-desc">Uitvallijst voor transacties onder de confidence-drempel, met één-klik toewijzing aan een potje.</span>
+      </div>
+      <div class="module-row">
+        <span class="module-id">MOD.05</span>
+        <span class="module-name">Planning (Vooruit)</span>
+        <span class="module-desc">Middellange termijn: buffer, spaarpotten en beleggen, plus een overzicht van het inkomen. Losstaand van de korte-termijn potjes in Budgeting.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span>04 — SYNC &amp; PRIVACY</span><span>OPTIONEEL</span></div>
+    <h2>Versleuteld delen binnen het gezin</h2>
+    <p>Data wordt vóór verzending op het apparaat versleuteld. De sync-relay slaat enkel versleutelde blobs op en kan de inhoud niet lezen — vergelijkbaar met de aanpak van Actual Budget. Bij het instellen kiest één gezinslid een sync-wachtwoord dat als sleutel dient; andere apparaten treden toe met datzelfde wachtwoord.</p>
+    <p class="note">Ook bij een blinde relay worden metadata verwerkt (accountbestaan, synctijdstippen, IP-adressen in logs) — dit blijft persoonsgegevens onder de AVG, alleen een aanzienlijk kleiner en minder gevoelig deel dan leesbare transactiedata.</p>
+  </section>
+
+  <section>
+    <div class="section-label"><span>05 — MCP-UITBREIDING</span><span>OPT-IN</span></div>
+    <h2>Bonnetje-foto verwerken via AI</h2>
+    <p>Een foto van een bonnetje wordt gedeeld in een Claude-gesprek. Het vision-model leest winkelnaam, datum, totaalbedrag en regelitems uit. Een MCP-tool zoekt een bijpassende banktransactie en koppelt de regelitems eraan, of maakt een nieuwe handmatige transactie aan. Alleen de geëxtraheerde structuurdata wordt lokaal bewaard, niet de foto zelf.</p>
+    <p class="note">Dit datapad loopt buiten de versleutelde sync-relay om: de foto wordt verwerkt door Anthropic als onderdeel van dat gesprek, zoals bij elke andere gedeelde afbeelding. Een bewuste, per-geval keuze van de gebruiker — geen achtergrondsynchronisatie.</p>
+  </section>
+
+  <section>
+    <div class="section-label"><span>06 — HOSTING</span><span>QUICKSTARTS</span></div>
+    <h2>Managed eerst, zelf hosten als geavanceerde route</h2>
+    <p>Zelf hosten draagt het meeste risico op misconfiguratie voor wie er niet dagelijks mee werkt. De documentatie leidt daarom naar managed platforms, met zelf hosten nadrukkelijk als route voor gevorderde gebruikers.</p>
+    <ul class="quickstart-list">
+      <li><span class="tag tag-rec">AANBEVOLEN</span> STACKIT — Cloud Foundry PaaS, data uitsluitend in Duitsland/Oostenrijk</li>
+      <li><span class="tag">OPTIE</span> Azure — Container Apps + Blob Storage, vaak binnen gratis quota</li>
+      <li><span class="tag">OPTIE</span> AWS — App Runner + S3</li>
+      <li><span class="tag tag-advanced">GEVORDERD</span> Zelf hosten — Docker Compose, eigen verantwoordelijkheid voor HTTPS, updates en backups</li>
+    </ul>
+    <table class="htable" style="margin-top:22px;">
+      <tr><th></th><th>Rekencomponent</th><th>Objectopslag</th><th>AVG-positionering</th></tr>
+      <tr><td class="rec">STACKIT</td><td>Cloud Foundry / Container Engine</td><td>Object Storage (S3-compatible)</td><td>Europese eigenaar, expliciet 'soevereine cloud'</td></tr>
+      <tr><td>Azure</td><td>Container Apps</td><td>Blob Storage</td><td>EU-datacenters beschikbaar, Amerikaans moederbedrijf</td></tr>
+      <tr><td>AWS</td><td>App Runner / Fargate</td><td>S3</td><td>EU-datacenters beschikbaar, Amerikaans moederbedrijf</td></tr>
+      <tr><td>Zelf hosten</td><td>Docker Compose</td><td>Lokaal bestandssysteem</td><td>Volledig in eigen beheer</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="section-label"><span>07 — UPDATESTRATEGIE</span><span>PER COMPONENT</span></div>
+    <h2>De PWA update zichzelf, de relay niet automatisch</h2>
+    <p>De PWA wordt centraal gehost en volgt de gewone build-en-release-pipeline. De sync-relay draait verspreid over meerdere platforms: releases worden als versioned container images gepubliceerd (GitHub Container Registry), met een "update beschikbaar"-signaal in plaats van een gedwongen update — belangrijk omdat een ongeziene migratie op financiële data een risico is dat de gebruiker zelf moet kunnen beheersen.</p>
+  </section>
+
+  <section>
+    <div class="section-label"><span>08 — OPEN SOURCE</span><span>LICENTIE</span></div>
+    <h2>Code openbaar, hosting bij de gebruiker</h2>
+    <p>Zolang alleen de broncode wordt gepubliceerd en er geen gehoste dienst door de maintainer wordt aangeboden, is er geen sprake van verwerkersverantwoordelijkheid voor andermans financiën — elke self-hoster is verantwoordelijk voor de eigen instantie. Aandachtspunten: licentiekeuze (MIT/Apache-2.0, of AGPL-3.0 om gesloten SaaS-hergebruik te ontmoedigen), geen telemetrie standaard aan, een SECURITY.md voor verantwoord melden van kwetsbaarheden, en een expliciete disclaimer dat gebruik op eigen risico is.</p>
+  </section>
+
+  <section>
+    <div class="section-label"><span>09 — OPEN PUNTEN</span><span>NOG UIT TE WERKEN</span></div>
+    <ul class="openlist">
+      <li>
+        <span class="box"></span>
+        <span><span class="status">OPEN</span>Aansprakelijkheidsdisclaimer ("gebruik op eigen risico") — in README en bij eerste gebruik in de app.</span>
+      </li>
+      <li>
+        <span class="box"></span>
+        <span><span class="status">OPEN</span>Matching-logica bonnetje ↔ bestaande transactie bij afwijkend bedrag (fooien, afronding, deelbetalingen).</span>
+      </li>
+      <li>
+        <span class="box"></span>
+        <span><span class="status">OPEN</span>Lokale migratiestrategie voor het datamodel: versienummer en migratiescripts bij een nieuwe PWA-versie.</span>
+      </li>
+      <li>
+        <span class="box"></span>
+        <span><span class="status">OPEN</span>CRDT-conflictresolutie voor gelijktijdige offline wijzigingen op meerdere apparaten.</span>
+      </li>
+      <li>
+        <span class="box"></span>
+        <span><span class="status">OPEN</span>Gezinslid-toewijzing op transacties (zoals in v1-ontwerp): puur informatief label, of ook gevolgen voor rechten (wie mag bewerken)? Nog niet bepaald.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Huishoudboekje — architectuurplaat</span>
+    <span>Sheet A1 · Rev 1.0 · Concept</span>
+  </footer>
+
+</div>
+</body>
+</html>
