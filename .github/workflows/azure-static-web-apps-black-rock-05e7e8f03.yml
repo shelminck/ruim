@@ -1,17 +1,21 @@
 name: Azure Static Web Apps CI/CD
 
+# Deploy-only-on-merge: no pull_request trigger. On a public repo, anyone can
+# open a PR (via a fork) without any write access to this repo — that's a
+# separate, much lower permission bar than push access. Reacting to
+# pull_request here would let an external PR trigger a real build against
+# our Azure resource. Deploying only on push to main means a deploy only ever
+# happens after a merge, which requires actual write access.
 on:
   push:
     branches:
       - main
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
+    paths:
+      - "src/pwa/**"
+      - ".github/workflows/azure-static-web-apps-black-rock-05e7e8f03.yml"
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
@@ -33,15 +37,3 @@ jobs:
           output_location: ".output/public" # Built app content directory - optional
           app_build_command: "npm run generate" # `nuxt build` (the default) renders index.html at request time via a Node server, which SWA static hosting can't run — `nuxt generate` prerenders real HTML files instead.
           ###### End of Repository/Build Configurations ######
-
-  close_pull_request_job:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    name: Close Pull Request Job
-    steps:
-      - name: Close Pull Request
-        id: closepullrequest
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_BLACK_ROCK_05E7E8F03 }}
-          action: "close"
