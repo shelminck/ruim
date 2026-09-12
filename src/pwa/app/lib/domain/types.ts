@@ -47,6 +47,13 @@ export interface Envelope {
   rolloverPolicy: RolloverPolicy
   /** Only used when rolloverPolicy === 'to-savings-goal'. */
   rolloverGoalId: string | null
+  /**
+   * Rest carried over from last month, applied by the (not yet built) "Nieuwe
+   * maand" rollover action per the envelope's rolloverPolicy. Stored because
+   * it's a discrete monthly decision, not something derivable from live data.
+   * The *remaining* budget (budget + carriedOver − spent) stays computed, never stored.
+   */
+  carriedOverCents: number
 }
 
 export interface Label {
