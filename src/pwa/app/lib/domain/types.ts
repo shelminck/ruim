@@ -130,6 +130,32 @@ export interface Investing {
   currentValueCents: number
 }
 
+/**
+ * One-off, per-month overlays on the waterfall — the lasting effects of
+ * applying a Meevaller allocation or a Minder (income-drop) coverage plan.
+ * Everything defaults to 0/false; absent = a normal month.
+ */
+export interface MonthlyAdjustment {
+  month: string // 'YYYY-MM', also the keyPath
+  /** From Meevaller: the part of the windfall added to this month's free-to-spend, once. */
+  extraVrijCents: number
+  /** From Minder: how much lower the base income is this month. */
+  incomeDropCents: number
+  /** From Minder: how much envelope budgets shrink this month, in aggregate. */
+  potjesKrimpCents: number
+  /** From Minder: investing's monthly deposit is skipped this month. */
+  investingPausedThisMonth: boolean
+  /** From Minder: one-off withdrawal from the buffer to cover the gap. */
+  bufferOpnameCents: number
+}
+
+/** Singleton (id is always 'windfallPolicy') — the saved default split for "elke meevaller zo verdelen". */
+export interface WindfallPolicy {
+  id: 'windfallPolicy'
+  bufferPct: number
+  investingPct: number
+}
+
 export type TaskGroup = 'overboeken' | 'regelen'
 
 export interface Task {

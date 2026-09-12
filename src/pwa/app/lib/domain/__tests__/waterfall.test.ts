@@ -67,4 +67,55 @@ describe('computeWaterfall', () => {
 
     expect(result.vrij).toBe(100000)
   })
+
+  it('applies a Minder scenario: income drop, envelope shrink and a paused investing contribution', () => {
+    const result = computeWaterfall({
+      incomeSources: [{ amountCents: 410000, countsTowardBase: true }],
+      subscriptions: [],
+      fixedCosts: [],
+      envelopes: [{ budgetCents: 30000 }],
+      goals: [],
+      investingMonthlyCents: 30000,
+      investingPausedThisMonth: true,
+      incomeDropCents: 34000,
+      potjesKrimpCents: 20000,
+      bufferOpnameCents: 34000,
+    })
+
+    expect(result.basis).toBe(376000) // 410000 - 34000
+    expect(result.sparen).toBe(0) // investing paused, nothing else contributing
+    expect(result.potjesBudget).toBe(10000) // 30000 - 20000
+    // 376000 - 0 - 0 - 10000 + 34000 (bufferOpname fully covers the drop)
+    expect(result.vrij).toBe(400000)
+  })
+
+  it('never lets potjesKrimp push potjesBudget below 0', () => {
+    const result = computeWaterfall({
+      incomeSources: [],
+      subscriptions: [],
+      fixedCosts: [],
+      envelopes: [{ budgetCents: 5000 }],
+      goals: [],
+      potjesKrimpCents: 20000, // more krimp than there is budget to shrink
+    })
+
+    expect(result.potjesBudget).toBe(0)
+  })
+
+  it('keeps meevaller based on the un-dropped basis', () => {
+    const result = computeWaterfall({
+      incomeSources: [
+        { amountCents: 300000, countsTowardBase: true },
+        { amountCents: 50000, countsTowardBase: false },
+      ],
+      subscriptions: [],
+      fixedCosts: [],
+      envelopes: [],
+      goals: [],
+      incomeDropCents: 10000,
+    })
+
+    expect(result.meevaller).toBe(50000)
+    expect(result.basis).toBe(290000)
+  })
 })

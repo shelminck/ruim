@@ -35,6 +35,11 @@ export function getDb(): Promise<IDBPDatabase<RuimDB>> {
           db.createObjectStore('buffer', { keyPath: 'id' })
           db.createObjectStore('investing', { keyPath: 'id' })
         }
+
+        if (oldVersion < 3) {
+          db.createObjectStore('monthlyAdjustments', { keyPath: 'month' })
+          db.createObjectStore('windfallPolicy', { keyPath: 'id' })
+        }
       },
     })
   }

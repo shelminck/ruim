@@ -8,15 +8,17 @@ import type {
   IncomeSource,
   Investing,
   Label,
+  MonthlyAdjustment,
   Rule,
   Subscription,
   Task,
   Transaction,
+  WindfallPolicy,
 } from '../domain/types'
 import type { Envelope } from '../domain/types'
 
 export const DB_NAME = 'ruim'
-export const DB_VERSION = 2
+export const DB_VERSION = 3
 
 export interface RuimDB extends DBSchema {
   accounts: {
@@ -78,5 +80,13 @@ export interface RuimDB extends DBSchema {
   investing: {
     key: string
     value: Investing
+  }
+  monthlyAdjustments: {
+    key: string
+    value: MonthlyAdjustment
+  }
+  windfallPolicy: {
+    key: string
+    value: WindfallPolicy
   }
 }

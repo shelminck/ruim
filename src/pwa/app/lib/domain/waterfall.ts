@@ -23,6 +23,12 @@ export interface WaterfallInput {
   bufferOpnameCents?: number
   /** One-off extra free-to-spend from an allocated windfall. */
   extraVrijCents?: number
+  /** Minder: how much lower the base income is this month. */
+  incomeDropCents?: number
+  /** Minder: how much envelope budgets shrink this month, in aggregate. */
+  potjesKrimpCents?: number
+  /** Minder: investing's monthly deposit is skipped this month. */
+  investingPausedThisMonth?: boolean
 }
 
 export interface WaterfallResult {
@@ -39,10 +45,11 @@ export interface WaterfallResult {
 
 export function computeWaterfall(input: WaterfallInput): WaterfallResult {
   const binnen = input.incomeSources.reduce((sum, source) => sum + source.amountCents, 0)
-  const basis = input.incomeSources
+  const rawBasis = input.incomeSources
     .filter((source) => source.countsTowardBase)
     .reduce((sum, source) => sum + source.amountCents, 0)
-  const meevaller = Math.max(0, binnen - basis)
+  const meevaller = Math.max(0, binnen - rawBasis)
+  const basis = rawBasis - (input.incomeDropCents ?? 0)
 
   const aboTotaal = input.subscriptions
     .filter((subscription) => subscription.cancelledAt === null)
@@ -51,9 +58,14 @@ export function computeWaterfall(input: WaterfallInput): WaterfallResult {
   const vasteLasten = fixedCostsTotal + aboTotaal
 
   const goalDeposits = input.goals.reduce((sum, goal) => sum + goal.monthlyDepositCents, 0)
-  const sparen = (input.bufferMonthlyCents ?? 0) + goalDeposits + (input.investingMonthlyCents ?? 0)
+  const investingContribution = input.investingPausedThisMonth ? 0 : (input.investingMonthlyCents ?? 0)
+  const sparen = (input.bufferMonthlyCents ?? 0) + goalDeposits + investingContribution
 
-  const potjesBudget = input.envelopes.reduce((sum, envelope) => sum + envelope.budgetCents, 0)
+  // Can shrink to nothing, never below — a krimp bigger than the budget doesn't make it negative.
+  const potjesBudget = Math.max(
+    0,
+    input.envelopes.reduce((sum, envelope) => sum + envelope.budgetCents, 0) - (input.potjesKrimpCents ?? 0),
+  )
 
   const vrij =
     basis -
