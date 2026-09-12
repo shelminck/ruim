@@ -68,7 +68,12 @@ async function apply() {
     depositsSinceCents: investing.depositsSinceCents + extraBeleg.value,
     currentValueCents: investing.currentValueCents + extraBeleg.value,
   })
-  await saveMonthlyAdjustment({ ...adjustment, extraVrijCents: adjustment.extraVrijCents + extraVrij.value })
+  await saveMonthlyAdjustment({
+    ...adjustment,
+    extraVrijCents: adjustment.extraVrijCents + extraVrij.value,
+    extraBufferCents: adjustment.extraBufferCents + extraBuffer.value,
+    extraBelegCents: adjustment.extraBelegCents + extraBeleg.value,
+  })
 
   if (makePermanent.value) {
     await saveWindfallPolicy({ id: 'windfallPolicy', bufferPct: bufferPct.value, investingPct: investingPct.value })

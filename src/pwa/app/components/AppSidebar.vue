@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import { CheckCircle, Home, List, ListCheck, PiggyBank, TrendingUp } from 'lucide-vue-next'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
+import { useTeDoenCount } from '../composables/useTeDoenCount'
 
-const { count: nakijkenCount } = useNakijkenCount()
+const { count: nakijkenCount, refresh: refreshNakijkenCount } = useNakijkenCount()
+const { count: teDoenCount, refresh: refreshTeDoenCount } = useTeDoenCount()
+
+// The badges are a shared singleton updated by whichever page last acted (import,
+// review, tasks) — refresh here too so a page that never touches them still
+// shows the right count on first load.
+onMounted(() => {
+  void refreshNakijkenCount()
+  void refreshTeDoenCount()
+})
 
 const primaryNav = [
   { to: '/nu', label: 'Nu', icon: Home },
   { to: '/alles', label: 'Alles', icon: List },
   { to: '/nakijken', label: 'Nakijken', icon: CheckCircle, badge: nakijkenCount },
-  { to: '/te-doen', label: 'Te doen', icon: ListCheck },
+  { to: '/te-doen', label: 'Te doen', icon: ListCheck, badge: teDoenCount },
   { to: '/potjes', label: 'Potjes', icon: PiggyBank },
   { to: '/vooruit', label: 'Vooruit', icon: TrendingUp },
 ]

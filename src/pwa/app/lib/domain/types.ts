@@ -147,6 +147,10 @@ export interface MonthlyAdjustment {
   investingPausedThisMonth: boolean
   /** From Minder: one-off withdrawal from the buffer to cover the gap. */
   bufferOpnameCents: number
+  /** From Meevaller: the part of the windfall added to the buffer, once — for the Te doen transfer task. */
+  extraBufferCents: number
+  /** From Meevaller: the part of the windfall added to investing, once — for the Te doen transfer task. */
+  extraBelegCents: number
 }
 
 /** Singleton (id is always 'windfallPolicy') — the saved default split for "elke meevaller zo verdelen". */
@@ -158,13 +162,14 @@ export interface WindfallPolicy {
 
 export type TaskGroup = 'overboeken' | 'regelen'
 
-export interface Task {
+/**
+ * Tasks themselves are derived (see lib/domain/tasks.ts), never stored — only
+ * the checked/dismissed state persists, keyed by the derived task's stable id
+ * (which embeds the month, so a new month naturally starts unchecked).
+ */
+export interface TaskState {
   id: string
-  group: TaskGroup
-  /** Tasks are derived, not stored — this id is stable per month+source so checked state persists. */
   month: string // 'YYYY-MM'
-  title: string
-  amountCents: number | null
   done: boolean
   dismissed: boolean
 }

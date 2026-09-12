@@ -11,7 +11,7 @@ import type {
   MonthlyAdjustment,
   Rule,
   Subscription,
-  Task,
+  TaskState,
   Transaction,
   WindfallPolicy,
 } from '../domain/types'
@@ -64,7 +64,7 @@ export interface RuimDB extends DBSchema {
   }
   tasks: {
     key: string
-    value: Task
+    value: TaskState
     indexes: {
       byMonth: string
     }

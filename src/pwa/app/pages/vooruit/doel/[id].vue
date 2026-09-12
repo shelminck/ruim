@@ -13,6 +13,7 @@ useScreenHeader().set('Doel', 'Voortgang en instellingen voor dit doel.')
 const goal = ref<Goal | null>(null)
 const accountLabelInput = ref('')
 const transferDayInput = ref('26')
+const savedInput = ref('0')
 const vrijTeBesteden = ref(0)
 
 async function load() {
@@ -24,6 +25,7 @@ async function load() {
   goal.value = found
   accountLabelInput.value = found.accountLabel
   transferDayInput.value = String(found.transferDay)
+  savedInput.value = (found.savedCents / 100).toString()
   vrijTeBesteden.value = (await loadWaterfall()).vrij
 }
 
@@ -57,6 +59,14 @@ async function saveSettings() {
   await updateGoal(goal.value)
 }
 
+async function saveSaved() {
+  if (!goal.value) return
+  const savedCents = Math.round(Number(savedInput.value.replace(',', '.')) * 100)
+  if (!Number.isFinite(savedCents)) return
+  goal.value = { ...goal.value, savedCents }
+  await updateGoal(goal.value)
+}
+
 async function togglePause() {
   if (!goal.value) return
   goal.value = { ...goal.value, pauseWhenIncomeLow: !goal.value.pauseWhenIncomeLow }
@@ -75,7 +85,10 @@ async function deleteAndReturn() {
 
   <div v-else class="doel-screen">
     <div class="left-column">
-      <div class="saldo-figure">{{ formatEuros(goal.savedCents) }}</div>
+      <label class="saldo-field">
+        <span class="saldo-currency">€</span>
+        <input v-model="savedInput" type="text" inputmode="decimal" class="saldo-input" @blur="saveSaved" />
+      </label>
       <div class="progress-track">
         <div class="progress-fill" :style="{ width: `${progressPct}%` }" />
       </div>
@@ -143,9 +156,25 @@ async function deleteAndReturn() {
   gap: 10px;
 }
 
-.saldo-figure {
+.saldo-field {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
   font-family: var(--font-heading);
   font-size: 38px;
+}
+
+.saldo-input {
+  border: none;
+  background: transparent;
+  font-family: var(--font-heading);
+  font-size: 38px;
+  width: 160px;
+  padding: 0;
+}
+
+.saldo-input:focus {
+  outline: none;
 }
 
 .progress-track {
