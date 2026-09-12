@@ -3,8 +3,11 @@ import { computed, onMounted, ref } from 'vue'
 import { formatEuros } from '../../lib/domain/format'
 import type { IncomeSource } from '../../lib/domain/types'
 import { createIncomeSource, listIncomeSources, updateIncomeSource } from '../../lib/db/income-sources'
+import { useSidebarValues } from '../../composables/useSidebarValues'
 
 useScreenHeader().set('Inkomen', 'Waar je plan op draait, en wat erboven komt.')
+
+const { refresh: refreshSidebarValues } = useSidebarValues()
 
 const sources = ref<IncomeSource[]>([])
 const showCreateForm = ref(false)
@@ -32,6 +35,7 @@ const baseLinePct = computed(() => Math.min(100, (basis.value / chartMax.value) 
 async function toggleSource(source: IncomeSource) {
   await updateIncomeSource({ ...source, countsTowardBase: !source.countsTowardBase })
   await load()
+  await refreshSidebarValues()
 }
 
 async function submitCreate() {
@@ -43,6 +47,7 @@ async function submitCreate() {
   newCountsTowardBase.value = true
   showCreateForm.value = false
   await load()
+  await refreshSidebarValues()
 }
 </script>
 

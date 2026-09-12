@@ -5,8 +5,11 @@ import type { FixedCost } from '../lib/domain/types'
 import { createFixedCost, listFixedCosts, removeFixedCost } from '../lib/db/fixed-costs'
 import { listSubscriptions } from '../lib/db/subscriptions'
 import { listIncomeSources } from '../lib/db/income-sources'
+import { useSidebarValues } from '../composables/useSidebarValues'
 
 useScreenHeader().set('Vaste lasten', 'Wat er elke maand vanaf gaat.')
+
+const { refresh: refreshSidebarValues } = useSidebarValues()
 
 const fixedCosts = ref<FixedCost[]>([])
 const subscriptionTotal = ref(0)
@@ -55,11 +58,13 @@ async function submitCreate() {
   newAmount.value = ''
   showCreateForm.value = false
   await load()
+  await refreshSidebarValues()
 }
 
 async function deleteCost(id: string) {
   await removeFixedCost(id)
   await load()
+  await refreshSidebarValues()
 }
 </script>
 

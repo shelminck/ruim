@@ -5,11 +5,13 @@ import { currentMonthKey } from '../../lib/domain/budget'
 import { loadWaterfall } from '../../composables/useWaterfall'
 import { getInvesting } from '../../lib/db/investing'
 import { getMonthlyAdjustment, saveMonthlyAdjustment } from '../../lib/db/monthly-adjustments'
+import { useSidebarValues } from '../../composables/useSidebarValues'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
 useScreenHeader().set('Minder inkomen', 'Dek een inkomensdaling met potjes, pauzeren of de buffer.')
 
 const router = useRouter()
+const { refresh: refreshSidebarValues } = useSidebarValues()
 
 const waterfall = ref<WaterfallResult | null>(null)
 const investingMonthlyCents = ref(0)
@@ -67,6 +69,7 @@ async function apply() {
     investingPausedThisMonth: investingPaused.value,
     bufferOpnameCents: bufferOpnameCents.value,
   })
+  await refreshSidebarValues()
   await router.push('/inkomen/waterval')
 }
 
@@ -85,6 +88,7 @@ async function deactivate() {
   bufferOpnameInput.value = '0'
   isActive.value = false
   await load()
+  await refreshSidebarValues()
 }
 </script>
 

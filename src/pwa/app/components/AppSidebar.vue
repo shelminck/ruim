@@ -2,16 +2,21 @@
 import { CheckCircle, Home, List, ListCheck, PiggyBank, TrendingUp } from 'lucide-vue-next'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
 import { useTeDoenCount } from '../composables/useTeDoenCount'
+import { useSidebarValues } from '../composables/useSidebarValues'
+import { formatEuros } from '../lib/domain/format'
 
 const { count: nakijkenCount, refresh: refreshNakijkenCount } = useNakijkenCount()
 const { count: teDoenCount, refresh: refreshTeDoenCount } = useTeDoenCount()
+const { vasteLastenCents, basisCents, labelCount, refresh: refreshSidebarValues } = useSidebarValues()
 
-// The badges are a shared singleton updated by whichever page last acted (import,
-// review, tasks) — refresh here too so a page that never touches them still
-// shows the right count on first load.
+// These are shared singletons updated by whichever page last acted — refresh
+// here too so a page that never touches them still shows the right numbers
+// on first load. The sidebar itself only mounts once in this SPA, so pages
+// that change these values must also call their refresh() after acting.
 onMounted(() => {
   void refreshNakijkenCount()
   void refreshTeDoenCount()
+  void refreshSidebarValues()
 })
 
 const primaryNav = [
@@ -23,12 +28,12 @@ const primaryNav = [
   { to: '/vooruit', label: 'Vooruit', icon: TrendingUp },
 ]
 
-const secondaryNav = [
-  { to: '/vaste-lasten', label: 'Vaste lasten' },
-  { to: '/inkomen', label: 'Inkomen' },
-  { to: '/labels', label: 'Labels' },
-  { to: '/importeren', label: 'MT940 importeren' },
-]
+const secondaryNav = computed(() => [
+  { to: '/vaste-lasten', label: 'Vaste lasten', value: formatEuros(vasteLastenCents.value) },
+  { to: '/inkomen', label: 'Inkomen', value: formatEuros(basisCents.value) },
+  { to: '/labels', label: 'Labels', value: String(labelCount.value) },
+  { to: '/importeren', label: 'MT940 importeren', value: '' },
+])
 
 function badgeLabel(value: number): string {
   return value > 99 ? '99+' : String(value)
@@ -69,6 +74,7 @@ function badgeLabel(value: number): string {
         active-class="nav-item--secondary-active"
       >
         <span class="nav-label">{{ item.label }}</span>
+        <span v-if="item.value" class="nav-value">{{ item.value }}</span>
       </NuxtLink>
     </nav>
 
@@ -180,6 +186,12 @@ function badgeLabel(value: number): string {
 
 .nav-item--secondary {
   font-size: 13.5px;
+}
+
+.nav-value {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--color-neutral-600);
 }
 
 .nav-item--secondary:hover {

@@ -3,8 +3,13 @@ import { onMounted, ref } from 'vue'
 import { formatEuros } from '../lib/domain/format'
 import type { Subscription } from '../lib/domain/types'
 import { createSubscription, listSubscriptions, toggleSubscriptionCancelled } from '../lib/db/subscriptions'
+import { useSidebarValues } from '../composables/useSidebarValues'
+import { useTeDoenCount } from '../composables/useTeDoenCount'
 
 useScreenHeader().set('Abonnementen', 'Actieve en opgezegde abonnementen.')
+
+const { refresh: refreshSidebarValues } = useSidebarValues()
+const { refresh: refreshTeDoenCount } = useTeDoenCount()
 
 const subscriptions = ref<Subscription[]>([])
 const showCreateForm = ref(false)
@@ -20,6 +25,8 @@ onMounted(load)
 async function toggle(subscription: Subscription) {
   await toggleSubscriptionCancelled(subscription)
   await load()
+  await refreshSidebarValues()
+  await refreshTeDoenCount()
 }
 
 async function submitCreate() {
@@ -30,6 +37,7 @@ async function submitCreate() {
   newAmount.value = ''
   showCreateForm.value = false
   await load()
+  await refreshSidebarValues()
 }
 </script>
 
