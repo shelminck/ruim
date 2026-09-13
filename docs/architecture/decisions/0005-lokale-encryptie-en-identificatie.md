@@ -4,7 +4,9 @@
 
 ## Context
 
-ADR 0003 liet één vraag open: is gezinslid-toewijzing puur informatief of ook autorisatie? Daarnaast staat de lokale SQLite-blob (via sql.js/absurd-sql in IndexedDB) nu onversleuteld op schijf — een los, nog niet vastgelegd risico. Beide raken het datamodel en de security-grens, dus eerst dit ADR, conform de werkafspraken in `CLAUDE.md`. De beslissingen hieronder komen uit een losse ontwerpsessie (hand-off-document, niet in de repo) en worden hier vastgelegd als bron van waarheid.
+ADR 0003 liet één vraag open: is gezinslid-toewijzing puur informatief of ook autorisatie? Daarnaast staat de lokale data nu onversleuteld op schijf — een los, nog niet vastgelegd risico. Beide raken het datamodel en de security-grens, dus eerst dit ADR, conform de werkafspraken in `CLAUDE.md`. De beslissingen hieronder komen uit een losse ontwerpsessie (hand-off-document, niet in de repo) en worden hier vastgelegd als bron van waarheid.
+
+**Correctie na implementatie:** deze paragraaf ging er oorspronkelijk van uit dat de lokale opslag al een geserialiseerde SQLite-blob was ("via sql.js/absurd-sql in IndexedDB"). Dat klopte niet — de PWA gebruikte rechtstreeks IndexedDB (vijftien losse object stores via de `idb`-library), zonder enige blob. ADR 0006 lost dit op door de opslag daadwerkelijk naar sql.js te migreren, zodat §2 hieronder nu wel op een bestaande blob kan bouwen.
 
 ## Beslissingen
 

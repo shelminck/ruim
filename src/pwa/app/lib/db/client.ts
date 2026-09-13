@@ -1,55 +1,35 @@
-import { openDB, type IDBPDatabase } from 'idb'
-import { DB_NAME, DB_VERSION, type RuimDB } from './schema'
+import initSqlJs from 'sql.js'
+import { readBlob, writeBlob } from './blob-store'
+import { SqlDb } from './sql-db'
+import { STORE_DEFS, createTableSql } from './sql-store-config'
 
-let dbPromise: Promise<IDBPDatabase<RuimDB>> | null = null
+let dbPromise: Promise<SqlDb> | null = null
 
-export function getDb(): Promise<IDBPDatabase<RuimDB>> {
+async function createDb(): Promise<SqlDb> {
+  const SQL = await initSqlJs({ locateFile: () => '/sql-wasm.wasm' })
+  const existing = await readBlob()
+  const sqlDb = existing ? new SQL.Database(existing) : new SQL.Database()
+
+  for (const def of STORE_DEFS) {
+    for (const statement of createTableSql(def)) {
+      sqlDb.run(statement)
+    }
+  }
+
+  async function persist(): Promise<void> {
+    await writeBlob(sqlDb.export())
+  }
+
+  // A fresh database has nothing to export yet — write it once up front so a
+  // reload before any write still finds the (empty but table-shaped) blob.
+  if (!existing) await persist()
+
+  return new SqlDb(sqlDb, persist)
+}
+
+export function getDb(): Promise<SqlDb> {
   if (!dbPromise) {
-    dbPromise = openDB<RuimDB>(DB_NAME, DB_VERSION, {
-      upgrade(db, oldVersion) {
-        if (oldVersion < 1) {
-          db.createObjectStore('accounts', { keyPath: 'id' })
-
-          const transactions = db.createObjectStore('transactions', { keyPath: 'id' })
-          transactions.createIndex('byAccountSequence', ['accountId', 'sequenceNumber'], {
-            unique: true,
-          })
-          transactions.createIndex('byEnvelope', 'envelopeId')
-          transactions.createIndex('byImportBatch', 'importBatchId')
-
-          db.createObjectStore('envelopes', { keyPath: 'id' })
-          db.createObjectStore('labels', { keyPath: 'id' })
-          db.createObjectStore('rules', { keyPath: 'id' })
-          db.createObjectStore('incomeSources', { keyPath: 'id' })
-          db.createObjectStore('fixedCosts', { keyPath: 'id' })
-          db.createObjectStore('subscriptions', { keyPath: 'id' })
-          db.createObjectStore('goals', { keyPath: 'id' })
-
-          const tasks = db.createObjectStore('tasks', { keyPath: 'id' })
-          tasks.createIndex('byMonth', 'month')
-
-          db.createObjectStore('household', { keyPath: 'id' })
-        }
-
-        if (oldVersion < 2) {
-          db.createObjectStore('buffer', { keyPath: 'id' })
-          db.createObjectStore('investing', { keyPath: 'id' })
-        }
-
-        if (oldVersion < 3) {
-          db.createObjectStore('monthlyAdjustments', { keyPath: 'month' })
-          db.createObjectStore('windfallPolicy', { keyPath: 'id' })
-        }
-
-        if (oldVersion < 4) {
-          // 'household' (free-text member names, no rights model) is superseded
-          // by 'gezinsleden' (real entities) per ADR 0005. Left in place rather
-          // than deleted — dropping an object store is a destructive DB action
-          // that needs explicit confirmation, not an automatic migration step.
-          db.createObjectStore('gezinsleden', { keyPath: 'id' })
-        }
-      },
-    })
+    dbPromise = createDb()
   }
   return dbPromise
 }
