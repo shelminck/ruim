@@ -174,7 +174,15 @@ export interface TaskState {
   dismissed: boolean
 }
 
-export interface Household {
+/**
+ * A family member is purely informational/personalization — never an
+ * authorization boundary. The only real access boundary is the sync
+ * password (ADR 0004); see ADR 0005 for why this stays deliberately
+ * rights-free.
+ */
+export interface Gezinslid {
   id: string
-  members: string[] // display names, e.g. ['Sanne', 'Mark']
+  naam: string
+  /** One of AVATAR_KLEUREN in lib/domain/gezinslid.ts, e.g. 'accent-300'. */
+  avatarKleur: string
 }

@@ -2,6 +2,7 @@
 import AppHeader from '../components/AppHeader.vue'
 import AppSidebar from '../components/AppSidebar.vue'
 import AppMobileTabBar from '../components/AppMobileTabBar.vue'
+import GezinslidPicker from '../components/GezinslidPicker.vue'
 </script>
 
 <template>
@@ -12,6 +13,7 @@ import AppMobileTabBar from '../components/AppMobileTabBar.vue'
       <slot />
     </main>
     <AppMobileTabBar class="tab-bar-slot" />
+    <GezinslidPicker />
   </div>
 </template>
 

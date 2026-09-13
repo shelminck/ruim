@@ -3,8 +3,8 @@ import type {
   Account,
   Buffer,
   FixedCost,
+  Gezinslid,
   Goal,
-  Household,
   IncomeSource,
   Investing,
   Label,
@@ -18,7 +18,7 @@ import type {
 import type { Envelope } from '../domain/types'
 
 export const DB_NAME = 'ruim'
-export const DB_VERSION = 3
+export const DB_VERSION = 4
 
 export interface RuimDB extends DBSchema {
   accounts: {
@@ -69,9 +69,18 @@ export interface RuimDB extends DBSchema {
       byMonth: string
     }
   }
+  gezinsleden: {
+    key: string
+    value: Gezinslid
+  }
+  /**
+   * Legacy, unused — superseded by 'gezinsleden' (ADR 0005). Kept (not
+   * deleted) because dropping an object store is a destructive local-DB
+   * migration that needs explicit confirmation, not an automatic step.
+   */
   household: {
     key: string
-    value: Household
+    value: unknown
   }
   buffer: {
     key: string
