@@ -20,7 +20,7 @@ Profielkeuze is per apparaat, zonder wachtwoord: bij eerste gebruik kies je wie 
 
 ### 2. Encryptie-at-rest: DEK gewrapt door PIN (verplicht) en optioneel biometrie
 
-Eén random data-encryptiesleutel (DEK) versleutelt de geserialiseerde SQLite-blob met AES-GCM, vlak vóór wegschrijven / na inlezen. De DEK leeft alleen in-memory tijdens een ontgrendelde sessie. Encryptie zit als losse laag om de blob heen, niet in de SQL-engine zelf (geen SQLCipher-aanpassing van sql.js nodig) — kleinere, beter te reviewen wijziging.
+Eén random data-encryptiesleutel (DEK) versleutelt de geserialiseerde SQLite-blob (zie ADR 0006) met XChaCha20-Poly1305, vlak vóór wegschrijven / na inlezen. De DEK leeft alleen in-memory tijdens een ontgrendelde sessie. Encryptie zit als losse laag om de blob heen, niet in de SQL-engine zelf (geen SQLCipher-aanpassing van sql.js nodig) — kleinere, beter te reviewen wijziging.
 
 Twee manieren om dezelfde DEK te unwrappen:
 - **PIN** (verplicht, primair mechanisme, geen fallback): PIN → Argon2id (hoge iteratiecount) → unwrapt de DEK.
@@ -30,7 +30,7 @@ PIN is niet optioneel als fallback omdat WebAuthn PRF niet overal ondersteund wo
 
 Bij app-start en na een time-out is de DB versleuteld; ontgrendelen is vereist. Foutieve PIN-pogingen krijgen exponentiële backoff.
 
-Conform de crypto-regel in `CLAUDE.md` (nooit zelf bouwen): AES-GCM en Argon2id via gevestigde, gevette libraries (Web Crypto API voor AES-GCM; voor Argon2id is een aparte, nog met de gebruiker af te stemmen dependency nodig zoals `hash-wasm` of `argon2-browser` — Web Crypto heeft geen Argon2id). Dit ADR autoriseert het ontwerp, niet de concrete package-keuze; die volgt bij implementatiestap 2 als losse afstemming.
+Conform de crypto-regel in `CLAUDE.md` (nooit zelf bouwen, altijd een gevestigde libsodium-achtige library): `libsodium-wrappers-sumo` voor zowel de Argon2id-sleutelafleiding (`crypto_pwhash`) als de XChaCha20-Poly1305-versleuteling (`crypto_aead_xchacha20poly1305_ietf_encrypt`/`_decrypt`) — dezelfde onderliggende library als ADR 0004 al koos voor de sync-crypto, dus in de geest één afhankelijkheid in plaats van twee. De **sumo**-variant is bewust, niet de gewone `libsodium-wrappers`: die laatste is een grootte-geoptimaliseerde WASM-build die `crypto_pwhash` (Argon2id) volledig mist — pas tijdens implementatie ontdekt, zie ADR 0006-achtige les. Afgestemd met de gebruiker bij implementatiestap 2 (2026-09-13); dit verving de oorspronkelijke, voorlopige aanname van AES-GCM via Web Crypto + een apart Argon2id-package.
 
 ### 3. Root-/tamper-signaal: heuristiek, geen garantie
 
