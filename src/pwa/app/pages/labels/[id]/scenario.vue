@@ -78,13 +78,14 @@ onMounted(async () => {
 
 .saving-label {
   font-size: 13.5px;
-  color: var(--ink-deep);
+  color: var(--color-neutral-700);
 }
 
 .saving-figure {
   font-family: var(--font-heading);
   font-size: 44px;
-  color: var(--ink-deep);
+  line-height: 1;
+  color: var(--color-accent-700);
   margin-top: 4px;
 }
 

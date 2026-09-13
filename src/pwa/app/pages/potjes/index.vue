@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { listAccounts } from '../../lib/db/accounts'
-import { aggregateProgress, currentMonthKey, envelopeProgress, spentCentsForEnvelope, type Stand } from '../../lib/domain/budget'
+import {
+  aggregateProgress,
+  currentMonthKey,
+  envelopeProgress,
+  spentCentsForEnvelope,
+  totalRemainingClampedCents,
+  type Stand,
+} from '../../lib/domain/budget'
 import type { Account, Envelope, RolloverPolicy } from '../../lib/domain/types'
 import { createEnvelope, listEnvelopes, removeEnvelope } from '../../lib/db/envelopes'
 import { getDb } from '../../lib/db/client'
@@ -9,6 +16,8 @@ import { formatEuros, monthDaysLeftLabel } from '../../lib/domain/format'
 import { getBuffer } from '../../lib/db/buffer'
 import { getInvesting } from '../../lib/db/investing'
 import { listGoals } from '../../lib/db/goals'
+import { getMonthlyAdjustment } from '../../lib/db/monthly-adjustments'
+import { loadWaterfall } from '../../composables/useWaterfall'
 
 useScreenHeader().set('Potjes', monthDaysLeftLabel())
 
@@ -17,6 +26,8 @@ const accounts = ref<Account[]>([])
 const spentByEnvelope = ref<Record<string, number>>({})
 const showCreateForm = ref(false)
 const netWorthCents = ref(0)
+const sparenCents = ref(0)
+const investingPaused = ref(false)
 
 const newName = ref('')
 const newBudget = ref('')
@@ -24,19 +35,23 @@ const newAccountId = ref('')
 const newRollover = ref<RolloverPolicy>('carry-over')
 
 async function load() {
-  const [db, allEnvelopes, allAccounts, buffer, investing, goals] = await Promise.all([
+  const [db, allEnvelopes, allAccounts, buffer, investing, goals, waterfall, adjustment] = await Promise.all([
     getDb(),
     listEnvelopes(),
     listAccounts(),
     getBuffer(),
     getInvesting(),
     listGoals(),
+    loadWaterfall(),
+    getMonthlyAdjustment(currentMonthKey()),
   ])
   const transactions = await db.getAll('transactions')
   const month = currentMonthKey()
 
   netWorthCents.value =
     buffer.savedCents + investing.currentValueCents + goals.reduce((sum, g) => sum + g.savedCents, 0)
+  sparenCents.value = waterfall.sparen
+  investingPaused.value = adjustment.investingPausedThisMonth
 
   envelopes.value = allEnvelopes
   accounts.value = allAccounts
@@ -56,13 +71,16 @@ const progressList = computed(() =>
 )
 
 const monthStand = computed(() => aggregateProgress(progressList.value.map((p) => p.progress)))
+const totalRemaining = computed(() => totalRemainingClampedCents(progressList.value.map((p) => p.progress)))
 const overspentCount = computed(() => progressList.value.filter((p) => p.progress.remainingCents < 0).length)
 
-const legend: { stand: Stand; label: string }[] = [
-  { stand: 'ruim', label: 'Ruim — nog volop ruimte' },
-  { stand: 'krap', label: 'Krap — boven de 75%' },
-  { stand: 'op', label: 'Op — budget bereikt of overschreden' },
-]
+const legend: Stand[] = ['ruim', 'krap', 'op']
+
+const vooruitSub = computed(() =>
+  investingPaused.value
+    ? `${formatEuros(sparenCents.value)} per maand · beleggen deels gepauzeerd`
+    : `${formatEuros(sparenCents.value)} per maand opzij`,
+)
 
 async function submitCreate() {
   const budgetCents = Math.round(Number(newBudget.value.replace(',', '.')) * 100)
@@ -89,11 +107,12 @@ async function deleteEnvelope(id: string) {
 <template>
   <div class="potjes-screen">
     <div class="summary-panel">
-      <div class="summary-label">samen nog in je potjes</div>
-      <div class="summary-figure">{{ formatEuros(monthStand.remainingCents) }}</div>
-      <div class="summary-sub">
-        {{ envelopes.length }} {{ envelopes.length === 1 ? 'potje' : 'potjes' }}
-        <template v-if="overspentCount > 0"> · {{ overspentCount }} in het rood</template>
+      <div class="summary-figures">
+        <div class="summary-label">samen nog in je potjes</div>
+        <div class="summary-figure">{{ formatEuros(totalRemaining) }}</div>
+      </div>
+      <div v-if="envelopes.length > 0" class="summary-sub">
+        {{ overspentCount }} van de {{ envelopes.length }} potjes staat in het rood
       </div>
     </div>
 
@@ -124,22 +143,23 @@ async function deleteEnvelope(id: string) {
       </NuxtLink>
 
       <NuxtLink to="/vooruit" class="card card--vooruit">
-        <div class="card-title-group">
-          <div class="card-name">Vooruit</div>
-          <div class="card-remaining">{{ formatEuros(netWorthCents) }}</div>
-        </div>
-        <p class="card-note">Buffer, doelen en beleggen samen.</p>
+        <span class="card-vooruit-name">Vooruit<br /><span class="card-vooruit-sub">{{ vooruitSub }}</span></span>
+        <span class="card-vooruit-figure">{{ formatEuros(netWorthCents) }}</span>
       </NuxtLink>
     </div>
 
     <div class="legend-card">
-      <div v-for="item in legend" :key="item.stand" class="legend-row" :class="{ 'legend-row--dim': item.stand !== monthStand.stand }">
-        <Merkteken :stand="item.stand" :size="34" />
-        <span>{{ item.label }}</span>
+      <span class="legend-overline">Merkteken in drie standen</span>
+      <div v-for="stand in legend" :key="stand" class="legend-row" :class="{ 'legend-row--dim': stand !== monthStand.stand }">
+        <Merkteken :stand="stand" :size="34" />
+        <span>{{ stand }}</span>
       </div>
     </div>
 
-    <p class="footnote">Een potje is geen rekening — het is een afspraak met jezelf over deze maand.</p>
+    <p class="footnote">
+      Hetzelfde teken vertelt hoe de maand ervoor staat — op je startscherm, per potje, in de lijst. Een potje is geen
+      rekening: het is een afspraak met jezelf over deze maand.
+    </p>
 
     <div class="create-section">
       <button v-if="!showCreateForm" type="button" class="ghost-button" @click="showCreateForm = true">
@@ -178,32 +198,43 @@ async function deleteEnvelope(id: string) {
 .potjes-screen {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  max-width: 900px;
+  gap: 22px;
+  max-width: 1180px;
 }
 
 .summary-panel {
   background: var(--ink);
   color: #fff;
-  border-radius: var(--radius-panel-lg);
-  padding: 30px 32px;
+  border-radius: 32px;
+  padding: 30px 34px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.summary-figures {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .summary-label {
   font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .summary-figure {
   font-family: var(--font-heading);
-  font-size: 40px;
-  margin-top: 6px;
+  font-size: 52px;
+  line-height: 1;
 }
 
 .summary-sub {
-  font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.72);
-  margin-top: 4px;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 280px;
 }
 
 .grid {
@@ -231,6 +262,25 @@ async function deleteEnvelope(id: string) {
 .card--vooruit {
   background: var(--soft);
   box-shadow: none;
+  justify-content: space-between;
+}
+
+.card-vooruit-name {
+  font-size: 16px;
+  color: var(--ink-deep);
+}
+
+.card-vooruit-sub {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+  font-weight: 400;
+  font-family: var(--font-body);
+}
+
+.card-vooruit-figure {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: var(--ink-deep);
 }
 
 .card-top {
@@ -252,12 +302,6 @@ async function deleteEnvelope(id: string) {
 
 .card-remaining--over {
   color: var(--color-accent-700);
-}
-
-.card-note {
-  font-size: 12.5px;
-  color: var(--color-neutral-700);
-  margin: 0;
 }
 
 .progress-track {
@@ -294,19 +338,28 @@ async function deleteEnvelope(id: string) {
 
 .legend-card {
   display: flex;
+  align-items: center;
   gap: 24px;
   flex-wrap: wrap;
   background: var(--card);
   border-radius: var(--radius-card);
-  padding: 16px 20px;
+  padding: 22px 26px;
   box-shadow: var(--shadow-sm);
+  max-width: 640px;
+}
+
+.legend-overline {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-neutral-600);
 }
 
 .legend-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .legend-row--dim {
@@ -314,8 +367,11 @@ async function deleteEnvelope(id: string) {
 }
 
 .footnote {
-  font-size: 12.5px;
-  color: var(--color-neutral-600);
+  font-size: 13px;
+  color: var(--color-neutral-700);
+  border-left: 2px solid var(--color-accent);
+  padding-left: 13px;
+  max-width: 640px;
   margin: 0;
 }
 

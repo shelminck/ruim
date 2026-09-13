@@ -89,55 +89,56 @@ async function deleteAndReturn() {
 
   <div v-else class="doel-screen">
     <div class="left-column">
-      <label class="saldo-field">
-        <span class="saldo-currency">€</span>
-        <input v-model="savedInput" type="text" inputmode="decimal" class="saldo-input" @blur="saveSaved" />
-      </label>
-      <div class="progress-track">
-        <div class="progress-fill" :style="{ width: `${progressPct}%` }" />
-      </div>
-      <div class="remaining-line">
-        <template v-if="remainingCents > 0">nog {{ formatEuros(remainingCents) }} te gaan</template>
-        <template v-else>doel behaald 🎉</template>
+      <div class="saldo-card">
+        <label class="saldo-field">
+          <span class="saldo-currency">€</span>
+          <input v-model="savedInput" type="text" inputmode="decimal" class="saldo-input" @blur="saveSaved" />
+        </label>
+        <div class="progress-track">
+          <div class="progress-fill" :style="{ width: `${progressPct}%` }" />
+        </div>
+        <div class="remaining-line">
+          <template v-if="remainingCents > 0">nog {{ formatEuros(remainingCents) }} te gaan</template>
+          <template v-else>doel behaald</template>
+        </div>
       </div>
 
-      <ul class="settings-list">
-        <li>
+      <div class="settings-card">
+        <div class="settings-row">
           <span>Staat op</span>
           <input v-model="accountLabelInput" type="text" placeholder="Spaarrekening · NL··8842" class="input" @blur="saveSettings" />
-        </li>
-        <li>
+        </div>
+        <div class="settings-row">
           <span>Overboeking</span>
           <span>automatisch · <input v-model="transferDayInput" type="text" class="input input--small" @blur="saveSettings" />e</span>
-        </li>
-        <li>
+        </div>
+        <button type="button" class="settings-row settings-row--button" @click="togglePause">
           <span>Pauzeren bij te weinig inkomen</span>
-          <button type="button" class="toggle-button" @click="togglePause">
+          <span class="toggle-value" :class="{ 'toggle-value--on': goal.pauseWhenIncomeLow }">
             {{ goal.pauseWhenIncomeLow ? 'aan ✓' : 'uit' }}
-          </button>
-        </li>
-      </ul>
+          </span>
+        </button>
+      </div>
 
       <button type="button" class="text-button" @click="deleteAndReturn">Doel verwijderen</button>
     </div>
 
     <div class="right-column">
-      <label class="field">
-        <span>Inleg per maand: {{ formatEuros(goal.monthlyDepositCents) }}</span>
-        <input
-          type="range"
-          min="5000"
-          max="30000"
-          step="1000"
-          :value="goal.monthlyDepositCents"
-          @input="onDepositChange"
-        />
-      </label>
-      <p v-if="readyLine" class="ready-line">{{ readyLine }}</p>
-      <div class="vrij-preview">
-        <span>Je kunt dan nog uitgeven</span>
-        <strong>{{ formatEuros(vrijTeBesteden) }}</strong>
+      <div class="deposit-row">
+        <span>Inleg per maand</span>
+        <span class="deposit-figure">{{ formatEuros(goal.monthlyDepositCents) }}</span>
       </div>
+      <input
+        type="range"
+        min="5000"
+        max="30000"
+        step="1000"
+        class="deposit-slider"
+        :value="goal.monthlyDepositCents"
+        @input="onDepositChange"
+      />
+      <p v-if="readyLine" class="ready-line">{{ readyLine }}</p>
+      <p class="vrij-line">en je vrij te besteden wordt {{ formatEuros(vrijTeBesteden) }} per maand</p>
     </div>
   </div>
 </template>
@@ -151,7 +152,7 @@ async function deleteAndReturn() {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 24px;
-  max-width: 900px;
+  max-width: 1020px;
 }
 
 @media (max-width: 1100px) {
@@ -163,7 +164,17 @@ async function deleteAndReturn() {
 .left-column {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 18px;
+}
+
+.saldo-card {
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border-radius: 30px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .saldo-field {
@@ -172,6 +183,7 @@ async function deleteAndReturn() {
   gap: 6px;
   font-family: var(--font-heading);
   font-size: 38px;
+  line-height: 1;
 }
 
 .saldo-input {
@@ -204,21 +216,41 @@ async function deleteAndReturn() {
   color: var(--color-neutral-700);
 }
 
-.settings-list {
-  list-style: none;
-  margin: 16px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.settings-card {
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border-radius: 28px;
+  padding: 4px 24px;
 }
 
-.settings-list li {
+.settings-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13.5px;
-  gap: 10px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--color-neutral-200);
+  font-size: 14px;
+  cursor: default;
+  text-align: left;
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row--button {
+  cursor: pointer;
+}
+
+.toggle-value {
+  color: var(--color-neutral-700);
+}
+
+.toggle-value--on {
+  color: var(--ink);
 }
 
 .input {
@@ -228,21 +260,14 @@ async function deleteAndReturn() {
   border-radius: 999px;
   border: 1px solid var(--color-neutral-300);
   font-size: 13px;
+  color: var(--color-neutral-700);
+  text-align: right;
 }
 
 .input--small {
   width: 36px;
   text-align: center;
   margin-right: 4px;
-}
-
-.toggle-button {
-  border: 1px solid var(--color-neutral-300);
-  background: #fff;
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 12.5px;
-  cursor: pointer;
 }
 
 .text-button {
@@ -252,50 +277,47 @@ async function deleteAndReturn() {
   color: var(--color-accent-700);
   cursor: pointer;
   font-size: 12.5px;
-  margin-top: 8px;
 }
 
 .right-column {
   background: var(--soft);
-  border-radius: var(--radius-panel-lg);
+  border-radius: 30px;
   padding: 26px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   align-self: start;
 }
 
-.field {
+.deposit-row {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 13.5px;
-  color: var(--ink-deep);
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+  color: var(--color-neutral-800);
 }
 
-.field input[type='range'] {
+.deposit-figure {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  color: var(--color-accent-700);
+}
+
+.deposit-slider {
   accent-color: var(--color-accent);
   height: 22px;
+  width: 100%;
 }
 
 .ready-line {
-  font-size: 12.5px;
-  color: var(--color-neutral-700);
+  font-size: 13.5px;
+  color: var(--color-neutral-800);
   margin: 0;
 }
 
-.vrij-preview {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 6px;
+.vrij-line {
   font-size: 13px;
-  color: var(--ink-deep);
-}
-
-.vrij-preview strong {
-  font-family: var(--font-heading);
-  font-size: 20px;
-  color: var(--color-accent-700);
+  color: var(--color-neutral-700);
+  margin: 0;
 }
 </style>

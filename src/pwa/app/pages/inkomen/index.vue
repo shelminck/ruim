@@ -66,6 +66,7 @@ async function submitCreate() {
       </div>
 
       <div class="chart-card">
+        <div class="chart-overline">Wat er binnenkwam · 12 maanden</div>
         <div class="chart" :style="{ '--base-line': `${baseLinePct}%` }">
           <div v-for="(month, index) in months" :key="month" class="chart-column">
             <div
@@ -74,8 +75,12 @@ async function submitCreate() {
               :style="{ height: `${Math.min(100, (basis / chartMax) * 100)}%` }"
             />
             <div v-else class="chart-bar" />
-            <span class="chart-label">{{ month }}</span>
           </div>
+        </div>
+        <div class="chart-footer">
+          <span>okt '25</span>
+          <span class="chart-legend"><span class="chart-legend-line" />basis</span>
+          <span>sep '26</span>
         </div>
         <p class="chart-note">Historie per maand verschijnt zodra er meerdere maanden data zijn.</p>
       </div>
@@ -89,9 +94,14 @@ async function submitCreate() {
           :class="{ 'source-card--excluded': !source.countsTowardBase }"
           @click="toggleSource(source)"
         >
-          <span>{{ source.name }}</span>
-          <span class="source-amount">{{ formatEuros(source.amountCents) }}</span>
-          <span v-if="!source.countsTowardBase" class="source-flag">niet in basis</span>
+          <span class="source-name">{{ source.name }}</span>
+          <span class="source-amount">
+            {{ formatEuros(source.amountCents) }}
+            <br />
+            <span class="source-flag" :class="{ 'source-flag--excluded': !source.countsTowardBase }">
+              {{ source.countsTowardBase ? 'telt mee in basis' : 'niet in basis' }}
+            </span>
+          </span>
         </button>
       </div>
 
@@ -115,17 +125,22 @@ async function submitCreate() {
     </div>
 
     <div class="right-column">
-      <p class="explanation">
-        Bronnen die meetellen vormen je basis — daar draait je hele plan op. Variabele bronnen (zoals freelance-inkomsten)
-        kun je uitsluiten: alles wat binnenkomt boven je basis is een meevaller om bewust te verdelen.
-      </p>
-      <NuxtLink to="/inkomen/waterval" class="link-card">Bekijk de waterval ›</NuxtLink>
+      <p class="explanation">Tik een bron aan om hem wel of niet in je basis te laten meetellen.</p>
 
-      <NuxtLink v-if="meevaller > 0" to="/inkomen/meevaller" class="windfall-card">
-        {{ formatEuros(meevaller) }} meevaller · nog niet verdeeld ›
+      <NuxtLink to="/inkomen/waterval" class="link-card">
+        <span>Waar gaat je basis heen?<br /><span class="link-card-sub">vaste lasten · sparen · potjes · vrij</span></span>
+        <span class="chevron">›</span>
       </NuxtLink>
 
-      <NuxtLink to="/inkomen/minder" class="link-card">Wat als je inkomen daalt? ›</NuxtLink>
+      <NuxtLink v-if="meevaller > 0" to="/inkomen/meevaller" class="windfall-card">
+        <span>{{ formatEuros(meevaller) }} meevaller<br /><span class="link-card-sub">nog niet verdeeld</span></span>
+        <span class="chevron">›</span>
+      </NuxtLink>
+
+      <NuxtLink to="/inkomen/minder" class="minder-card">
+        <span>Wat als je inkomen daalt?<br /><span class="link-card-sub">reken een lager inkomen door</span></span>
+        <span class="chevron chevron--accent">›</span>
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -133,9 +148,9 @@ async function submitCreate() {
 <style scoped>
 .inkomen-screen {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: 24px;
-  max-width: 960px;
+  max-width: 1180px;
 }
 
 @media (max-width: 1100px) {
@@ -152,42 +167,57 @@ async function submitCreate() {
 
 .hero-panel {
   background: var(--soft);
-  border-radius: var(--radius-panel-lg);
-  padding: 30px;
+  border-radius: 30px;
+  padding: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .hero-label {
   font-size: 13.5px;
-  color: var(--ink-deep);
+  color: var(--color-neutral-700);
 }
 
 .hero-figure {
   font-family: var(--font-heading);
   font-size: 50px;
+  line-height: 1;
   color: var(--ink-deep);
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .hero-sub {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--color-neutral-700);
-  margin-top: 4px;
+  max-width: 220px;
 }
 
 .chart-card {
   background: var(--card);
-  border-radius: var(--radius-card);
+  border-radius: 30px;
   box-shadow: var(--shadow-sm);
-  padding: 20px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chart-overline {
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-neutral-600);
 }
 
 .chart {
   height: 140px;
   display: flex;
   align-items: flex-end;
-  gap: 6px;
+  gap: 8px;
   position: relative;
-  border-top: 1px dashed transparent;
 }
 
 .chart::before {
@@ -202,11 +232,8 @@ async function submitCreate() {
 .chart-column {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
+  align-items: flex-end;
   height: 100%;
-  gap: 6px;
 }
 
 .chart-bar {
@@ -220,49 +247,70 @@ async function submitCreate() {
   background: var(--color-accent);
 }
 
-.chart-label {
-  font-size: 10px;
+.chart-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
   color: var(--color-neutral-600);
 }
 
+.chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-deep);
+}
+
+.chart-legend-line {
+  width: 18px;
+  border-top: 1.5px dashed var(--ink);
+}
+
 .chart-note {
-  margin: 10px 0 0;
+  margin: 0;
   font-size: 12px;
   color: var(--color-neutral-600);
 }
 
 .source-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
 }
 
 .source-card {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 12px;
-  background: var(--card);
+  background: #fff;
   border: none;
-  border-radius: var(--radius-row);
-  box-shadow: var(--shadow-sm);
-  padding: 14px 18px;
-  font-size: 14px;
+  border-radius: 22px;
+  box-shadow: inset 0 0 0 1.5px var(--color-neutral-300);
+  padding: 18px;
+  font-size: 14.5px;
   cursor: pointer;
   text-align: left;
 }
 
 .source-card--excluded {
-  border: 1.5px solid var(--color-accent);
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
   background: var(--color-accent-100);
 }
 
 .source-amount {
-  margin-left: auto;
-  font-family: var(--font-heading);
+  text-align: right;
+  flex: none;
 }
 
 .source-flag {
-  font-size: 11px;
+  font-size: 11.5px;
+  color: var(--ink);
+}
+
+.source-flag--excluded {
   color: var(--color-accent-700);
 }
 
@@ -330,34 +378,66 @@ async function submitCreate() {
 }
 
 .explanation {
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--color-neutral-700);
   margin: 0;
 }
 
-.link-card {
-  display: block;
-  background: var(--card);
-  border-radius: var(--radius-row);
-  box-shadow: var(--shadow-sm);
-  padding: 14px 18px;
+.link-card,
+.windfall-card,
+.minder-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-radius: 24px;
+  padding: 20px;
   font-size: 14px;
-  color: var(--ink-deep);
   text-decoration: none;
+}
+
+.link-card-sub {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+.chevron {
+  flex: none;
+  font-size: 19px;
+  color: var(--color-neutral-700);
+}
+
+.chevron--accent {
+  color: var(--color-accent-700);
+}
+
+.link-card {
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+}
+
+.link-card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .windfall-card {
-  display: block;
   background: var(--soft);
   border: 1.5px solid var(--ink);
-  border-radius: var(--radius-row);
-  padding: 14px 18px;
-  font-size: 14px;
   color: var(--ink-deep);
-  text-decoration: none;
 }
 
 .windfall-card:hover {
-  background: #c9d2e2;
+  background: var(--soft-pressed);
+}
+
+.minder-card {
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
+  background: var(--color-accent-100);
+  color: var(--color-accent-800);
+}
+
+.minder-card:hover {
+  background: var(--color-accent-200);
 }
 </style>

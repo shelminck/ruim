@@ -38,92 +38,112 @@ async function save() {
 
 <template>
   <div v-if="investing" class="beleggen-screen">
-    <div class="figures">
-      <div class="figure-block">
-        <div class="figure-label">Inleg sinds het begin</div>
+    <div class="left-column">
+      <div class="figure-card">
+        <div class="figure-label">ingelegd sinds het begin</div>
         <div class="figure-value">{{ formatEuros(investing.depositsSinceCents) }}</div>
-      </div>
-      <div class="figure-block">
-        <div class="figure-label">Waarde vandaag</div>
-        <div class="figure-value">{{ formatEuros(investing.currentValueCents) }}</div>
-        <div class="figure-sub" :class="{ negative: gainCents < 0 }">
-          {{ gainCents >= 0 ? '+' : '' }}{{ formatEuros(gainCents) }} koersresultaat
+        <div class="figure-sub">
+          waarde vandaag {{ formatEuros(investing.currentValueCents) }} ·
+          <span :class="{ negative: gainCents < 0 }">{{ gainCents >= 0 ? '+' : '' }}{{ formatEuros(gainCents) }}</span>
         </div>
       </div>
     </div>
 
-    <div class="philosophy-note">
-      We volgen je inleg, niet de koers. Koerswinst is geen geld om mee te budgetteren — en telt niet mee in je buffer.
-    </div>
+    <div class="right-column">
+      <div class="philosophy-note">
+        We volgen je inleg, niet de koers. Koerswinst is geen geld om mee te budgetteren — en telt niet mee in je buffer.
+      </div>
 
-    <form class="edit-form" @submit.prevent="save">
-      <label class="field">
-        <span>Inleg sinds het begin (€)</span>
-        <input v-model="depositsInput" type="text" inputmode="decimal" class="input" />
-      </label>
-      <label class="field">
-        <span>Waarde vandaag (€)</span>
-        <input v-model="valueInput" type="text" inputmode="decimal" class="input" />
-      </label>
-      <label class="field">
-        <span>Vaste inleg per maand (€)</span>
-        <input v-model="monthlyInput" type="text" inputmode="decimal" class="input" />
-      </label>
-      <button type="submit" class="primary-button">Opslaan</button>
-    </form>
+      <form class="settings-card" @submit.prevent="save">
+        <label class="field">
+          <span>Inleg sinds het begin (€)</span>
+          <input v-model="depositsInput" type="text" inputmode="decimal" class="input" />
+        </label>
+        <label class="field">
+          <span>Waarde vandaag (€)</span>
+          <input v-model="valueInput" type="text" inputmode="decimal" class="input" />
+        </label>
+        <label class="field">
+          <span>Vaste inleg per maand (€)</span>
+          <input v-model="monthlyInput" type="text" inputmode="decimal" class="input" />
+        </label>
+        <button type="submit" class="primary-button">Opslaan</button>
+      </form>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .beleggen-screen {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 560px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px;
+  max-width: 1060px;
+  align-items: start;
 }
 
-.figures {
+@media (max-width: 1100px) {
+  .beleggen-screen {
+    grid-template-columns: 1fr;
+  }
+}
+
+.left-column,
+.right-column {
   display: flex;
-  gap: 24px;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.figure-card {
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border-radius: 30px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .figure-label {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-neutral-600);
+  font-size: 13.5px;
+  color: var(--color-neutral-700);
 }
 
 .figure-value {
   font-family: var(--font-heading);
   font-size: 40px;
-  margin-top: 4px;
+  line-height: 1;
 }
 
 .figure-sub {
-  font-size: 12.5px;
-  color: var(--ink);
-  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-neutral-700);
 }
 
-.figure-sub.negative {
+.figure-sub .negative {
   color: var(--color-accent-700);
 }
 
+.figure-sub span:not(.negative) {
+  color: var(--ink);
+}
+
 .philosophy-note {
+  border-radius: 22px;
   border: 1.5px dashed var(--color-accent);
-  border-radius: var(--radius-callout);
-  padding: 16px 18px;
+  background: var(--color-accent-100);
+  padding: 18px;
   font-size: 13px;
   color: var(--color-accent-800);
 }
 
-.edit-form {
+.settings-card {
   display: flex;
   flex-direction: column;
   gap: 10px;
   background: var(--card);
-  border-radius: var(--radius-card);
+  border-radius: 28px;
   padding: 20px;
   box-shadow: var(--shadow-sm);
 }

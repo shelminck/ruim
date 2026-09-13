@@ -16,14 +16,14 @@ const subscriptions = ref<Subscription[]>([])
 const showCreateForm = ref(false)
 const newName = ref('')
 const newAmount = ref('')
+const summarySub = ref('0 diensten · € 0 per maand')
 
 async function load() {
   subscriptions.value = await listSubscriptions()
   const active = subscriptions.value.filter((s) => s.cancelledAt === null)
   const total = active.reduce((sum, s) => sum + s.amountCents, 0)
-  screenHeader.set('Abonnementen', `${active.length} diensten · ${formatEuros(total)} per maand`, {
-    back: { to: '/vaste-lasten', label: 'Vaste lasten' },
-  })
+  summarySub.value = `${active.length} diensten · ${formatEuros(total)} per maand`
+  screenHeader.set('Abonnementen', summarySub.value, { back: { to: '/vaste-lasten', label: 'Vaste lasten' } })
 }
 
 onMounted(load)
@@ -49,6 +49,8 @@ async function submitCreate() {
 
 <template>
   <div class="abonnementen-screen">
+    <p class="summary-line">{{ summarySub }} — tik een abonnement aan om het als opgezegd te markeren.</p>
+
     <div class="grid">
       <button
         v-for="subscription in subscriptions"
@@ -58,10 +60,18 @@ async function submitCreate() {
         :class="{ 'card--cancelled': subscription.cancelledAt !== null }"
         @click="toggle(subscription)"
       >
-        <div class="card-name">{{ subscription.name }}</div>
-        <div class="card-amount">{{ formatEuros(subscription.amountCents) }}</div>
-        <div v-if="subscription.cancelledAt" class="card-meta">opgezegd · bespaart {{ formatEuros(subscription.amountCents) }}</div>
-        <div v-else class="card-meta">per maand · tik om op te zeggen</div>
+        <span class="card-name">
+          {{ subscription.name }}
+          <br />
+          <span class="card-meta">
+            {{ subscription.cancelledAt ? 'opgezegd' : 'per maand · tik om op te zeggen' }}
+          </span>
+        </span>
+        <span class="card-amount">
+          {{ formatEuros(subscription.amountCents) }}
+          <br />
+          <span v-if="subscription.cancelledAt" class="card-delta">bespaart {{ formatEuros(subscription.amountCents) }}</span>
+        </span>
       </button>
     </div>
 
@@ -85,24 +95,31 @@ async function submitCreate() {
 .abonnementen-screen {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 720px;
+  gap: 18px;
+  max-width: 1100px;
+}
+
+.summary-line {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--color-neutral-700);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
 }
 
 .card {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   background: var(--card);
   border: none;
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-sm);
+  border-radius: 22px;
+  box-shadow: none;
   padding: 18px;
   text-align: left;
   cursor: pointer;
@@ -111,22 +128,26 @@ async function submitCreate() {
 .card--cancelled {
   background: var(--color-neutral-100);
   opacity: 0.55;
-  box-shadow: none;
 }
 
 .card-name {
-  font-family: var(--font-heading);
-  font-size: 16px;
+  font-size: 14.5px;
 }
 
 .card-amount {
-  font-size: 20px;
-  font-family: var(--font-heading);
+  font-size: 14.5px;
+  text-align: right;
+  flex: none;
 }
 
 .card-meta {
   font-size: 11.5px;
-  color: var(--color-neutral-600);
+  color: var(--color-neutral-700);
+}
+
+.card-delta {
+  font-size: 11.5px;
+  color: var(--color-accent-700);
 }
 
 .create-section {

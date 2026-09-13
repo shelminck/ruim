@@ -52,14 +52,18 @@ const maxEnvelopeAmount = computed(() =>
 
   <div v-else class="label-screen">
     <div class="left-panel">
-      <div class="average-label">gemiddeld per maand</div>
+      <div class="average-label">kost je gemiddeld</div>
       <div class="average-figure">{{ stats ? formatEuros(stats.monthlyAverageCents) : '—' }}</div>
-      <div class="yearly-line">{{ stats ? formatEuros(stats.yearlyCents) : '—' }} per jaar</div>
+      <div class="yearly-line">{{ stats ? formatEuros(stats.yearlyCents) : '—' }} per jaar · gemeten over 12 maanden</div>
 
-      <NuxtLink :to="`/labels/${label.id}/scenario`" class="cta-button">Wegdenken: wat blijft er over? ›</NuxtLink>
+      <NuxtLink :to="`/labels/${label.id}/scenario`" class="cta-button">
+        <span>Wegdenken: wat blijft er over?<br /><span class="cta-sub">bereken de besparing</span></span>
+        <span class="cta-chevron">›</span>
+      </NuxtLink>
     </div>
 
     <div class="right-panel">
+      <div class="right-panel-title">Waar dat vandaan komt</div>
       <div v-if="!stats || stats.byEnvelope.length === 0" class="empty-note">
         Nog geen transacties met dit label.
       </div>
@@ -83,7 +87,7 @@ const maxEnvelopeAmount = computed(() =>
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
   gap: 24px;
-  max-width: 900px;
+  max-width: 1060px;
   align-items: start;
 }
 
@@ -95,8 +99,8 @@ const maxEnvelopeAmount = computed(() =>
 
 .left-panel {
   background: var(--soft);
-  border-radius: var(--radius-panel-lg);
-  padding: 30px;
+  border-radius: 30px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -104,13 +108,14 @@ const maxEnvelopeAmount = computed(() =>
 
 .average-label {
   font-size: 13.5px;
-  color: var(--ink-deep);
+  color: var(--color-neutral-700);
 }
 
 .average-figure {
   font-family: var(--font-heading);
   font-size: 46px;
-  color: var(--ink-deep);
+  line-height: 1;
+  color: var(--color-accent-700);
 }
 
 .yearly-line {
@@ -119,26 +124,48 @@ const maxEnvelopeAmount = computed(() =>
 }
 
 .cta-button {
-  margin-top: 12px;
-  align-self: flex-start;
-  border: none;
-  background: var(--color-accent);
-  color: #fff;
-  font-family: var(--font-heading);
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
+  background: var(--color-accent-100);
+  color: var(--color-accent-800);
   font-size: 13.5px;
-  border-radius: 999px;
-  padding: 12px 18px;
+  border-radius: 20px;
+  padding: 16px;
   text-decoration: none;
 }
 
 .cta-button:hover {
-  background: var(--color-accent-600);
+  background: var(--color-accent-200);
+}
+
+.cta-sub {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+.cta-chevron {
+  flex: none;
+  font-size: 19px;
+  color: var(--color-accent-700);
 }
 
 .right-panel {
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border-radius: 30px;
+  padding: 26px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+}
+
+.right-panel-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
 }
 
 .empty-note {
