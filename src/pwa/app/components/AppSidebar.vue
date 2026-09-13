@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckCircle, Home, List, ListCheck, TrendingUp, Wallet } from 'lucide-vue-next'
+import { CircleCheck, Home, List, ListCheck, TrendingUp, Wallet } from 'lucide-vue-next'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
 import { useTeDoenCount } from '../composables/useTeDoenCount'
 import { useSidebarValues } from '../composables/useSidebarValues'
@@ -22,7 +22,7 @@ onMounted(() => {
 const primaryNav = [
   { to: '/nu', label: 'Nu', icon: Home },
   { to: '/alles', label: 'Alles', icon: List },
-  { to: '/nakijken', label: 'Nakijken', icon: CheckCircle, badge: nakijkenCount },
+  { to: '/nakijken', label: 'Nakijken', icon: CircleCheck, badge: nakijkenCount },
   { to: '/te-doen', label: 'Te doen', icon: ListCheck, badge: teDoenCount },
   { to: '/potjes', label: 'Potjes', icon: Wallet },
   { to: '/vooruit', label: 'Vooruit', icon: TrendingUp },

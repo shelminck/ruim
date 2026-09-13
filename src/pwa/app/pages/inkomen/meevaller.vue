@@ -9,9 +9,8 @@ import { getMonthlyAdjustment, saveMonthlyAdjustment } from '../../lib/db/monthl
 import { getWindfallPolicy, saveWindfallPolicy } from '../../lib/db/windfall-policy'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Meevaller verdelen', 'Verdeel een meevaller over buffer, beleggen en vrij te besteden.', {
-  back: { to: '/inkomen', label: 'Inkomen' },
-})
+const screenHeader = useScreenHeader()
+screenHeader.set('Er kwam meer binnen', '', { back: { to: '/inkomen', label: 'Inkomen' } })
 
 const router = useRouter()
 
@@ -32,6 +31,9 @@ async function load() {
     investingPct.value = policy.investingPct
     makePermanent.value = true
   }
+  screenHeader.set('Er kwam meer binnen', `${formatEuros(wf.meevaller)} boven je basis`, {
+    back: { to: '/inkomen', label: 'Inkomen' },
+  })
 }
 
 onMounted(load)

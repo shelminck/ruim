@@ -5,16 +5,18 @@ import { listEnvelopes } from '../lib/db/envelopes'
 import { getBuffer, saveBuffer } from '../lib/db/buffer'
 import { listIncomeSources } from '../lib/db/income-sources'
 import { aggregateProgress, currentMonthKey, envelopeProgress, spentCentsForDay, spentCentsForEnvelope } from '../lib/domain/budget'
-import { formatEuros } from '../lib/domain/format'
+import { formatEuros, monthDaysLeftLabel } from '../lib/domain/format'
 import { loadWaterfall } from '../composables/useWaterfall'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
 import { useTeDoenCount } from '../composables/useTeDoenCount'
 import type { Envelope, Transaction } from '../lib/domain/types'
 import type { WaterfallResult } from '../lib/domain/waterfall'
 
-useScreenHeader().set('Nu', 'Het overzicht: wat je nog kunt uitgeven, je potjes en wat er nog moet gebeuren.', {
-  hideOnMobile: true,
-})
+// Header title/subtitle for this screen are the greeting itself, on every
+// breakpoint — see design handoff, Prototype Ruim Desktop.dc.html:1022
+// (`nu: ['Goeiemorgen, Sanne', 'september · nog 11 dagen']`), not a generic
+// "Nu" title.
+useScreenHeader().set('Goeiemorgen, Sanne', monthDaysLeftLabel(), { avatars: true })
 
 const { count: nakijkenCount, refresh: refreshNakijkenCount } = useNakijkenCount()
 const { count: teDoenCount, refresh: refreshTeDoenCount } = useTeDoenCount()
@@ -93,46 +95,41 @@ const perDayLine = computed(() => {
   return `${formatEuros(perDay)} per dag tot ${lastDayLabel}`
 })
 
-const standExplanation: Record<string, string> = {
-  ruim: 'je zit ruim onder budget deze maand.',
-  krap: 'je nadert de grens van je potjes.',
-  op: 'je hebt je budget deze maand bereikt.',
+// Literal per-stand copy from the design (Prototype Ruim Desktop.dc.html:1166,
+// `maandMerkUitleg`) — not a paraphrase. The "krap" line names the last day
+// of the month; the prototype hardcodes "de 30e" for its September fixture,
+// computed for real here instead.
+const standExplanation = computed<Record<string, string>>(() => {
+  const lastDay = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
+  return {
+    ruim: 'je ligt voor op je maand',
+    krap: `let even op tot de ${lastDay}e`,
+    op: 'je potjes zijn leeg',
+  }
+})
+
+// Literal suffix from the design (Prototype Ruim.dc.html: `p.rest`), not
+// just the bare currency figure.
+function envelopeRestLabel(remainingCents: number): string {
+  return remainingCents < 0 ? `${formatEuros(-remainingCents)} te veel` : `${formatEuros(remainingCents)} over`
 }
 
-const standLabel = computed(() => monthStand.value.stand[0]!.toUpperCase() + monthStand.value.stand.slice(1))
 const showCoach = computed(
   () => !coachDismissed.value && monthStand.value.stand === 'ruim' && (waterfall.value?.vrij ?? 0) > 0,
 )
-
-const greetingDateLabel = computed(() => {
-  const now = new Date()
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  const daysLeft = lastDay.getDate() - now.getDate() + 1
-  const monthLabel = new Intl.DateTimeFormat('nl-NL', { month: 'long' }).format(now)
-  return `${monthLabel} · nog ${daysLeft} ${daysLeft === 1 ? 'dag' : 'dagen'}`
-})
 </script>
 
 <template>
   <div class="nu-screen">
     <div class="left-column">
-      <div class="mobile-greeting">
-        <div>
-          <div class="greeting-title">Goeiemorgen, Sanne</div>
-          <div class="greeting-sub">{{ greetingDateLabel }}</div>
-        </div>
-        <div class="avatars">
-          <span class="avatar avatar--one" />
-          <span class="avatar avatar--two" />
-        </div>
-      </div>
-
+      <!-- Desktop hero — merkteken, stand suffix, explanation clause and the
+           "Waar komt dit vandaan" link. Hidden on mobile, see .hero-mobile. -->
       <div class="hero">
         <div class="hero-top">
           <Merkteken :stand="monthStand.stand" :size="88" surface="bg" hero-ring />
           <div class="hero-text">
             <div class="hero-label">
-              je kunt nog uitgeven · <strong>{{ standLabel }}</strong>
+              je kunt nog uitgeven · <span class="hero-stand">{{ monthStand.stand }}</span>
             </div>
             <div class="hero-figure">{{ waterfall ? formatEuros(waterfall.vrij) : '—' }}</div>
             <div class="hero-sub">
@@ -141,6 +138,14 @@ const greetingDateLabel = computed(() => {
           </div>
           <NuxtLink to="/inkomen/waterval" class="ghost-pill">Waar komt dit vandaan ›</NuxtLink>
         </div>
+      </div>
+
+      <!-- Mobile hero — three plain lines, no merkteken/pill/explanation.
+           See Prototype Ruim.dc.html, isNu block. -->
+      <div class="hero-mobile">
+        <div class="hero-label">je kunt nog uitgeven</div>
+        <div class="hero-figure">{{ waterfall ? formatEuros(waterfall.vrij) : '—' }}</div>
+        <div class="hero-sub">{{ perDayLine }}</div>
       </div>
 
       <div v-if="showCoach" class="coach-card">
@@ -193,7 +198,7 @@ const greetingDateLabel = computed(() => {
       <div class="mobile-list">
         <NuxtLink v-for="{ envelope, progress } in progressList" :key="envelope.id" :to="`/potjes/${envelope.id}`" class="mobile-list-row">
           <span>{{ envelope.name }}</span>
-          <span :class="{ overspent: progress.remainingCents < 0 }">{{ formatEuros(progress.remainingCents) }}</span>
+          <span :class="{ overspent: progress.remainingCents < 0 }">{{ envelopeRestLabel(progress.remainingCents) }}</span>
         </NuxtLink>
         <NuxtLink to="/potjes" class="mobile-list-row mobile-list-row--muted">
           <span>Alle potjes en sparen</span>
@@ -284,46 +289,6 @@ const greetingDateLabel = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 24px;
-}
-
-/* Mobile-only header replacement: the shared AppHeader hides its title on
-   this screen (hideOnMobile), so nu.vue supplies its own greeting instead
-   — see design handoff README, mobile prototype's "Nu" screen. */
-.mobile-greeting {
-  display: none;
-}
-
-.greeting-title {
-  font-family: var(--font-heading);
-  font-size: 20px;
-  color: var(--color-text);
-}
-
-.greeting-sub {
-  font-size: 12.5px;
-  color: var(--color-neutral-700);
-  margin-top: 2px;
-}
-
-.avatars {
-  display: flex;
-  flex: none;
-}
-
-.avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  border: 1.5px solid var(--color-text);
-}
-
-.avatar--one {
-  background: var(--color-accent-300);
-}
-
-.avatar--two {
-  background: var(--color-neutral-300);
-  margin-left: -9px;
 }
 
 .coach-card {
@@ -445,15 +410,15 @@ const greetingDateLabel = computed(() => {
   color: rgba(255, 255, 255, 0.82);
 }
 
-.hero-label strong {
+.hero-stand {
   color: #fff;
 }
 
 .hero-figure {
   font-family: var(--font-heading);
-  /* Narrower vw multiplier than the design spec's clamp(56px, 6.4vw, 86px):
-     that figure assumed the full 1320px prototype viewport, not a ~1.3fr
-     column inside a two-column shell. */
+  /* Narrower vw multiplier than the desktop design spec's
+     clamp(56px, 6.4vw, 86px): that figure assumed the full 1320px prototype
+     viewport, not a ~1.3fr column inside a two-column shell. */
   font-size: clamp(40px, 4vw, 76px);
   line-height: 0.92;
   margin-top: 4px;
@@ -463,6 +428,28 @@ const greetingDateLabel = computed(() => {
   margin-top: 8px;
   font-size: 13.5px;
   color: rgba(255, 255, 255, 0.82);
+}
+
+/* Mobile hero — separate block, hidden by default (see .hero-mobile in the
+   trailing media query). Fixed 60px figure and 32px radius per the mobile
+   prototype, not the desktop clamp/36px. */
+.hero-mobile {
+  display: none;
+  background: var(--ink);
+  border-radius: 32px;
+  padding: 26px;
+  color: #fff;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hero-mobile .hero-figure {
+  font-size: 60px;
+  line-height: 0.95;
+}
+
+.hero-mobile .hero-sub {
+  margin-top: 0;
 }
 
 .ghost-pill {
@@ -650,11 +637,12 @@ const greetingDateLabel = computed(() => {
 /* Placed last so it wins the cascade over the unconditional display:none
    rules above at equal specificity. */
 @media (max-width: 1100px) {
-  .mobile-greeting {
+  .hero {
+    display: none;
+  }
+
+  .hero-mobile {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 6px;
   }
 
   .mobile-pills {

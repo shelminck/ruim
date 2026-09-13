@@ -5,9 +5,8 @@ import type { IncomeSource } from '../../lib/domain/types'
 import { createIncomeSource, listIncomeSources, updateIncomeSource } from '../../lib/db/income-sources'
 import { useSidebarValues } from '../../composables/useSidebarValues'
 
-useScreenHeader().set('Inkomen', 'Waar je plan op draait, en wat erboven komt.', {
-  back: { to: '/nu', label: 'Nu' },
-})
+const screenHeader = useScreenHeader()
+screenHeader.set('Inkomen', '0 bronnen · deze maand € 0 binnen', { back: { to: '/nu', label: 'Nu' } })
 
 const { refresh: refreshSidebarValues } = useSidebarValues()
 
@@ -19,6 +18,10 @@ const newCountsTowardBase = ref(true)
 
 async function load() {
   sources.value = await listIncomeSources()
+  const totalIn = sources.value.reduce((sum, s) => sum + s.amountCents, 0)
+  screenHeader.set('Inkomen', `${sources.value.length} bronnen · deze maand ${formatEuros(totalIn)} binnen`, {
+    back: { to: '/nu', label: 'Nu' },
+  })
 }
 
 onMounted(load)

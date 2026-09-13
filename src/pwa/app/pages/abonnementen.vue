@@ -6,9 +6,8 @@ import { createSubscription, listSubscriptions, toggleSubscriptionCancelled } fr
 import { useSidebarValues } from '../composables/useSidebarValues'
 import { useTeDoenCount } from '../composables/useTeDoenCount'
 
-useScreenHeader().set('Abonnementen', 'Actieve en opgezegde abonnementen.', {
-  back: { to: '/vaste-lasten', label: 'Vaste lasten' },
-})
+const screenHeader = useScreenHeader()
+screenHeader.set('Abonnementen', '0 diensten · € 0 per maand', { back: { to: '/vaste-lasten', label: 'Vaste lasten' } })
 
 const { refresh: refreshSidebarValues } = useSidebarValues()
 const { refresh: refreshTeDoenCount } = useTeDoenCount()
@@ -20,6 +19,11 @@ const newAmount = ref('')
 
 async function load() {
   subscriptions.value = await listSubscriptions()
+  const active = subscriptions.value.filter((s) => s.cancelledAt === null)
+  const total = active.reduce((sum, s) => sum + s.amountCents, 0)
+  screenHeader.set('Abonnementen', `${active.length} diensten · ${formatEuros(total)} per maand`, {
+    back: { to: '/vaste-lasten', label: 'Vaste lasten' },
+  })
 }
 
 onMounted(load)

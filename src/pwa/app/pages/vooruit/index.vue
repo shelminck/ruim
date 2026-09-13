@@ -7,7 +7,7 @@ import { createGoal, listGoals } from '../../lib/db/goals'
 import type { Buffer, Goal } from '../../lib/domain/types'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Vooruit', 'Buffer, doelen en beleggen — in die volgorde.')
+useScreenHeader().set('Vooruit', 'buffer, doelen en beleggen')
 
 const buffer = ref<Buffer | null>(null)
 const waterfall = ref<WaterfallResult | null>(null)

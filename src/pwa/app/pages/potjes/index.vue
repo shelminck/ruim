@@ -5,12 +5,12 @@ import { aggregateProgress, currentMonthKey, envelopeProgress, spentCentsForEnve
 import type { Account, Envelope, RolloverPolicy } from '../../lib/domain/types'
 import { createEnvelope, listEnvelopes, removeEnvelope } from '../../lib/db/envelopes'
 import { getDb } from '../../lib/db/client'
-import { formatEuros } from '../../lib/domain/format'
+import { formatEuros, monthDaysLeftLabel } from '../../lib/domain/format'
 import { getBuffer } from '../../lib/db/buffer'
 import { getInvesting } from '../../lib/db/investing'
 import { listGoals } from '../../lib/db/goals'
 
-useScreenHeader().set('Potjes', 'Je maandelijkse envelopes: budget, besteed en wat nog rest.')
+useScreenHeader().set('Potjes', monthDaysLeftLabel())
 
 const envelopes = ref<Envelope[]>([])
 const accounts = ref<Account[]>([])

@@ -4,7 +4,7 @@ import { formatEuros } from '../../lib/domain/format'
 import { getInvesting, saveInvesting } from '../../lib/db/investing'
 import type { Investing } from '../../lib/domain/types'
 
-useScreenHeader().set('Beleggen', 'Inleg sinds het begin, los van koerswinst.', {
+useScreenHeader().set('Beleggen', 'richting, geen potje dat leegraakt', {
   back: { to: '/vooruit', label: 'Vooruit' },
 })
 

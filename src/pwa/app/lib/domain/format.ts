@@ -13,3 +13,11 @@ export function formatEuros(cents: number): string {
 
   return `${cents < 0 ? '−' : ''}€ ${formatted}`
 }
+
+/** "september · nog 11 dagen" — the header subtitle pattern shared by Nu and Potjes in the design. */
+export function monthDaysLeftLabel(now: Date = new Date()): string {
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  const daysLeft = lastDay.getDate() - now.getDate() + 1
+  const monthLabel = new Intl.DateTimeFormat('nl-NL', { month: 'long' }).format(now)
+  return `${monthLabel} · nog ${daysLeft} ${daysLeft === 1 ? 'dag' : 'dagen'}`
+}

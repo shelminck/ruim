@@ -14,9 +14,8 @@ const spentCents = ref(0)
 const budgetInput = ref('')
 const carriedOverInput = ref('')
 
-useScreenHeader().set('Potje', 'Budget, meegenomen rest en de doorschuif-regel voor dit potje.', {
-  back: { to: '/potjes', label: 'Potjes' },
-})
+const screenHeader = useScreenHeader()
+screenHeader.set('Potje', 'betaalpotje · gedeeld met Mark', { back: { to: '/potjes', label: 'Potjes' } })
 
 async function load() {
   const id = String(route.params.id)
@@ -28,6 +27,7 @@ async function load() {
   envelope.value = found
   budgetInput.value = (found.budgetCents / 100).toString()
   carriedOverInput.value = (found.carriedOverCents / 100).toString()
+  screenHeader.set(found.name, 'betaalpotje · gedeeld met Mark', { back: { to: '/potjes', label: 'Potjes' } })
 
   const transactions = await db.getAll('transactions')
   spentCents.value = spentCentsForEnvelope(transactions, found.id, currentMonthKey())

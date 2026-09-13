@@ -8,9 +8,8 @@ import type { Goal } from '../../../lib/domain/types'
 const route = useRoute()
 const router = useRouter()
 
-useScreenHeader().set('Doel', 'Voortgang en instellingen voor dit doel.', {
-  back: { to: '/vooruit', label: 'Vooruit' },
-})
+const screenHeader = useScreenHeader()
+screenHeader.set('Doel', '', { back: { to: '/vooruit', label: 'Vooruit' } })
 
 const goal = ref<Goal | null>(null)
 const accountLabelInput = ref('')
@@ -29,6 +28,9 @@ async function load() {
   transferDayInput.value = String(found.transferDay)
   savedInput.value = (found.savedCents / 100).toString()
   vrijTeBesteden.value = (await loadWaterfall()).vrij
+  screenHeader.set(found.name, `doel · ${formatEuros(found.targetCents)}`, {
+    back: { to: '/vooruit', label: 'Vooruit' },
+  })
 }
 
 onMounted(load)

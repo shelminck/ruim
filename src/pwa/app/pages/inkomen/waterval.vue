@@ -4,7 +4,7 @@ import { formatEuros } from '../../lib/domain/format'
 import { loadWaterfall } from '../../composables/useWaterfall'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Waterval', 'De volgorde waarin je basisinkomen wordt verdeeld.', {
+useScreenHeader().set('Waar gaat je basis heen', 'de volgorde van je maand', {
   back: { to: '/inkomen', label: 'Inkomen' },
 })
 

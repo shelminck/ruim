@@ -8,7 +8,10 @@ import { getMonthlyAdjustment, saveMonthlyAdjustment } from '../../lib/db/monthl
 import { useSidebarValues } from '../../composables/useSidebarValues'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Minder inkomen', 'Dek een inkomensdaling met potjes, pauzeren of de buffer.', {
+// Design title is 'Je basis daalt' with a fixture-specific narrative subtitle
+// ("Sam gaat 4 dagen werken · vanaf oktober") that doesn't generalize — this
+// screen has no real "reason for the drop" data, so the subtitle stays generic.
+useScreenHeader().set('Je basis daalt', 'reken door wat een lager inkomen betekent voor je plan', {
   back: { to: '/inkomen', label: 'Inkomen' },
 })
 

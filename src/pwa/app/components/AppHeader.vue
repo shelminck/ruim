@@ -6,7 +6,7 @@ import { getDb } from '../lib/db/client'
 import { spentCentsForDay } from '../lib/domain/budget'
 import { formatEuros } from '../lib/domain/format'
 
-const { title, subtitle, back, hideOnMobile } = useScreenHeader()
+const { title, subtitle, back, avatars } = useScreenHeader()
 const { count: nakijkenCount } = useNakijkenCount()
 
 const monthLabel = new Intl.DateTimeFormat('nl-NL', { month: 'long', year: 'numeric' }).format(new Date())
@@ -23,9 +23,15 @@ onMounted(async () => {
   <header class="header">
     <NuxtLink v-if="back" :to="back.to" class="back-link">‹ {{ back.label }}</NuxtLink>
 
-    <div class="titles" :class="{ 'titles--hide-mobile': hideOnMobile }">
-      <h1 class="title">{{ title }}</h1>
-      <p v-if="subtitle" class="subtitle">{{ subtitle }}</p>
+    <div class="titles-row">
+      <div class="titles">
+        <h1 class="title">{{ title }}</h1>
+        <p v-if="subtitle" class="subtitle">{{ subtitle }}</p>
+      </div>
+      <div v-if="avatars" class="header-avatars">
+        <span class="header-avatar header-avatar--one">S</span>
+        <span class="header-avatar header-avatar--two">M</span>
+      </div>
     </div>
 
     <div class="pills">
@@ -52,6 +58,15 @@ onMounted(async () => {
   display: none;
 }
 
+.titles-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .title {
   font-size: 32px;
   line-height: 1.1;
@@ -69,6 +84,32 @@ onMounted(async () => {
   align-items: center;
   gap: 10px;
   flex: none;
+}
+
+/* Only the mobile prototype's Nu screen shows this — see
+   Prototype Ruim.dc.html, the avatar pair next to the greeting. */
+.header-avatars {
+  display: none;
+}
+
+.header-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.header-avatar--one {
+  background: var(--color-accent-200);
+}
+
+.header-avatar--two {
+  background: var(--soft-pressed);
+  margin-left: -9px;
 }
 
 .pill {
@@ -110,12 +151,13 @@ onMounted(async () => {
     text-decoration: none;
   }
 
-  .titles--hide-mobile {
+  .pills {
     display: none;
   }
 
-  .pills {
-    display: none;
+  .header-avatars {
+    display: flex;
+    flex: none;
   }
 }
 </style>

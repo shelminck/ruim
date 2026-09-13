@@ -7,7 +7,7 @@ import { getDb } from '../../lib/db/client'
 import { useSidebarValues } from '../../composables/useSidebarValues'
 import type { Label, Transaction } from '../../lib/domain/types'
 
-useScreenHeader().set('Labels', 'Wat kost een ding echt, dwars door je potjes heen?', {
+useScreenHeader().set('Labels', 'wat kost het ons?', {
   back: { to: '/nu', label: 'Nu' },
 })
 

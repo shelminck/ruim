@@ -7,9 +7,8 @@ import { listSubscriptions } from '../lib/db/subscriptions'
 import { listIncomeSources } from '../lib/db/income-sources'
 import { useSidebarValues } from '../composables/useSidebarValues'
 
-useScreenHeader().set('Vaste lasten', 'Wat er elke maand vanaf gaat.', {
-  back: { to: '/nu', label: 'Nu' },
-})
+const screenHeader = useScreenHeader()
+screenHeader.set('Vaste lasten', '24 terugkerende betalingen · herkend', { back: { to: '/nu', label: 'Nu' } })
 
 const { refresh: refreshSidebarValues } = useSidebarValues()
 
@@ -28,8 +27,14 @@ async function load() {
     listIncomeSources(),
   ])
   fixedCosts.value = costs
-  subscriptionTotal.value = subscriptions.filter((s) => s.cancelledAt === null).reduce((sum, s) => sum + s.amountCents, 0)
+  const activeSubscriptions = subscriptions.filter((s) => s.cancelledAt === null)
+  subscriptionTotal.value = activeSubscriptions.reduce((sum, s) => sum + s.amountCents, 0)
   basis.value = incomeSources.filter((s) => s.countsTowardBase).reduce((sum, s) => sum + s.amountCents, 0)
+
+  const recurringCount = costs.length + activeSubscriptions.length
+  screenHeader.set('Vaste lasten', `${recurringCount} terugkerende betalingen · herkend`, {
+    back: { to: '/nu', label: 'Nu' },
+  })
 }
 
 onMounted(load)

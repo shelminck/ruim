@@ -8,10 +8,9 @@ import { getDb } from '../../../lib/db/client'
 import type { Envelope, Label } from '../../../lib/domain/types'
 
 const route = useRoute()
+const screenHeader = useScreenHeader()
 
-useScreenHeader().set('Label', 'Gemiddelde per maand en de kosten per potje.', {
-  back: { to: '/labels', label: 'Labels' },
-})
+screenHeader.set('Label', '', { back: { to: '/labels', label: 'Labels' } })
 
 const label = ref<Label | null>(null)
 const stats = ref<LabelStats | null>(null)
@@ -28,6 +27,12 @@ async function load() {
   envelopes.value = allEnvelopes
   const transactions = await db.getAll('transactions')
   stats.value = computeLabelStats(id, transactions)
+
+  const labelTxCount = transactions.filter((t) => t.labelIds.includes(id)).length
+  const envelopeCount = stats.value.byEnvelope.length
+  screenHeader.set(`◈ ${found.name}`, `${labelTxCount} transacties · loopt door ${envelopeCount} potjes`, {
+    back: { to: '/labels', label: 'Labels' },
+  })
 }
 
 onMounted(load)

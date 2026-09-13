@@ -9,7 +9,7 @@ import { formatEuros } from '../lib/domain/format'
 import type { Envelope, Label, Transaction } from '../lib/domain/types'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
 
-useScreenHeader().set('Nakijken', 'Geef elke transactie een potje en leg er een regel onder.')
+useScreenHeader().set('Nakijken', 'geef elke betaling een potje — en leg er een regel onder')
 
 const { refresh: refreshNakijkenCount } = useNakijkenCount()
 

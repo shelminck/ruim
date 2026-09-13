@@ -3,7 +3,7 @@ import { importStatement, type ImportSummary } from '../lib/db/import'
 import { parseMt940 } from '../lib/mt940/parser'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
 
-useScreenHeader().set('MT940 importeren', 'Lees een .sta-bestand van je bank in — dit blijft op je apparaat.', {
+useScreenHeader().set('MT940 importeren', 'bestand blijft op je apparaat', {
   back: { to: '/nu', label: 'Nu' },
 })
 
