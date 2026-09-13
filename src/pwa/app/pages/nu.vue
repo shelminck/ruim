@@ -8,6 +8,7 @@ import { aggregateProgress, currentMonthKey, envelopeProgress, spentCentsForDay,
 import { formatEuros } from '../lib/domain/format'
 import { loadWaterfall } from '../composables/useWaterfall'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
+import { useTeDoenCount } from '../composables/useTeDoenCount'
 import type { Envelope, Transaction } from '../lib/domain/types'
 import type { WaterfallResult } from '../lib/domain/waterfall'
 
@@ -16,6 +17,7 @@ useScreenHeader().set('Nu', 'Het overzicht: wat je nog kunt uitgeven, je potjes 
 })
 
 const { count: nakijkenCount, refresh: refreshNakijkenCount } = useNakijkenCount()
+const { count: teDoenCount, refresh: refreshTeDoenCount } = useTeDoenCount()
 
 const waterfall = ref<WaterfallResult | null>(null)
 const envelopes = ref<Envelope[]>([])
@@ -56,6 +58,7 @@ async function load() {
   meevallerCents.value = Math.max(0, binnen - basis)
 
   await refreshNakijkenCount()
+  await refreshTeDoenCount()
 }
 
 onMounted(load)
@@ -182,6 +185,45 @@ const greetingDateLabel = computed(() => {
           <div class="stat-figure">{{ labelCount }}</div>
         </NuxtLink>
       </div>
+
+      <!-- Mobile prototype layout below: a flat divider + list instead of
+           the desktop stat-grid/panels — see Prototype Ruim.dc.html, isNu
+           block, the potjes-rows + nav-links list under the divider. -->
+      <div class="mobile-divider" />
+      <div class="mobile-list">
+        <NuxtLink v-for="{ envelope, progress } in progressList" :key="envelope.id" :to="`/potjes/${envelope.id}`" class="mobile-list-row">
+          <span>{{ envelope.name }}</span>
+          <span :class="{ overspent: progress.remainingCents < 0 }">{{ formatEuros(progress.remainingCents) }}</span>
+        </NuxtLink>
+        <NuxtLink to="/potjes" class="mobile-list-row mobile-list-row--muted">
+          <span>Alle potjes en sparen</span>
+          <span>›</span>
+        </NuxtLink>
+        <NuxtLink to="/te-doen" class="mobile-list-row mobile-list-row--muted mobile-list-row--rule">
+          <span>Te doen{{ teDoenCount > 0 ? ` · ${teDoenCount} open` : '' }}</span>
+          <span>›</span>
+        </NuxtLink>
+        <NuxtLink to="/vaste-lasten" class="mobile-list-row mobile-list-row--muted mobile-list-row--rule">
+          <span>Vaste lasten · {{ waterfall ? formatEuros(waterfall.vasteLasten) : '—' }} p/m</span>
+          <span>›</span>
+        </NuxtLink>
+        <NuxtLink to="/labels" class="mobile-list-row mobile-list-row--muted mobile-list-row--rule">
+          <span>Labels · wat kost het ons?</span>
+          <span>›</span>
+        </NuxtLink>
+        <NuxtLink to="/inkomen" class="mobile-list-row mobile-list-row--muted mobile-list-row--rule">
+          <span>Inkomen · basis {{ waterfall ? formatEuros(waterfall.basis) : '—' }}</span>
+          <span>›</span>
+        </NuxtLink>
+        <NuxtLink to="/vooruit" class="mobile-list-row mobile-list-row--muted mobile-list-row--rule">
+          <span>Vooruit · sparen & beleggen</span>
+          <span>›</span>
+        </NuxtLink>
+        <NuxtLink to="/importeren" class="mobile-list-row mobile-list-row--muted mobile-list-row--rule">
+          <span>MT940 importeren</span>
+          <span>›</span>
+        </NuxtLink>
+      </div>
     </div>
 
     <div class="right-column">
@@ -220,8 +262,6 @@ const greetingDateLabel = computed(() => {
           </NuxtLink>
         </template>
       </div>
-
-      <NuxtLink to="/importeren" class="import-link">MT940 importeren ›</NuxtLink>
     </div>
   </div>
 </template>
@@ -446,6 +486,38 @@ const greetingDateLabel = computed(() => {
   gap: 16px;
 }
 
+.mobile-divider {
+  display: none;
+}
+
+.mobile-list {
+  display: none;
+}
+
+.mobile-list-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 4px;
+  font-size: 15px;
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+
+.mobile-list-row:hover {
+  background: var(--color-neutral-100);
+}
+
+.mobile-list-row--muted {
+  font-size: 15px;
+  color: var(--color-neutral-700);
+}
+
+.mobile-list-row--rule {
+  border-top: 1px solid var(--color-neutral-200);
+}
+
 .stat-card {
   background: var(--card);
   border-radius: var(--radius-card);
@@ -575,16 +647,6 @@ const greetingDateLabel = computed(() => {
   background: var(--ink-deep);
 }
 
-/* Reaches importeren without the sidebar's secondary nav — needed on mobile,
-   harmless (if slightly redundant) on desktop. */
-.import-link {
-  text-align: center;
-  font-size: 13px;
-  color: var(--color-accent);
-  text-decoration: none;
-  padding: 4px;
-}
-
 /* Placed last so it wins the cascade over the unconditional display:none
    rules above at equal specificity. */
 @media (max-width: 1100px) {
@@ -598,6 +660,25 @@ const greetingDateLabel = computed(() => {
   .mobile-pills {
     display: flex;
     gap: 10px;
+  }
+
+  /* Mobile prototype has no stat-grid/panel cards — a flat divider + list
+     instead (see Prototype Ruim.dc.html, isNu block). */
+  .stat-grid,
+  .right-column {
+    display: none;
+  }
+
+  .mobile-divider {
+    display: block;
+    height: 1px;
+    background: var(--color-neutral-200);
+  }
+
+  .mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 }
 </style>
