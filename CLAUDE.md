@@ -60,7 +60,7 @@ Managed-first documentatiestructuur, zelf hosten is de geavanceerde route (zie `
 - [ ] Matching-logica bonnetje ↔ bestaande transactie bij afwijkend bedrag (fooien, afronding, deelbetalingen).
 - [ ] Lokale migratiestrategie voor het datamodel (versienummer + migratiescripts bij nieuwe PWA-versie).
 - [ ] CRDT-conflictresolutie voor gelijktijdige offline wijzigingen op meerdere apparaten.
-- [ ] Gezinslid-toewijzing op transacties (zoals in v1-ontwerp): puur informatief, of ook gevolgen voor rechten (wie mag bewerken)? Nog niet bepaald — zie ADR 0003.
+- [ ] Apparaat-intrekking vs. wachtwoordrotatie (ADR 0005): moet intrekken van een apparaat-schrijftoken automatisch het sync-wachtwoord forceren te roteren? Anders blijft een verloren toestel het wachtwoord "kennen" ook na intrekking van het token.
 - [ ] MCP-tool(s) voor AI-ondersteunde categorisatie/budgetsuggesties: de nakijken-wachtrij (of onduidelijke potjes-indeling) voorleggen aan Claude en voorgestelde regels/budgetten laten terugschrijven — met dezelfde preview-en-bevestig-eis als retroactieve regels (nooit stilzwijgend toepassen).
 
 ## Mapstructuur

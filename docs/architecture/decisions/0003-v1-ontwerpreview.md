@@ -1,6 +1,6 @@
 # 0003 — Aanvullingen uit v1-ontwerpreview
 
-**Status:** Aangenomen (deels met open vraag)
+**Status:** Aangenomen, open vraag beantwoord in ADR 0005
 
 ## Context
 
@@ -16,6 +16,8 @@ Het v1-ontwerp (Claude Design wireframes/prototype) bevat een aantal functionele
 
 4. **Planning (Vooruit) als vijfde, losse domeinmodule.** Middellange termijn — buffer, spaarpotten, beleggen, inkomen — expliciet gescheiden van de korte-termijn potjes in Budgeting. Geen prognose/voorspelling, maar doelgerichte planning.
 
-## Open vraag
+## Open vraag (beantwoord, zie ADR 0005)
 
 **Gezinslid-toewijzing op transacties** (zoals "Mark" in het ontwerp): nog niet bepaald of dit puur informatief is, of ook gevolgen heeft voor rechten (bijv. alleen het toegewezen lid mag de transactie bewerken). Dit raakt mogelijk de nog openstaande CRDT-conflictresolutie (ADR 0001) — zie backlog.
+
+**Antwoord (ADR 0005):** puur informatief/personalisatie, geen rechten. `Gezinslid` wordt een echte entiteit (`id`, `naam`, `avatarKleur`), profielkeuze is per apparaat zonder wachtwoord. De enige echte toegangsgrens blijft het sync-wachtwoord (ADR 0004).
