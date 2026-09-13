@@ -61,6 +61,18 @@ export function envelopeProgress(
   }
 }
 
+/**
+ * "Samen nog in je potjes" on the Potjes overview — each envelope's remaining
+ * amount floors at 0 before summing, so an overspent envelope doesn't drag
+ * the total negative. Distinct from aggregateProgress, which sums the raw
+ * remaining (needed there for the month-level merkteken ratio to stay
+ * accurate). See design handoff, Prototype Ruim Desktop.dc.html:1080
+ * (`Math.max(0, p.budget + p.mee - p.besteed)`).
+ */
+export function totalRemainingClampedCents(progresses: Pick<EnvelopeProgress, 'remainingCents'>[]): number {
+  return progresses.reduce((sum, p) => sum + Math.max(0, p.remainingCents), 0)
+}
+
 /** Aggregate progress across every envelope — used for the month-level merkteken. */
 export function aggregateProgress(progresses: EnvelopeProgress[]): EnvelopeProgress {
   const spentCents = progresses.reduce((sum, p) => sum + p.spentCents, 0)

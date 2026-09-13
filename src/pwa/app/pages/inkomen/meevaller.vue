@@ -9,9 +9,8 @@ import { getMonthlyAdjustment, saveMonthlyAdjustment } from '../../lib/db/monthl
 import { getWindfallPolicy, saveWindfallPolicy } from '../../lib/db/windfall-policy'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Meevaller verdelen', 'Verdeel een meevaller over buffer, beleggen en vrij te besteden.', {
-  back: { to: '/inkomen', label: 'Inkomen' },
-})
+const screenHeader = useScreenHeader()
+screenHeader.set('Er kwam meer binnen', '', { back: { to: '/inkomen', label: 'Inkomen' } })
 
 const router = useRouter()
 
@@ -32,6 +31,9 @@ async function load() {
     investingPct.value = policy.investingPct
     makePermanent.value = true
   }
+  screenHeader.set('Er kwam meer binnen', `${formatEuros(wf.meevaller)} boven je basis`, {
+    back: { to: '/inkomen', label: 'Inkomen' },
+  })
 }
 
 onMounted(load)
@@ -91,69 +93,81 @@ async function apply() {
 
     <template v-else>
       <div class="hero-panel">
-        <div class="hero-label">meevaller om te verdelen</div>
         <div class="hero-figure">{{ formatEuros(meevaller) }}</div>
+        <div class="hero-sub">{{ formatEuros(meevaller) }} boven je basis — staat nog nergens op. Waar zet je het neer?</div>
       </div>
 
-      <label class="slider-field">
-        <div class="slider-label">
-          <span>Buffer aanvullen</span>
-          <span>{{ bufferPct }}%</span>
-        </div>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="5"
-          :value="bufferPct"
-          @input="onBufferPctInput(Number(($event.target as HTMLInputElement).value))"
-        />
-        <p class="slider-consequence">
-          buffer {{ bufferMonthsNow.toFixed(1).replace('.', ',') }} → {{ bufferMonthsAfter.toFixed(1).replace('.', ',') }}
-          maanden lasten
-        </p>
-      </label>
+      <div class="controls-column">
+        <div class="controls-card">
+          <label class="slider-field">
+            <div class="slider-label">
+              <span>Buffer aanvullen</span>
+              <span>{{ bufferPct }}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              :value="bufferPct"
+              @input="onBufferPctInput(Number(($event.target as HTMLInputElement).value))"
+            />
+            <p class="slider-consequence">
+              buffer {{ bufferMonthsNow.toFixed(1).replace('.', ',') }} → {{ bufferMonthsAfter.toFixed(1).replace('.', ',') }}
+              maanden lasten
+            </p>
+          </label>
 
-      <label class="slider-field">
-        <div class="slider-label">
-          <span>Extra beleggen</span>
-          <span>{{ investingPct }}%</span>
-        </div>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="5"
-          :value="investingPct"
-          @input="onInvestingPctInput(Number(($event.target as HTMLInputElement).value))"
-        />
-        <p class="slider-consequence">{{ formatEuros(extraBeleg) }} erbij op je inleg</p>
-      </label>
+          <label class="slider-field">
+            <div class="slider-label">
+              <span>Extra beleggen</span>
+              <span>{{ investingPct }}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              :value="investingPct"
+              @input="onInvestingPctInput(Number(($event.target as HTMLInputElement).value))"
+            />
+            <p class="slider-consequence">bovenop je vaste inleg van {{ formatEuros(extraBeleg) }}</p>
+          </label>
 
-      <div class="remainder-panel">
-        <span>Erbij op je vrij te besteden</span>
-        <strong>{{ formatEuros(extraVrij) }}</strong>
-        <p>eenmalig, alleen deze maand</p>
+          <div class="divider" />
+
+          <div class="remainder-row">
+            <span>Erbij op je vrij te besteden<br /><span class="remainder-sub">eenmalig, alleen deze maand</span></span>
+            <strong>{{ formatEuros(extraVrij) }}</strong>
+          </div>
+        </div>
+
+        <label class="checkbox-row">
+          <input v-model="makePermanent" type="checkbox" />
+          <span>Elke meevaller zo verdelen<br /><span class="checkbox-sub">dan hoef je dit nooit meer te beslissen</span></span>
+        </label>
+
+        <button type="button" class="primary-button" @click="apply">
+          {{ makePermanent ? 'Zo doen · en voortaan automatisch' : 'Zo doen' }}
+        </button>
       </div>
-
-      <label class="checkbox-row">
-        <input v-model="makePermanent" type="checkbox" />
-        <span>Elke meevaller zo verdelen — dan hoef je dit nooit meer te beslissen</span>
-      </label>
-
-      <button type="button" class="primary-button" @click="apply">
-        {{ makePermanent ? 'Zo doen · en voortaan automatisch' : 'Zo doen' }}
-      </button>
     </template>
   </div>
 </template>
 
 <style scoped>
 .meevaller-screen {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 480px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 24px;
+  max-width: 1040px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .meevaller-screen {
+    grid-template-columns: 1fr;
+  }
 }
 
 .empty-note {
@@ -163,36 +177,52 @@ async function apply() {
 
 .hero-panel {
   background: var(--soft);
-  border-radius: var(--radius-panel-lg);
-  padding: 26px;
-}
-
-.hero-label {
-  font-size: 13.5px;
-  color: var(--ink-deep);
+  border-radius: 30px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .hero-figure {
   font-family: var(--font-heading);
-  font-size: 40px;
+  font-size: 46px;
+  line-height: 1;
   color: var(--ink-deep);
-  margin-top: 4px;
+}
+
+.hero-sub {
+  font-size: 13px;
+  color: var(--color-neutral-700);
+}
+
+.controls-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.controls-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--card);
+  border-radius: 30px;
+  box-shadow: var(--shadow-sm);
+  padding: 26px;
 }
 
 .slider-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  background: var(--card);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-sm);
-  padding: 18px;
+  gap: 8px;
 }
 
 .slider-label {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
+  color: var(--color-neutral-800);
 }
 
 .slider-field input[type='range'] {
@@ -202,35 +232,49 @@ async function apply() {
 
 .slider-consequence {
   margin: 0;
-  font-size: 12.5px;
-  color: var(--color-neutral-700);
-}
-
-.remainder-panel {
-  background: var(--soft);
-  border-radius: var(--radius-callout);
-  padding: 18px;
-}
-
-.remainder-panel strong {
-  display: block;
-  font-family: var(--font-heading);
-  font-size: 28px;
-  color: var(--ink-deep);
-  margin-top: 4px;
-}
-
-.remainder-panel p {
-  margin: 4px 0 0;
   font-size: 12px;
   color: var(--color-neutral-700);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-neutral-200);
+}
+
+.remainder-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--color-neutral-800);
+}
+
+.remainder-sub {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+.remainder-row strong {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  color: var(--color-accent-700);
 }
 
 .checkbox-row {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 11px;
+  border-radius: 22px;
+  padding: 17px;
+  box-shadow: inset 0 0 0 1.5px var(--color-neutral-300);
   font-size: 13px;
+  color: var(--color-neutral-800);
+  cursor: pointer;
+}
+
+.checkbox-sub {
+  font-size: 12px;
   color: var(--color-neutral-700);
 }
 

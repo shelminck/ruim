@@ -14,9 +14,8 @@ const spentCents = ref(0)
 const budgetInput = ref('')
 const carriedOverInput = ref('')
 
-useScreenHeader().set('Potje', 'Budget, meegenomen rest en de doorschuif-regel voor dit potje.', {
-  back: { to: '/potjes', label: 'Potjes' },
-})
+const screenHeader = useScreenHeader()
+screenHeader.set('Potje', 'betaalpotje · gedeeld met Mark', { back: { to: '/potjes', label: 'Potjes' } })
 
 async function load() {
   const id = String(route.params.id)
@@ -28,6 +27,7 @@ async function load() {
   envelope.value = found
   budgetInput.value = (found.budgetCents / 100).toString()
   carriedOverInput.value = (found.carriedOverCents / 100).toString()
+  screenHeader.set(found.name, 'betaalpotje · gedeeld met Mark', { back: { to: '/potjes', label: 'Potjes' } })
 
   const transactions = await db.getAll('transactions')
   spentCents.value = spentCentsForEnvelope(transactions, found.id, currentMonthKey())
@@ -37,6 +37,12 @@ onMounted(load)
 watch(() => route.params.id, load)
 
 const progress = computed(() => (envelope.value ? envelopeProgress(envelope.value, spentCents.value) : null))
+
+const previousMonthLabel = computed(() => {
+  const now = new Date()
+  const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  return new Intl.DateTimeFormat('nl-NL', { month: 'long' }).format(previousMonth)
+})
 
 const rolloverOptions: { value: RolloverPolicy; title: string; sub: string }[] = [
   { value: 'carry-over', title: 'Schuift door naar volgende maand', sub: 'max. 1 maand meenemen' },
@@ -73,16 +79,17 @@ async function deleteAndReturn() {
 
   <div v-else class="potje-screen">
     <div class="arithmetic-panel">
+      <div class="panel-title">{{ envelope.name }}</div>
       <div class="row">
         <span>Budget per maand</span>
         <span>{{ formatEuros(envelope.budgetCents) }}</span>
       </div>
       <div class="row">
-        <span>Meegenomen van vorige maand</span>
+        <span>Meegenomen uit {{ previousMonthLabel }}</span>
         <span>{{ formatEuros(envelope.carriedOverCents) }}</span>
       </div>
       <div class="row">
-        <span>Besteed deze maand</span>
+        <span>Besteed</span>
         <span>{{ formatEuros(-spentCents) }}</span>
       </div>
       <div class="divider" />
@@ -105,8 +112,8 @@ async function deleteAndReturn() {
     </div>
 
     <div class="rollover-panel">
-      <h2 class="rollover-title">Als er iets overblijft</h2>
-      <div class="rollover-list">
+      <div class="rollover-label">Restbudget aan het eind van de maand</div>
+      <div class="rollover-card">
         <label
           v-for="option in rolloverOptions"
           :key="option.value"
@@ -122,8 +129,9 @@ async function deleteAndReturn() {
           />
           <span class="dot" />
           <span class="rollover-text">
-            <strong>{{ option.title }}</strong>
-            <small>{{ option.sub }}</small>
+            {{ option.title }}
+            <br />
+            <span class="rollover-sub">{{ option.sub }}</span>
           </span>
         </label>
       </div>
@@ -143,8 +151,9 @@ async function deleteAndReturn() {
 .potje-screen {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 24px;
-  max-width: 900px;
+  gap: 22px;
+  max-width: 1020px;
+  align-items: start;
 }
 
 @media (max-width: 1100px) {
@@ -155,11 +164,17 @@ async function deleteAndReturn() {
 
 .arithmetic-panel {
   background: var(--soft);
-  border-radius: var(--radius-panel-lg);
+  border-radius: 30px;
   padding: 26px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.panel-title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  color: var(--ink-deep);
 }
 
 .row {
@@ -223,28 +238,33 @@ async function deleteAndReturn() {
 .rollover-panel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
-.rollover-title {
-  font-size: 17px;
+.rollover-label {
+  font-size: 13px;
+  color: var(--color-neutral-700);
 }
 
-.rollover-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.rollover-card {
+  background: var(--card);
+  border-radius: 28px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
 .rollover-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: var(--radius-row);
-  border: 1px solid var(--color-neutral-300);
+  align-items: flex-start;
+  gap: 13px;
+  padding: 17px;
   cursor: pointer;
   font-size: 14px;
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+.rollover-row:first-child {
+  border-top: none;
 }
 
 .rollover-row input {
@@ -255,36 +275,32 @@ async function deleteAndReturn() {
 }
 
 .rollover-row .dot {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
   flex: none;
+  margin-top: 2px;
   border-radius: 999px;
-  border: 1.5px solid var(--color-neutral-400);
+  border: 1.5px solid var(--color-neutral-500);
 }
 
 .rollover-row--selected {
   background: var(--color-accent-100);
-  border-color: transparent;
 }
 
 .rollover-row--selected .dot {
   border: 5px solid var(--color-accent);
 }
 
-.rollover-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.rollover-text small {
-  color: var(--color-neutral-600);
+.rollover-sub {
+  color: var(--color-neutral-700);
   font-size: 12px;
 }
 
 .footnote {
-  font-size: 12.5px;
-  color: var(--color-neutral-600);
+  font-size: 13px;
+  color: var(--color-neutral-700);
+  border-left: 2px solid var(--color-accent);
+  padding-left: 13px;
 }
 
 .text-button {

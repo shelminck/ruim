@@ -3,7 +3,7 @@ import { importStatement, type ImportSummary } from '../lib/db/import'
 import { parseMt940 } from '../lib/mt940/parser'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
 
-useScreenHeader().set('MT940 importeren', 'Lees een .sta-bestand van je bank in — dit blijft op je apparaat.', {
+useScreenHeader().set('MT940 importeren', 'bestand blijft op je apparaat', {
   back: { to: '/nu', label: 'Nu' },
 })
 
@@ -101,33 +101,35 @@ function openFilePicker() {
       <p v-if="error" class="error-line">{{ error }}</p>
     </div>
 
-    <div v-if="summary" class="result-panel">
-      <ul class="result-list">
-        <li>
-          <span>Regels gevonden</span>
-          <strong>{{ summary.found }}</strong>
-        </li>
-        <li class="result-neutral">
-          <span>Al bekend (dubbel)</span>
-          <strong>{{ summary.duplicates }}</strong>
-        </li>
-        <li class="result-ink">
-          <span>Automatisch in een potje</span>
-          <strong>{{ summary.automatic }}</strong>
-        </li>
-        <li class="result-accent">
-          <span>Naar nakijken</span>
-          <strong>{{ summary.toReview }}</strong>
-        </li>
-      </ul>
+    <div class="side-column">
+      <template v-if="summary">
+        <ul class="result-list">
+          <li>
+            <span>Regels gevonden</span>
+            <strong>{{ summary.found }}</strong>
+          </li>
+          <li class="result-neutral">
+            <span>Al bekend (dubbel)</span>
+            <strong>{{ summary.duplicates }}</strong>
+          </li>
+          <li class="result-ink">
+            <span>Automatisch in een potje</span>
+            <strong>{{ summary.automatic }}</strong>
+          </li>
+          <li class="result-accent">
+            <span>Naar nakijken</span>
+            <strong>{{ summary.toReview }}</strong>
+          </li>
+        </ul>
 
-      <NuxtLink
-        v-if="summary.automatic + summary.toReview > 0"
-        to="/nakijken"
-        class="confirm-button"
-      >
-        {{ summary.automatic }} toevoegen · {{ summary.toReview }} nakijken
-      </NuxtLink>
+        <NuxtLink
+          v-if="summary.automatic + summary.toReview > 0"
+          to="/nakijken"
+          class="confirm-button"
+        >
+          {{ summary.automatic }} toevoegen · {{ summary.toReview }} nakijken
+        </NuxtLink>
+      </template>
 
       <p class="footnote">Bestand blijft op je apparaat. Dubbelen worden herkend op volgnummer.</p>
     </div>
@@ -136,19 +138,28 @@ function openFilePicker() {
 
 <style scoped>
 .import-screen {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 24px;
-  max-width: 640px;
+  max-width: 980px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .import-screen {
+    grid-template-columns: 1fr;
+  }
 }
 
 .dropzone {
-  border: 2px dashed var(--color-accent);
-  border-radius: var(--radius-panel-lg);
+  border: 1.5px dashed var(--color-accent);
+  border-radius: 30px;
   padding: 52px 24px;
   text-align: center;
   cursor: pointer;
-  background: var(--card);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .dropzone:hover,
@@ -157,31 +168,29 @@ function openFilePicker() {
 }
 
 .dropzone-glyph {
-  font-size: 28px;
-  color: var(--color-accent);
-  margin-bottom: 8px;
+  font-size: 32px;
+  color: var(--color-accent-700);
 }
 
 .dropzone-title {
-  font-family: var(--font-heading);
-  font-size: 17px;
-  margin: 0 0 4px;
+  font-size: 15px;
+  margin: 0;
 }
 
 .dropzone-sub {
   font-size: 13px;
-  color: var(--color-neutral-600);
+  color: var(--color-neutral-700);
   margin: 0;
 }
 
 .read-line {
-  margin-top: 16px;
+  margin-top: 8px;
   font-size: 13.5px;
   color: var(--ink-deep);
 }
 
 .error-line {
-  margin-top: 16px;
+  margin-top: 8px;
   font-size: 13.5px;
   color: var(--color-accent-700);
 }
@@ -194,7 +203,7 @@ function openFilePicker() {
   clip: rect(0 0 0 0);
 }
 
-.result-panel {
+.side-column {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -204,19 +213,23 @@ function openFilePicker() {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   background: var(--card);
-  border-radius: var(--radius-card);
-  padding: 20px;
+  border-radius: 28px;
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
 .result-list li {
   display: flex;
   justify-content: space-between;
+  padding: 15px 22px;
   font-size: 14px;
+  color: var(--color-neutral-800);
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+.result-list li:first-child {
+  border-top: none;
 }
 
 .result-ink strong {
@@ -248,9 +261,10 @@ function openFilePicker() {
 }
 
 .footnote {
-  font-size: 12px;
-  color: var(--color-neutral-600);
-  text-align: center;
+  font-size: 13px;
+  color: var(--color-neutral-700);
+  border-left: 2px solid var(--color-accent);
+  padding-left: 13px;
   margin: 0;
 }
 </style>

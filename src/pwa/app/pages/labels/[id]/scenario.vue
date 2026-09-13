@@ -9,7 +9,7 @@ import type { Label } from '../../../lib/domain/types'
 const route = useRoute()
 const screenHeader = useScreenHeader()
 
-screenHeader.set('Scenario', 'Wat blijft er over als je dit wegdenkt?', {
+screenHeader.set('Zonder …', 'schatting op basis van 12 maanden', {
   back: { to: `/labels/${route.params.id}`, label: 'Label' },
 })
 
@@ -25,7 +25,7 @@ onMounted(async () => {
   }
   label.value = found
   stats.value = computeLabelStats(id, await db.getAll('transactions'))
-  screenHeader.set('Scenario', 'Wat blijft er over als je dit wegdenkt?', {
+  screenHeader.set(`Zonder ${found.name}`, 'schatting op basis van 12 maanden', {
     back: { to: `/labels/${id}`, label: found.name },
   })
 })
@@ -78,13 +78,14 @@ onMounted(async () => {
 
 .saving-label {
   font-size: 13.5px;
-  color: var(--ink-deep);
+  color: var(--color-neutral-700);
 }
 
 .saving-figure {
   font-family: var(--font-heading);
   font-size: 44px;
-  color: var(--ink-deep);
+  line-height: 1;
+  color: var(--color-accent-700);
   margin-top: 4px;
 }
 

@@ -8,7 +8,10 @@ import { getMonthlyAdjustment, saveMonthlyAdjustment } from '../../lib/db/monthl
 import { useSidebarValues } from '../../composables/useSidebarValues'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Minder inkomen', 'Dek een inkomensdaling met potjes, pauzeren of de buffer.', {
+// Design title is 'Je basis daalt' with a fixture-specific narrative subtitle
+// ("Sam gaat 4 dagen werken · vanaf oktober") that doesn't generalize — this
+// screen has no real "reason for the drop" data, so the subtitle stays generic.
+useScreenHeader().set('Je basis daalt', 'reken door wat een lager inkomen betekent voor je plan', {
   back: { to: '/inkomen', label: 'Inkomen' },
 })
 
@@ -108,26 +111,30 @@ async function deactivate() {
     </div>
 
     <div class="right-panel">
-      <div class="coverage-option">
+      <p class="right-intro">Kies hoe je het opvangt — je ziet direct wat het kost.</p>
+
+      <div class="coverage-option" :class="{ 'coverage-option--active': potjesKrimpCents > 0 }">
         <div class="coverage-header">
           <span>Potjes krimpen</span>
           <input v-model="potjesKrimpInput" type="text" inputmode="decimal" class="coverage-input" />
         </div>
+        <p class="coverage-consequence">verlaagt de budgetten van je potjes deze maand</p>
       </div>
 
-      <label class="coverage-option coverage-option--toggle">
+      <label class="coverage-option coverage-option--toggle" :class="{ 'coverage-option--active': investingPaused }">
         <div class="coverage-header">
           <span>Beleggen pauzeren</span>
-          <span>{{ formatEuros(investingMonthlyCents) }}</span>
+          <span class="coverage-amount">{{ formatEuros(investingMonthlyCents) }}<input v-model="investingPaused" type="checkbox" /></span>
         </div>
-        <input v-model="investingPaused" type="checkbox" />
+        <p class="coverage-consequence">buffer en doelen lopen door, beleggen staat stil</p>
       </label>
 
-      <div class="coverage-option">
+      <div class="coverage-option" :class="{ 'coverage-option--active': bufferOpnameCents > 0 }">
         <div class="coverage-header">
           <span>Uit de buffer</span>
           <input v-model="bufferOpnameInput" type="text" inputmode="decimal" class="coverage-input" />
         </div>
+        <p class="coverage-consequence">gaat ten koste van je buffer deze maand</p>
       </div>
 
       <div class="gap-strip" :class="{ 'gap-strip--covered': remainingGapCents === 0 && dropCents > 0 }">
@@ -158,8 +165,8 @@ async function deactivate() {
 
 .left-panel {
   background: var(--soft);
-  border-radius: var(--radius-panel-lg);
-  padding: 26px;
+  border-radius: 30px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -167,7 +174,7 @@ async function deactivate() {
 
 .scenario-label {
   font-size: 13.5px;
-  color: var(--ink-deep);
+  color: var(--color-neutral-700);
   margin: 0;
 }
 
@@ -176,7 +183,8 @@ async function deactivate() {
   align-items: center;
   gap: 4px;
   font-family: var(--font-heading);
-  font-size: 32px;
+  font-size: 46px;
+  line-height: 1;
   color: var(--color-accent-700);
 }
 
@@ -184,9 +192,10 @@ async function deactivate() {
   border: none;
   background: transparent;
   font-family: var(--font-heading);
-  font-size: 32px;
+  font-size: 46px;
+  line-height: 1;
   color: var(--color-accent-700);
-  width: 120px;
+  width: 140px;
 }
 
 .drop-input:focus {
@@ -213,20 +222,31 @@ async function deactivate() {
 .right-panel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+}
+
+.right-intro {
+  font-size: 13px;
+  color: var(--color-neutral-700);
+  margin: 0;
 }
 
 .coverage-option {
-  background: var(--card);
-  border-radius: var(--radius-row);
-  box-shadow: var(--shadow-sm);
-  padding: 14px 16px;
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: inset 0 0 0 1.5px var(--color-neutral-300);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.coverage-option--active {
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
+  background: var(--color-accent-100);
 }
 
 .coverage-option--toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   cursor: pointer;
 }
 
@@ -235,7 +255,13 @@ async function deactivate() {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
+  font-size: 14.5px;
+}
+
+.coverage-amount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .coverage-input {
@@ -245,6 +271,12 @@ async function deactivate() {
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 13px;
+}
+
+.coverage-consequence {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-neutral-700);
 }
 
 .gap-strip {

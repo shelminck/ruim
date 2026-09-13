@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { CheckCircle, Home, List, ListCheck, PiggyBank, TrendingUp } from 'lucide-vue-next'
+import { CircleCheck, Home, List, TrendingUp, Wallet } from 'lucide-vue-next'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
-import { useTeDoenCount } from '../composables/useTeDoenCount'
 
 const { count: nakijkenCount } = useNakijkenCount()
-const { count: teDoenCount } = useTeDoenCount()
 
+// Matches the mobile prototype's tab bar exactly (Prototype Ruim.dc.html,
+// `const tabs = [...]`) — 5 items, no "Te doen" (desktop-only in the
+// prototype; reachable from Nu's link list on mobile instead).
 const tabs = [
   { to: '/nu', label: 'Nu', icon: Home },
   { to: '/alles', label: 'Alles', icon: List },
-  { to: '/nakijken', label: 'Nakijken', icon: CheckCircle, badge: nakijkenCount },
-  { to: '/te-doen', label: 'Te doen', icon: ListCheck, badge: teDoenCount },
-  { to: '/potjes', label: 'Potjes', icon: PiggyBank },
+  { to: '/nakijken', label: 'Nakijken', icon: CircleCheck, badge: nakijkenCount },
+  { to: '/potjes', label: 'Potjes', icon: Wallet },
   { to: '/vooruit', label: 'Vooruit', icon: TrendingUp },
 ]
 

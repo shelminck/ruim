@@ -7,9 +7,8 @@ import { listSubscriptions } from '../lib/db/subscriptions'
 import { listIncomeSources } from '../lib/db/income-sources'
 import { useSidebarValues } from '../composables/useSidebarValues'
 
-useScreenHeader().set('Vaste lasten', 'Wat er elke maand vanaf gaat.', {
-  back: { to: '/nu', label: 'Nu' },
-})
+const screenHeader = useScreenHeader()
+screenHeader.set('Vaste lasten', '24 terugkerende betalingen · herkend', { back: { to: '/nu', label: 'Nu' } })
 
 const { refresh: refreshSidebarValues } = useSidebarValues()
 
@@ -28,8 +27,14 @@ async function load() {
     listIncomeSources(),
   ])
   fixedCosts.value = costs
-  subscriptionTotal.value = subscriptions.filter((s) => s.cancelledAt === null).reduce((sum, s) => sum + s.amountCents, 0)
+  const activeSubscriptions = subscriptions.filter((s) => s.cancelledAt === null)
+  subscriptionTotal.value = activeSubscriptions.reduce((sum, s) => sum + s.amountCents, 0)
   basis.value = incomeSources.filter((s) => s.countsTowardBase).reduce((sum, s) => sum + s.amountCents, 0)
+
+  const recurringCount = costs.length + activeSubscriptions.length
+  screenHeader.set('Vaste lasten', `${recurringCount} terugkerende betalingen · herkend`, {
+    back: { to: '/nu', label: 'Nu' },
+  })
 }
 
 onMounted(load)
@@ -82,26 +87,26 @@ async function deleteCost(id: string) {
     </div>
 
     <div class="groups-column">
-      <div v-for="g in groups" :key="g.group" class="group-card">
-        <div class="group-header">
-          <span>{{ g.group }}</span>
-          <span>{{ formatEuros(g.amountCents) }}</span>
+      <div class="groups-card">
+        <div v-for="g in groups" :key="g.group" class="group-block">
+          <div class="group-row">
+            <span class="group-name">{{ g.group }}<br /><span class="group-sub">{{ costsInGroup(g.group).length }} {{ costsInGroup(g.group).length === 1 ? 'post' : 'posten' }}</span></span>
+            <span class="group-amount">{{ formatEuros(g.amountCents) }} <span class="chevron">›</span></span>
+          </div>
+          <ul class="group-items">
+            <li v-for="cost in costsInGroup(g.group)" :key="cost.id">
+              <span>{{ cost.name }}</span>
+              <span>{{ formatEuros(cost.amountCents) }}</span>
+              <button type="button" class="text-button" @click="deleteCost(cost.id)">Verwijderen</button>
+            </li>
+          </ul>
         </div>
-        <ul class="group-items">
-          <li v-for="cost in costsInGroup(g.group)" :key="cost.id">
-            <span>{{ cost.name }}</span>
-            <span>{{ formatEuros(cost.amountCents) }}</span>
-            <button type="button" class="text-button" @click="deleteCost(cost.id)">Verwijderen</button>
-          </li>
-        </ul>
-      </div>
 
-      <NuxtLink to="/abonnementen" class="group-card group-card--link">
-        <div class="group-header">
-          <span>Abonnementen</span>
-          <span>{{ formatEuros(subscriptionTotal) }} ›</span>
-        </div>
-      </NuxtLink>
+        <NuxtLink to="/abonnementen" class="group-row group-row--link">
+          <span class="group-name">Abonnementen<br /><span class="group-sub">tik om te openen</span></span>
+          <span class="group-amount">{{ formatEuros(subscriptionTotal) }} <span class="chevron">›</span></span>
+        </NuxtLink>
+      </div>
 
       <div class="create-section">
         <button v-if="!showCreateForm" type="button" class="ghost-button" @click="showCreateForm = true">
@@ -124,9 +129,9 @@ async function deleteCost(id: string) {
 <style scoped>
 .vaste-lasten-screen {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
   gap: 24px;
-  max-width: 900px;
+  max-width: 1100px;
   align-items: start;
 }
 
@@ -138,13 +143,16 @@ async function deleteCost(id: string) {
 
 .summary-panel {
   background: var(--soft);
-  border-radius: var(--radius-panel-lg);
-  padding: 30px;
+  border-radius: 30px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .summary-label {
   font-size: 13.5px;
-  color: var(--ink-deep);
+  color: var(--color-neutral-700);
 }
 
 .summary-figure {
@@ -166,30 +174,57 @@ async function deleteCost(id: string) {
   gap: 14px;
 }
 
-.group-card {
+.groups-card {
   background: var(--card);
-  border-radius: var(--radius-card);
+  border-radius: 30px;
   box-shadow: var(--shadow-sm);
-  padding: 16px 20px;
-  text-decoration: none;
-  color: inherit;
-  display: block;
+  padding: 10px 26px;
 }
 
-.group-card--link:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.group-header {
+.group-row {
   display: flex;
   justify-content: space-between;
-  font-family: var(--font-heading);
-  font-size: 15px;
+  align-items: center;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--color-neutral-200);
+  text-decoration: none;
+  color: inherit;
+  cursor: default;
+}
+
+.group-block:last-child .group-row {
+  border-bottom: none;
+}
+
+a.group-row {
+  cursor: pointer;
+}
+
+a.group-row:hover {
+  opacity: 0.7;
+}
+
+.group-name {
+  font-size: 15.5px;
+}
+
+.group-sub {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+.group-amount {
+  font-size: 15.5px;
+  white-space: nowrap;
+}
+
+.chevron {
+  color: var(--color-neutral-600);
 }
 
 .group-items {
   list-style: none;
-  margin: 10px 0 0;
+  margin: 0 0 10px;
   padding: 0;
   display: flex;
   flex-direction: column;

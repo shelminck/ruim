@@ -7,7 +7,7 @@ import { getDb } from '../../lib/db/client'
 import { useSidebarValues } from '../../composables/useSidebarValues'
 import type { Label, Transaction } from '../../lib/domain/types'
 
-useScreenHeader().set('Labels', 'Wat kost een ding echt, dwars door je potjes heen?', {
+useScreenHeader().set('Labels', 'wat kost het ons?', {
   back: { to: '/nu', label: 'Nu' },
 })
 
@@ -31,6 +31,13 @@ function monthlyAverage(labelId: string): number {
   return computeLabelStats(labelId, transactions.value).monthlyAverageCents
 }
 
+function labelSub(labelId: string): string {
+  const txCount = transactions.value.filter((t) => t.labelIds.includes(labelId)).length
+  const envelopeCount = computeLabelStats(labelId, transactions.value).byEnvelope.length
+  const txWord = `${txCount} ${txCount === 1 ? 'transactie' : 'transacties'}`
+  return envelopeCount > 1 ? `${txWord} · ${envelopeCount} potjes` : txWord
+}
+
 async function submitCreate() {
   if (!newName.value.trim()) return
   await createLabel(newName.value.trim())
@@ -49,12 +56,18 @@ async function deleteLabel(id: string) {
 
 <template>
   <div class="labels-screen">
+    <p class="intro">Een label loopt dwars door potjes heen — zo zie je wat iets écht kost.</p>
+
     <div v-if="labels.length === 0" class="empty-note">Nog geen labels aangemaakt.</div>
 
-    <div class="list">
-      <NuxtLink v-for="label in labels" :key="label.id" :to="`/labels/${label.id}`" class="label-row">
-        <span class="label-name">◈ {{ label.name }}</span>
-        <span class="label-amount">{{ formatEuros(monthlyAverage(label.id)) }} / mnd</span>
+    <div class="grid">
+      <NuxtLink v-for="label in labels" :key="label.id" :to="`/labels/${label.id}`" class="label-card">
+        <span class="label-name">
+          ◈ {{ label.name }}
+          <br />
+          <span class="label-sub">{{ labelSub(label.id) }}</span>
+        </span>
+        <span class="label-amount">{{ formatEuros(monthlyAverage(label.id)) }}</span>
         <button type="button" class="dismiss-button" @click.prevent="deleteLabel(label.id)">✕</button>
       </NuxtLink>
     </div>
@@ -78,8 +91,14 @@ async function deleteLabel(id: string) {
 .labels-screen {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 560px;
+  gap: 18px;
+  max-width: 1000px;
+}
+
+.intro {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--color-neutral-700);
 }
 
 .empty-note {
@@ -87,37 +106,41 @@ async function deleteLabel(id: string) {
   color: var(--color-neutral-600);
 }
 
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
 }
 
-.label-row {
+.label-card {
   display: flex;
   align-items: center;
   gap: 12px;
   background: var(--card);
-  border-radius: var(--radius-row);
+  border-radius: 24px;
   box-shadow: var(--shadow-sm);
-  padding: 14px 18px;
+  padding: 20px;
   text-decoration: none;
   color: inherit;
 }
 
-.label-row:hover {
+.label-card:hover {
   box-shadow: var(--shadow-md);
 }
 
 .label-name {
   flex: 1;
-  font-size: 14px;
+  font-size: 15px;
+}
+
+.label-sub {
+  font-size: 12px;
+  color: var(--color-neutral-700);
 }
 
 .label-amount {
-  font-family: var(--font-heading);
-  font-size: 14px;
-  color: var(--ink-deep);
+  font-size: 15px;
+  color: var(--color-text);
 }
 
 .dismiss-button {

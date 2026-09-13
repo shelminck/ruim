@@ -4,14 +4,16 @@ import { formatEuros } from '../../lib/domain/format'
 import { loadWaterfall } from '../../composables/useWaterfall'
 import { getBuffer, saveBuffer } from '../../lib/db/buffer'
 import { createGoal, listGoals } from '../../lib/db/goals'
-import type { Buffer, Goal } from '../../lib/domain/types'
+import { getInvesting } from '../../lib/db/investing'
+import type { Buffer, Goal, Investing } from '../../lib/domain/types'
 import type { WaterfallResult } from '../../lib/domain/waterfall'
 
-useScreenHeader().set('Vooruit', 'Buffer, doelen en beleggen — in die volgorde.')
+useScreenHeader().set('Vooruit', 'buffer, doelen en beleggen')
 
 const buffer = ref<Buffer | null>(null)
 const waterfall = ref<WaterfallResult | null>(null)
 const goals = ref<Goal[]>([])
+const investing = ref<Investing | null>(null)
 const bufferSavedInput = ref('')
 const bufferContributionInput = ref('')
 
@@ -22,13 +24,18 @@ const newTargetDate = ref('')
 const newMonthlyDeposit = ref('')
 
 async function load() {
-  const [b, wf, g] = await Promise.all([getBuffer(), loadWaterfall(), listGoals()])
+  const [b, wf, g, inv] = await Promise.all([getBuffer(), loadWaterfall(), listGoals(), getInvesting()])
   buffer.value = b
   waterfall.value = wf
   goals.value = g
+  investing.value = inv
   bufferSavedInput.value = (b.savedCents / 100).toString()
   bufferContributionInput.value = (b.monthlyContributionCents / 100).toString()
 }
+
+const netWorthCents = computed(
+  () => (buffer.value?.savedCents ?? 0) + (investing.value?.currentValueCents ?? 0) + goals.value.reduce((sum, g) => sum + g.savedCents, 0),
+)
 
 onMounted(load)
 
@@ -76,14 +83,33 @@ async function submitCreateGoal() {
 
 <template>
   <div class="vooruit-screen">
-    <div class="priority-item">
-      <div class="priority-number">1</div>
-      <div class="priority-body">
-        <h2 class="priority-title">Buffer</h2>
+    <div class="hero-panel">
+      <div class="hero-figures">
+        <div class="hero-label">samen opgebouwd</div>
+        <div class="hero-figure">{{ formatEuros(netWorthCents) }}</div>
+      </div>
+      <div class="hero-sub">
+        buffer, doelen en beleggingen samen
+        <template v-if="buffer && buffer.monthlyContributionCents > 0">
+          · {{ formatEuros(buffer.monthlyContributionCents) }} per maand opzij
+        </template>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="step-card">
+        <div class="step-badge">
+          <span class="badge-number">1</span>
+          <span class="badge-label">Eerst: zekerheid</span>
+        </div>
+        <div class="step-row">
+          <span class="step-name">Buffer</span>
+          <span class="step-value">{{ formatEuros(buffer?.savedCents ?? 0) }} / {{ formatEuros((waterfall?.lastenMnd ?? 0) * bufferGoalMonths) }}</span>
+        </div>
         <div class="progress-track">
           <div class="progress-fill progress-fill--buffer" :style="{ width: `${bufferProgressPct}%` }" />
         </div>
-        <p class="priority-sub">
+        <p class="step-sub">
           {{ bufferMonthsCovered.toFixed(1).replace('.', ',') }} van de {{ bufferGoalMonths }} maanden lasten
           <template v-if="buffer && buffer.monthlyContributionCents > 0">
             · {{ formatEuros(buffer.monthlyContributionCents) }} per maand
@@ -102,23 +128,22 @@ async function submitCreateGoal() {
           <button type="submit" class="primary-button">Opslaan</button>
         </form>
       </div>
-    </div>
 
-    <div class="priority-item">
-      <div class="priority-number">2</div>
-      <div class="priority-body">
-        <h2 class="priority-title">Doelen</h2>
+      <NuxtLink v-for="goal in goals" :key="goal.id" :to="`/vooruit/doel/${goal.id}`" class="step-card">
+        <div class="step-badge">
+          <span class="badge-number">2</span>
+          <span class="badge-label">Doel met een datum</span>
+        </div>
+        <div class="step-row">
+          <span class="step-name">{{ goal.name }}</span>
+          <span class="step-value">{{ formatEuros(goal.savedCents) }} / {{ formatEuros(goal.targetCents) }}</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill progress-fill--goal" :style="{ width: `${goalProgressPct(goal)}%` }" />
+        </div>
+      </NuxtLink>
 
-        <NuxtLink v-for="goal in goals" :key="goal.id" :to="`/vooruit/doel/${goal.id}`" class="goal-row">
-          <div class="goal-row-text">
-            <span>{{ goal.name }}</span>
-            <span>{{ formatEuros(goal.savedCents) }} / {{ formatEuros(goal.targetCents) }}</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill progress-fill--goal" :style="{ width: `${goalProgressPct(goal)}%` }" />
-          </div>
-        </NuxtLink>
-
+      <div class="step-card step-card--plain">
         <div class="create-section">
           <button v-if="!showCreateForm" type="button" class="ghost-button" @click="showCreateForm = true">
             + Doel toevoegen
@@ -135,14 +160,23 @@ async function submitCreateGoal() {
           </form>
         </div>
       </div>
-    </div>
 
-    <div class="priority-item">
-      <div class="priority-number">3</div>
-      <div class="priority-body">
-        <h2 class="priority-title">Beleggen</h2>
-        <NuxtLink to="/vooruit/beleggen" class="link-row">Bekijk inleg en koerswinst ›</NuxtLink>
-      </div>
+      <NuxtLink to="/vooruit/beleggen" class="step-card">
+        <div class="step-badge">
+          <span class="badge-number">3</span>
+          <span class="badge-label">Richting zonder einddatum</span>
+        </div>
+        <div class="step-row">
+          <span class="step-name">Beleggen</span>
+          <span class="step-value step-value--heading">{{ formatEuros(investing?.depositsSinceCents ?? 0) }}</span>
+        </div>
+        <p class="step-sub">
+          <template v-if="investing && investing.monthlyDepositCents > 0">
+            {{ formatEuros(investing.monthlyDepositCents) }} per maand ·
+          </template>
+          geen einddatum
+        </p>
+      </NuxtLink>
     </div>
 
     <p class="footnote">De buffer gaat voor. Doelen schuiven op in een krappe maand; beleggen blijft staan.</p>
@@ -153,42 +187,119 @@ async function submitCreateGoal() {
 .vooruit-screen {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  max-width: 700px;
+  gap: 22px;
+  max-width: 1180px;
 }
 
-.priority-item {
+.hero-panel {
+  background: var(--soft);
+  border-radius: 32px;
+  padding: 30px 34px;
   display: flex;
-  gap: 16px;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
-.priority-number {
+.hero-figures {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hero-label {
+  font-size: 13.5px;
+  color: var(--color-neutral-700);
+}
+
+.hero-figure {
+  font-family: var(--font-heading);
+  font-size: 50px;
+  line-height: 1;
+  color: var(--ink-deep);
+}
+
+.hero-sub {
+  font-size: 13px;
+  color: var(--color-neutral-700);
+  max-width: 260px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.step-card {
+  border-radius: 28px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  text-decoration: none;
+  color: inherit;
+}
+
+a.step-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.step-card--plain {
+  justify-content: center;
+}
+
+.step-badge {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.badge-number {
   width: 24px;
   height: 24px;
   flex: none;
   border-radius: 999px;
   background: var(--ink);
   color: #fff;
-  font-family: var(--font-heading);
-  font-size: 13px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.priority-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.badge-label {
+  font-size: 13px;
+  color: var(--color-neutral-700);
 }
 
-.priority-title {
-  font-size: 17px;
+.step-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.step-name {
+  font-size: 16px;
+}
+
+.step-value {
+  font-size: 13.5px;
+  color: var(--color-neutral-800);
+}
+
+.step-value--heading {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  color: var(--color-text);
 }
 
 .progress-track {
-  height: 8px;
+  height: 10px;
   border-radius: 999px;
   background: var(--color-neutral-200);
   overflow: hidden;
@@ -206,8 +317,8 @@ async function submitCreateGoal() {
   background: var(--color-accent);
 }
 
-.priority-sub {
-  font-size: 12.5px;
+.step-sub {
+  font-size: 12px;
   color: var(--color-neutral-700);
   margin: 0;
 }
@@ -266,33 +377,8 @@ async function submitCreateGoal() {
   height: 36px;
 }
 
-.goal-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  background: var(--card);
-  border-radius: var(--radius-row);
-  box-shadow: var(--shadow-sm);
-  padding: 14px 16px;
-  text-decoration: none;
-  color: inherit;
-}
-
-.goal-row-text {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13.5px;
-}
-
-.link-row {
-  font-size: 13.5px;
-  color: var(--color-accent);
-  text-decoration: none;
-}
-
 .create-section {
   display: flex;
-  margin-top: 4px;
 }
 
 .ghost-button {
@@ -309,11 +395,7 @@ async function submitCreateGoal() {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: var(--card);
-  border-radius: var(--radius-card);
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
-  max-width: 320px;
+  width: 100%;
 }
 
 .create-actions {
@@ -322,7 +404,11 @@ async function submitCreateGoal() {
 }
 
 .footnote {
-  font-size: 12.5px;
-  color: var(--color-neutral-600);
+  font-size: 13px;
+  color: var(--color-neutral-700);
+  border-left: 2px solid var(--color-accent);
+  padding-left: 13px;
+  margin: 0;
+  max-width: 640px;
 }
 </style>

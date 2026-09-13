@@ -6,26 +6,22 @@ export interface ScreenHeaderBack {
 const title = ref('')
 const subtitle = ref('')
 const back = ref<ScreenHeaderBack | undefined>(undefined)
-const hideOnMobile = ref(false)
+const avatars = ref(false)
 
-/** Lets each page set the header's title/subtitle pair (see README "Each screen supplies its own title/subtitle pair"). */
+/** Lets each page set the header's title/subtitle pair (see design handoff, the `KOP` table keyed by screen). */
 export function useScreenHeader() {
-  function set(
-    nextTitle: string,
-    nextSubtitle: string,
-    opts?: { back?: ScreenHeaderBack; hideOnMobile?: boolean },
-  ) {
+  function set(nextTitle: string, nextSubtitle: string, opts?: { back?: ScreenHeaderBack; avatars?: boolean }) {
     title.value = nextTitle
     subtitle.value = nextSubtitle
     back.value = opts?.back
-    hideOnMobile.value = opts?.hideOnMobile ?? false
+    avatars.value = opts?.avatars ?? false
   }
 
   return {
     title: readonly(title),
     subtitle: readonly(subtitle),
     back: readonly(back),
-    hideOnMobile: readonly(hideOnMobile),
+    avatars: readonly(avatars),
     set,
   }
 }

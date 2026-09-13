@@ -13,7 +13,7 @@ import { clearTaskStatesForMonth, listTaskStatesForMonth, saveTaskState } from '
 import { useTeDoenCount } from '../composables/useTeDoenCount'
 import type { TaskGroup, TaskState } from '../lib/domain/types'
 
-useScreenHeader().set('Te doen', 'De handmatige overboekingen en taken die uit je plan volgen.')
+useScreenHeader().set('Te doen', 'Ruim kijkt niet mee in je bank — dit moet je zelf overboeken of regelen')
 
 const { refresh: refreshTeDoenCount } = useTeDoenCount()
 

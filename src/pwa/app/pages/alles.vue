@@ -5,7 +5,7 @@ import { listEnvelopes } from '../lib/db/envelopes'
 import { formatEuros } from '../lib/domain/format'
 import type { Envelope, Transaction } from '../lib/domain/types'
 
-useScreenHeader().set('Alles', 'Alle transacties, met filters op potje en bedrag.')
+useScreenHeader().set('Alles', 'elke transactie van deze maand')
 
 type Filter = 'alles' | 'geen-potje' | 'groot'
 

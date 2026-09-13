@@ -6,6 +6,7 @@ import {
   spentCentsForDay,
   spentCentsForEnvelope,
   standForRatio,
+  totalRemainingClampedCents,
 } from '../budget'
 
 describe('standForRatio', () => {
@@ -57,6 +58,28 @@ describe('spentCentsForDay', () => {
 
   it('returns 0 when nothing matches', () => {
     expect(spentCentsForDay(transactions, '2026-01-01')).toBe(0)
+  })
+})
+
+describe('totalRemainingClampedCents', () => {
+  it('matches the design handoff fixture: Boodschappen/Vervoer/Uit eten/Abonnementen/Kleding sums to € 327, not € 315', () => {
+    // budget/carried-over/spent per README fixture, Uit eten is overspent (120/0/132 = -12)
+    const progresses = [
+      envelopeProgress({ budgetCents: 30000, carriedOverCents: 4200 }, 21600), // 126
+      envelopeProgress({ budgetCents: 15000, carriedOverCents: 0 }, 5300), // 97
+      envelopeProgress({ budgetCents: 12000, carriedOverCents: 0 }, 13200), // -12, overspent
+      envelopeProgress({ budgetCents: 7800, carriedOverCents: 0 }, 6900), // 9
+      envelopeProgress({ budgetCents: 10000, carriedOverCents: 1500 }, 2000), // 95
+    ]
+    expect(totalRemainingClampedCents(progresses)).toBe(32700)
+  })
+
+  it('floors each envelope at 0 rather than letting overspend drag the total negative', () => {
+    const progresses = [
+      envelopeProgress({ budgetCents: 10000, carriedOverCents: 0 }, 5000), // 50 remaining
+      envelopeProgress({ budgetCents: 10000, carriedOverCents: 0 }, 30000), // -200 remaining, overspent
+    ]
+    expect(totalRemainingClampedCents(progresses)).toBe(5000)
   })
 })
 
