@@ -40,6 +40,14 @@ export function getDb(): Promise<IDBPDatabase<RuimDB>> {
           db.createObjectStore('monthlyAdjustments', { keyPath: 'month' })
           db.createObjectStore('windfallPolicy', { keyPath: 'id' })
         }
+
+        if (oldVersion < 4) {
+          // 'household' (free-text member names, no rights model) is superseded
+          // by 'gezinsleden' (real entities) per ADR 0005. Left in place rather
+          // than deleted — dropping an object store is a destructive DB action
+          // that needs explicit confirmation, not an automatic migration step.
+          db.createObjectStore('gezinsleden', { keyPath: 'id' })
+        }
       },
     })
   }

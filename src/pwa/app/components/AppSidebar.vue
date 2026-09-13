@@ -4,10 +4,15 @@ import { useNakijkenCount } from '../composables/useNakijkenCount'
 import { useTeDoenCount } from '../composables/useTeDoenCount'
 import { useSidebarValues } from '../composables/useSidebarValues'
 import { formatEuros } from '../lib/domain/format'
+import { useGezinsleden } from '../composables/useGezinsleden'
+import { initiaal } from '../lib/domain/gezinslid'
 
 const { count: nakijkenCount, refresh: refreshNakijkenCount } = useNakijkenCount()
 const { count: teDoenCount, refresh: refreshTeDoenCount } = useTeDoenCount()
 const { vasteLastenCents, basisCents, labelCount, refresh: refreshSidebarValues } = useSidebarValues()
+const { gezinsleden, refresh: refreshGezinsleden } = useGezinsleden()
+
+const householdNaam = computed(() => gezinsleden.value.map((g) => g.naam).join(' & '))
 
 // These are shared singletons updated by whichever page last acted — refresh
 // here too so a page that never touches them still shows the right numbers
@@ -17,6 +22,7 @@ onMounted(() => {
   void refreshNakijkenCount()
   void refreshTeDoenCount()
   void refreshSidebarValues()
+  void refreshGezinsleden()
 })
 
 const primaryNav = [
@@ -80,13 +86,18 @@ function badgeLabel(value: number): string {
 
     <div class="sidebar-spacer" />
 
-    <div class="household-card">
+    <div v-if="gezinsleden.length > 0" class="household-card">
       <div class="avatars">
-        <span class="avatar avatar--one" />
-        <span class="avatar avatar--two" />
+        <span
+          v-for="g in gezinsleden.slice(0, 2)"
+          :key="g.id"
+          class="avatar"
+          :style="{ background: `var(--color-${g.avatarKleur})` }"
+          >{{ initiaal(g.naam) }}</span
+        >
       </div>
       <div class="household-text">
-        <div class="household-names">Sanne & Mark</div>
+        <div class="household-names">{{ householdNaam }}</div>
         <div class="household-sub">gedeeld huishouden</div>
       </div>
     </div>
@@ -228,14 +239,15 @@ function badgeLabel(value: number): string {
   height: 32px;
   border-radius: 999px;
   border: 1.5px solid var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-deep);
 }
 
-.avatar--one {
-  background: var(--color-accent-300);
-}
-
-.avatar--two {
-  background: var(--color-neutral-300);
+.avatar + .avatar {
   margin-left: -10px;
 }
 
