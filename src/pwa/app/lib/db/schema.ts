@@ -1,4 +1,3 @@
-import type { DBSchema } from 'idb'
 import type {
   Account,
   Buffer,
@@ -17,10 +16,13 @@ import type {
 } from '../domain/types'
 import type { Envelope } from '../domain/types'
 
-export const DB_NAME = 'ruim'
-export const DB_VERSION = 4
-
-export interface RuimDB extends DBSchema {
+/**
+ * Shape of the app's data, independent of how it's persisted. Used to type
+ * the sql.js-backed store access in sql-db.ts (see sql-store-config.ts for
+ * how each store maps onto actual SQL tables/columns) — this file no longer
+ * describes a real IndexedDB schema, just the TypeScript-facing contract.
+ */
+export interface RuimDB {
   accounts: {
     key: string
     value: Account
@@ -72,15 +74,6 @@ export interface RuimDB extends DBSchema {
   gezinsleden: {
     key: string
     value: Gezinslid
-  }
-  /**
-   * Legacy, unused — superseded by 'gezinsleden' (ADR 0005). Kept (not
-   * deleted) because dropping an object store is a destructive local-DB
-   * migration that needs explicit confirmation, not an automatic step.
-   */
-  household: {
-    key: string
-    value: unknown
   }
   buffer: {
     key: string
