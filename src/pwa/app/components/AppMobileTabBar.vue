@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckCircle, Home, List, PiggyBank, TrendingUp } from 'lucide-vue-next'
+import { CheckCircle, Home, List, TrendingUp, Wallet } from 'lucide-vue-next'
 import { useNakijkenCount } from '../composables/useNakijkenCount'
 
 const { count: nakijkenCount } = useNakijkenCount()
@@ -11,7 +11,7 @@ const tabs = [
   { to: '/nu', label: 'Nu', icon: Home },
   { to: '/alles', label: 'Alles', icon: List },
   { to: '/nakijken', label: 'Nakijken', icon: CheckCircle, badge: nakijkenCount },
-  { to: '/potjes', label: 'Potjes', icon: PiggyBank },
+  { to: '/potjes', label: 'Potjes', icon: Wallet },
   { to: '/vooruit', label: 'Vooruit', icon: TrendingUp },
 ]
 
