@@ -3,6 +3,7 @@ import AppHeader from '../components/AppHeader.vue'
 import AppSidebar from '../components/AppSidebar.vue'
 import AppMobileTabBar from '../components/AppMobileTabBar.vue'
 import GezinslidPicker from '../components/GezinslidPicker.vue'
+import UnlockGate from '../components/UnlockGate.vue'
 </script>
 
 <template>
@@ -14,6 +15,7 @@ import GezinslidPicker from '../components/GezinslidPicker.vue'
     </main>
     <AppMobileTabBar class="tab-bar-slot" />
     <GezinslidPicker />
+    <UnlockGate />
   </div>
 </template>
 
