@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useUnlockSession } from '../lib/crypto/session'
+import { useSecurityCheckStatus } from '../composables/useSecurityCheckStatus'
 import { getOrCreateDeviceHash, readKeyring } from '../lib/db/blob-store'
 import { listSecurityConsentLogs, recordSecurityConsent } from '../lib/db/security-consent'
 import { detectPassiveSignals, hasAlreadyConsented, type TamperSignal } from '../lib/security/tamper-heuristic'
 
 const { isUnlocked } = useUnlockSession()
+const { record: recordCheckStatus } = useSecurityCheckStatus()
 const appVersion = useRuntimeConfig().public.appVersion
 
 const visible = ref(false)
@@ -23,6 +25,10 @@ watch(
     const attestationSignals: TamperSignal[] =
       keyring?.biometric?.attestationLooksGenuine === false ? ['webauthn-attestation-missing'] : []
     const found = [...new Set([...detectPassiveSignals(), ...attestationSignals])]
+    // Recorded regardless of outcome — the accountpagina's statusregel needs
+    // a "laatste controle" even on a clean run, unlike SecurityConsentLog
+    // which only gets a row once the user has actually consented.
+    recordCheckStatus(found.length === 0)
     if (found.length === 0) return
 
     const logs = await listSecurityConsentLogs()

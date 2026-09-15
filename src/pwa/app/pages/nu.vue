@@ -228,6 +228,10 @@ const showCoach = computed(
           <span>MT940 importeren</span>
           <span>›</span>
         </NuxtLink>
+        <NuxtLink to="/account" class="mobile-list-row mobile-list-row--muted mobile-list-row--rule">
+          <span>Account · beveiliging & gezinsleden</span>
+          <span>›</span>
+        </NuxtLink>
       </div>
     </div>
 

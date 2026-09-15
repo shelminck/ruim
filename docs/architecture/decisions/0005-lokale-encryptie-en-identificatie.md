@@ -60,6 +60,10 @@ Los van de algemene sessie-ontgrendeling: her-authenticatie (PIN/biometrie) vlak
 
 Nieuw scherm met **Beveiliging** (status, PIN wijzigen, biometrie aan/uit), **Gezinsleden** (lijst, toevoegen/bewerken, geen rechten) en **Synchronisatie** (aan/uit, wachtwoord wijzigen, apparaat toevoegen, verbonden apparaten met intrekken-actie, geavanceerd/relay-endpoint uitklapper). Bewust gescheiden omdat ze verschillende dingen beschermen.
 
+**Implementatiestap 7 (deel 1 — Beveiliging + Gezinsleden):** `pages/account.vue` bevat nu de eerste twee secties. Beveiliging: een statusregel gebaseerd op een nieuwe, losse `useSecurityCheckStatus()` (localStorage, per-device) die bij élke ontgrendeling wordt bijgewerkt — niet hetzelfde als `SecurityConsentLog`, dat alleen een rij krijgt zodra een signaal daadwerkelijk afgaat én bevestigd is, dus op een schoon toestel bestaat mogelijk nooit zo'n rij. Pincode wijzigen (`changePin()` in keyring.ts, wrapt dezelfde DEK opnieuw, geen nieuwe DEK) en biometrie aan/uit (`disableBiometric()`, nieuw naast het al bestaande `setupBiometric()`) roepen beide eerst `useReauthGuard().requireReauth(...)` aan — de eerste echte aanroeper van de in stap 6 gebouwde, tot dusver ongebruikte infrastructuur. Gezinsleden: lijst, toevoegen (al bestaand via `createGezinslid`), bewerken (nieuwe `updateGezinslid()`) en verwijderen (`removeGezinslid`, bestond al maar had nog geen UI-aanroeper).
+
+**Synchronisatie is bewust nog niet gebouwd**, ook niet als lege placeholder-UI: er bestaat nog helemaal geen sync-cliënt in de PWA (ADR 0004 is alleen een relay-scaffold), dus een "aan/uit"-schakelaar zou niets aansturen. De sectie toont een korte tekstuele uitleg in plaats van nagebouwde UI zonder functie. Blokkeert nog steeds op het open punt hieronder.
+
 ## Overwogen alternatieven
 
 - **SQLCipher-achtige aanpassing van sql.js** — versleuteling dieper in de SQL-engine, maar grotere, moeilijker te reviewen wijziging voor hetzelfde resultaat. Verworpen ten gunste van een encryptielaag om de geserialiseerde blob.

@@ -18,6 +18,11 @@ export async function createGezinslid(naam: string, avatarKleur: string): Promis
   return gezinslid
 }
 
+export async function updateGezinslid(id: string, naam: string, avatarKleur: string): Promise<void> {
+  const db = await getDb()
+  await db.put('gezinsleden', { id, naam, avatarKleur })
+}
+
 export async function removeGezinslid(id: string): Promise<void> {
   const db = await getDb()
   await db.delete('gezinsleden', id)
