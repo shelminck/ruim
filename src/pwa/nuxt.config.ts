@@ -1,7 +1,20 @@
+import { readFileSync } from 'node:fs'
+
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8')) as { version: string }
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-01-01',
   ssr: false,
   devtools: { enabled: true },
+
+  runtimeConfig: {
+    public: {
+      // Used by the tamper-heuristic consent flow (ADR 0005 §3) to decide
+      // whether a re-triggered signal is "new" (different app version) or
+      // already acknowledged.
+      appVersion: pkg.version,
+    },
+  },
 
   css: ['~/assets/css/tokens.css', '~/assets/css/base.css'],
 
