@@ -5,6 +5,10 @@ import AppMobileTabBar from '../components/AppMobileTabBar.vue'
 import GezinslidPicker from '../components/GezinslidPicker.vue'
 import UnlockGate from '../components/UnlockGate.vue'
 import TamperConsentGate from '../components/TamperConsentGate.vue'
+import ReauthModal from '../components/ReauthModal.vue'
+import { useFocusLock } from '../composables/useFocusLock'
+
+useFocusLock()
 </script>
 
 <template>
@@ -18,6 +22,7 @@ import TamperConsentGate from '../components/TamperConsentGate.vue'
     <GezinslidPicker />
     <UnlockGate />
     <TamperConsentGate />
+    <ReauthModal />
   </div>
 </template>
 

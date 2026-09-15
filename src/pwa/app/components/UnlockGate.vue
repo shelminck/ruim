@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { hasKeyring, setupPin, unlockWithPin } from '../lib/crypto/keyring'
-import {
-  hasBiometric,
-  isPlatformAuthenticatorAvailable,
-  setupBiometric,
-  unlockWithBiometric,
-} from '../lib/crypto/webauthn'
+import { onMounted, ref } from 'vue'
+import { hasKeyring, setupPin } from '../lib/crypto/keyring'
+import { isPlatformAuthenticatorAvailable, setupBiometric } from '../lib/crypto/webauthn'
 import { useUnlockSession } from '../lib/crypto/session'
+import PinUnlockForm from './PinUnlockForm.vue'
 
 const { isUnlocked, unlock } = useUnlockSession()
 
@@ -19,46 +15,14 @@ const confirmPin = ref('')
 const error = ref<string | null>(null)
 const busy = ref(false)
 
-const biometricEnabled = ref(false)
-const biometricBusy = ref(false)
 // Holds the freshly-generated DEK between PIN setup and the biometric offer
 // step — the offer is skippable, but either way the DEK it was created with
 // must be the one that gets unlocked, not a second freshly generated one.
 const pendingDek = ref<Uint8Array | null>(null)
 
-// In-memory only, resets on reload — Argon2id's own cost per attempt (see
-// keyring.ts) is the primary brake, this is a UX nudge on top, not the
-// security boundary itself.
-const failedAttempts = ref(0)
-const backoffMs = computed(() => (failedAttempts.value <= 2 ? 0 : Math.min(500 * 2 ** (failedAttempts.value - 2), 8000)))
-
 onMounted(async () => {
-  if (!(await hasKeyring())) {
-    mode.value = 'setup'
-    return
-  }
-  mode.value = 'unlock'
-  biometricEnabled.value = await hasBiometric()
-  if (biometricEnabled.value) {
-    // Auto-triggered on entry per the hand-off's unlock-screen spec — the
-    // PIN field underneath is the silent fallback if this is declined/fails.
-    attemptBiometricUnlock(true)
-  }
+  mode.value = (await hasKeyring()) ? 'unlock' : 'setup'
 })
-
-async function attemptBiometricUnlock(silent: boolean) {
-  biometricBusy.value = true
-  try {
-    const dek = await unlockWithBiometric()
-    if (dek) {
-      unlock(dek)
-    } else if (!silent) {
-      error.value = 'Niet gelukt. Gebruik je pincode.'
-    }
-  } finally {
-    biometricBusy.value = false
-  }
-}
 
 async function enableBiometric() {
   if (!pendingDek.value) return
@@ -106,27 +70,6 @@ async function submitSetup() {
     busy.value = false
   }
 }
-
-async function submitUnlock() {
-  error.value = null
-  if (backoffMs.value > 0) return
-  busy.value = true
-  try {
-    const dek = await unlockWithPin(pin.value)
-    if (dek) {
-      unlock(dek)
-    } else {
-      failedAttempts.value += 1
-      error.value = 'Onjuiste pincode.'
-      pin.value = ''
-      if (backoffMs.value > 0) {
-        await new Promise((resolve) => setTimeout(resolve, backoffMs.value))
-      }
-    }
-  } finally {
-    busy.value = false
-  }
-}
 </script>
 
 <template>
@@ -138,7 +81,7 @@ async function submitUnlock() {
           Je gegevens staan straks versleuteld op dit toestel. Kies een pincode om ze te ontgrendelen — zonder
           pincode kun je niet meer bij je data, dus bewaar 'm goed.
         </p>
-        <form class="pin-form" @submit.prevent="submitSetup">
+        <form class="pin-form" novalidate @submit.prevent="submitSetup">
           <input
             v-model="pin"
             type="password"
@@ -174,32 +117,7 @@ async function submitUnlock() {
 
       <template v-else-if="mode === 'unlock'">
         <h2 class="title">Ontgrendelen</h2>
-        <template v-if="biometricEnabled">
-          <p class="sub">Ontgrendel met vingerafdruk of gezicht, of gebruik je pincode.</p>
-          <button
-            type="button"
-            class="primary-button"
-            :disabled="biometricBusy"
-            @click="attemptBiometricUnlock(false)"
-          >
-            Ontgrendel met vingerafdruk / gezicht
-          </button>
-        </template>
-        <p v-else class="sub">Voer je pincode in om verder te gaan.</p>
-        <form class="pin-form" @submit.prevent="submitUnlock">
-          <input
-            v-model="pin"
-            type="password"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            placeholder="Pincode"
-            class="input"
-            autocomplete="current-password"
-            autofocus
-          />
-          <p v-if="error" class="error-line">{{ error }}</p>
-          <button type="submit" class="primary-button" :disabled="busy || backoffMs > 0">Ontgrendelen</button>
-        </form>
+        <PinUnlockForm @unlocked="unlock" />
       </template>
     </div>
   </div>

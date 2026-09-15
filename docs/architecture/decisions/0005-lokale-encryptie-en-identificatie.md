@@ -54,6 +54,8 @@ Page Visibility API vergrendelt direct bij focusverlies/scherm uit (niet pas na 
 
 Los van de algemene sessie-ontgrendeling: her-authenticatie (PIN/biometrie) vlak vóór gevoelige acties, ook als de sessie al ontgrendeld is. Minimaal: sync-wachtwoord tonen/wijzigen, toetredings-QR tonen, apparaat intrekken, PIN wijzigen, biometrie aan/uit, toekomstige export.
 
+**Implementatiestap 6:** `lock()` (session.ts) zet alleen de sessie-vlag terug — de al-ontsleutelde sql.js-database blijft in het geheugen staan, dat wordt hier bewust niet aangepakt (zie "Bekende beperkingen" hieronder: een geheugenlezende aanvaller is toch al geen dreiging waartegen dit ontwerp beschermt). Vergrendelen dwingt alleen `UnlockGate` weer af, niet een echte re-encryptie. De idle-timeout staat vast op 5 minuten (`useFocusLock.ts`), nog niet instelbaar — er is nog geen instellingenscherm om dat aan te bieden (dat is stap 7). Her-authenticatie is gebouwd als herbruikbare infrastructuur (`useReauthGuard` + `ReauthModal.vue`, met de PIN/biometrie-UI zelf gedeeld met `UnlockGate` via `PinUnlockForm.vue`), maar heeft nog geen enkele aanroeper: geen van de genoemde gevoelige acties (sync-wachtwoord, apparaat intrekken, PIN wijzigen, biometrie aan/uit) bestaat al in de UI — die komen pas met de accountpagina in stap 7, die deze guard dan aanroept.
+
 ### 6. Accountpagina: drie gescheiden secties
 
 Nieuw scherm met **Beveiliging** (status, PIN wijzigen, biometrie aan/uit), **Gezinsleden** (lijst, toevoegen/bewerken, geen rechten) en **Synchronisatie** (aan/uit, wachtwoord wijzigen, apparaat toevoegen, verbonden apparaten met intrekken-actie, geavanceerd/relay-endpoint uitklapper). Bewust gescheiden omdat ze verschillende dingen beschermen.
