@@ -213,7 +213,7 @@
     <div class="section-label"><span>01 — UITGANGSPUNT</span><span>PRINCIPE</span></div>
     <h2>Lokaal-eerst, geen server nodig om te beginnen</h2>
     <p class="lede">De volledige app — rekeningen, potjes, MT940-import, categorisatie en de uitvallijst — draait op het apparaat zelf. Er is geen backend nodig om de app te gebruiken. Twee losse, optionele uitbreidingen komen daar bovenop: versleutelde synchronisatie tussen apparaten binnen een gezin, en een lokale MCP-server waarmee een AI-client zoals Claude met de eigen data kan werken.</p>
-    <p class="note">De lokale data staat inmiddels ook zelf versleuteld op het apparaat (niet alleen tijdens sync): een sql.js/SQLite-blob, per sessie ontgrendeld met een pincode (Argon2id-afgeleide sleutel, XChaCha20-Poly1305) — zie ADR 0005 en ADR 0006. Een gezinslid-profiel (wie ben je) is daarbij puur informatief en geen aparte toegangsgrens.</p>
+    <p class="note">De lokale data staat inmiddels ook zelf versleuteld op het apparaat (niet alleen tijdens sync): een sql.js/SQLite-blob, per sessie ontgrendeld met een pincode (Argon2id-afgeleide sleutel, XChaCha20-Poly1305), optioneel aangevuld met biometrie via de WebAuthn PRF-extensie — zie ADR 0005 en ADR 0006. Een gezinslid-profiel (wie ben je) is daarbij puur informatief en geen aparte toegangsgrens. Let op: een passkey-beherende browserextensie (Proton Pass, 1Password, Bitwarden e.d.) kan de WebAuthn-aanroep onderscheppen — "biometrie" is dan feitelijk gebonden aan die extensie-vault in plaats van aan toestelhardware. De pincode blijft in alle gevallen de garantie, biometrie is en blijft puur een optioneel gemak erbovenop.</p>
   </section>
 
   <section>
