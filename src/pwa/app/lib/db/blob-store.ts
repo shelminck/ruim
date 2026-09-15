@@ -12,6 +12,15 @@ export interface Keyring {
   salt: Uint8Array
   /** nonce (crypto_aead_xchacha20poly1305_ietf_NPUBBYTES) + ciphertext, wrapping the DEK under the PIN-derived key. */
   wrappedDek: Uint8Array
+  /** Optional WebAuthn PRF-based unlock, additive to the PIN, never a replacement — ADR 0005 §2. Absent when biometry hasn't been set up on this device. */
+  biometric?: {
+    /** WebAuthn credential id (`rawId`), needed to target the right platform authenticator on each unlock. */
+    credentialId: Uint8Array
+    /** Fixed per credential so the PRF eval returns the same secret on every unlock. */
+    salt: Uint8Array
+    /** nonce + ciphertext, wrapping the DEK under a key derived from the PRF secret. */
+    wrappedDek: Uint8Array
+  }
 }
 
 /**
