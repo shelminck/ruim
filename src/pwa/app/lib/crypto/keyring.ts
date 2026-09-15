@@ -45,3 +45,16 @@ export async function unlockWithPin(pin: string): Promise<Uint8Array | null> {
   const pinKey = await deriveKeyFromPin(pin, keyring.salt)
   return unwrapDek(keyring.wrappedDek, pinKey)
 }
+
+/** Re-wraps the already-unlocked DEK under a new PIN — the DEK itself, and thus the encrypted blob, never changes. Caller is expected to have already re-authenticated (ADR 0005 §5). */
+export async function changePin(dek: Uint8Array, newPin: string): Promise<void> {
+  const keyring = await readKeyring()
+  if (!keyring) throw new Error('No keyring to update — call hasKeyring() first')
+
+  const sodium = await getSodium()
+  const salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES)
+  const pinKey = await deriveKeyFromPin(newPin, salt)
+  const wrappedDek = await wrapDek(dek, pinKey)
+
+  await writeKeyring({ ...keyring, salt, wrappedDek })
+}

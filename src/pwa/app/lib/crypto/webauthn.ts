@@ -40,6 +40,15 @@ export async function hasBiometric(): Promise<boolean> {
   return keyring?.biometric !== undefined
 }
 
+/** Removes the biometric unlock path — the PIN keeps working unchanged. Caller is expected to have already re-authenticated (ADR 0005 §5). */
+export async function disableBiometric(): Promise<void> {
+  const keyring = await readKeyring()
+  if (!keyring?.biometric) return
+  const rest = { ...keyring }
+  delete rest.biometric
+  await writeKeyring(rest)
+}
+
 /**
  * Registers a platform credential and, only if it actually supports the PRF
  * extension (not guaranteed just because a platform authenticator exists —

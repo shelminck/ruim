@@ -39,6 +39,7 @@ const secondaryNav = computed(() => [
   { to: '/inkomen', label: 'Inkomen', value: formatEuros(basisCents.value) },
   { to: '/labels', label: 'Labels', value: String(labelCount.value) },
   { to: '/importeren', label: 'MT940 importeren', value: '' },
+  { to: '/account', label: 'Account', value: '' },
 ])
 
 function badgeLabel(value: number): string {
