@@ -1,6 +1,7 @@
 import { getSodium } from './sodium'
 import { wrapDek, unwrapDek } from './dek-wrap'
 import { readKeyring, writeKeyring } from '../db/blob-store'
+import { evaluateAttestation } from '../security/tamper-heuristic'
 
 const RP_NAME = 'ruim'
 const PRF_SALT_BYTES = 32
@@ -61,9 +62,10 @@ export async function setupBiometric(dek: Uint8Array): Promise<boolean> {
           { type: 'public-key', alg: -257 }, // RS256
         ],
         authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'required' },
-        // Attestation feeds the tamper-heuristiek from ADR 0005 §3, which is
-        // a later build step — 'none' is enough for a PRF-only credential now.
-        attestation: 'none',
+        // 'direct' feeds the tamper-heuristiek from ADR 0005 §3 — many
+        // platform authenticators still return a 'none'-shaped attestation
+        // anyway for privacy reasons, which is itself the (weak) signal.
+        attestation: 'direct',
         extensions: { prf: {} },
       },
     })) as PublicKeyCredential | null
@@ -82,9 +84,12 @@ export async function setupBiometric(dek: Uint8Array): Promise<boolean> {
   const wrapKey = sodium.crypto_generichash(sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES, secret, null)
   const wrappedDek = await wrapDek(dek, wrapKey)
 
+  const attestationResponse = credential.response as AuthenticatorAttestationResponse
+  const attestationLooksGenuine = evaluateAttestation(attestationResponse.attestationObject).length === 0
+
   const keyring = await readKeyring()
   if (!keyring) throw new Error('No PIN keyring to attach biometry to — set up a PIN first')
-  await writeKeyring({ ...keyring, biometric: { credentialId, salt, wrappedDek } })
+  await writeKeyring({ ...keyring, biometric: { credentialId, salt, wrappedDek, attestationLooksGenuine } })
   return true
 }
 

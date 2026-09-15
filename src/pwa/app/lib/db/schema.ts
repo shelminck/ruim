@@ -9,6 +9,7 @@ import type {
   Label,
   MonthlyAdjustment,
   Rule,
+  SecurityConsentLog,
   Subscription,
   TaskState,
   Transaction,
@@ -90,5 +91,9 @@ export interface RuimDB {
   windfallPolicy: {
     key: string
     value: WindfallPolicy
+  }
+  securityConsentLog: {
+    key: string
+    value: SecurityConsentLog
   }
 }

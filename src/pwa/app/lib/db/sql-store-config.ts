@@ -49,6 +49,7 @@ export const STORE_DEFS: StoreDef[] = [
   { name: 'investing', keyPath: 'id', extraColumns: [], indexes: [] },
   { name: 'monthlyAdjustments', keyPath: 'month', extraColumns: [], indexes: [] },
   { name: 'windfallPolicy', keyPath: 'id', extraColumns: [], indexes: [] },
+  { name: 'securityConsentLog', keyPath: 'id', extraColumns: [], indexes: [] },
 ]
 
 export function createTableSql(def: StoreDef): string[] {

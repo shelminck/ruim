@@ -186,3 +186,17 @@ export interface Gezinslid {
   /** One of AVATAR_KLEUREN in lib/domain/gezinslid.ts, e.g. 'accent-300'. */
   avatarKleur: string
 }
+
+/**
+ * One row per time the user acknowledged the tamper-heuristic consent modal
+ * — never blocks, just a record for support purposes. See ADR 0005 §3.
+ */
+export interface SecurityConsentLog {
+  id: string
+  timestamp: string
+  /** Which lib/security/tamper-heuristic.ts signals triggered — see TamperSignal. */
+  heuristieken: string[]
+  appVersie: string
+  /** Random, not derived from any real device identifier — see blob-store.ts getOrCreateDeviceHash(). */
+  toestelHash: string
+}

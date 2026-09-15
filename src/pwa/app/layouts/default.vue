@@ -4,6 +4,7 @@ import AppSidebar from '../components/AppSidebar.vue'
 import AppMobileTabBar from '../components/AppMobileTabBar.vue'
 import GezinslidPicker from '../components/GezinslidPicker.vue'
 import UnlockGate from '../components/UnlockGate.vue'
+import TamperConsentGate from '../components/TamperConsentGate.vue'
 </script>
 
 <template>
@@ -16,6 +17,7 @@ import UnlockGate from '../components/UnlockGate.vue'
     <AppMobileTabBar class="tab-bar-slot" />
     <GezinslidPicker />
     <UnlockGate />
+    <TamperConsentGate />
   </div>
 </template>
 

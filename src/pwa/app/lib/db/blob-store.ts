@@ -6,6 +6,7 @@ const BLOB_STORE = 'blob'
 const BLOB_KEY = 'db'
 const KEYRING_STORE = 'keyring'
 const KEYRING_KEY = 'keyring'
+const DEVICE_HASH_KEY = 'device-hash'
 
 export interface Keyring {
   /** Argon2id salt for deriving a key from the PIN — crypto_pwhash_SALTBYTES. */
@@ -20,6 +21,8 @@ export interface Keyring {
     salt: Uint8Array
     /** nonce + ciphertext, wrapping the DEK under a key derived from the PRF secret. */
     wrappedDek: Uint8Array
+    /** Result of lib/security/tamper-heuristic.ts evaluateAttestation() at credential-creation time — feeds the tamper-heuristiek consent flow, ADR 0005 §3. */
+    attestationLooksGenuine: boolean
   }
 }
 
@@ -71,6 +74,22 @@ export async function readKeyring(): Promise<Keyring | undefined> {
 export async function writeKeyring(keyring: Keyring): Promise<void> {
   const db = await openBlobDb()
   await db.put(KEYRING_STORE, keyring, KEYRING_KEY)
+}
+
+/**
+ * A random id generated once per device, not derived from any real hardware
+ * identifier — "niet-herleidbare toestel-hash" (ADR 0005 §3). Only used to
+ * correlate multiple SecurityConsentLog entries from the same device for
+ * support purposes. Lives alongside the keyring since it's needed before
+ * (and independent of) any unlock.
+ */
+export async function getOrCreateDeviceHash(): Promise<string> {
+  const db = await openBlobDb()
+  const existing = await db.get(KEYRING_STORE, DEVICE_HASH_KEY)
+  if (existing) return existing
+  const hash = crypto.randomUUID()
+  await db.put(KEYRING_STORE, hash, DEVICE_HASH_KEY)
+  return hash
 }
 
 /** Test-only: force a fresh connection (e.g. after resetting fake-indexeddb between tests). */
